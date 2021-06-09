@@ -1,1 +1,8 @@
-# remoteok_react_node
+# Job Board
+
+## Technologies
+
+```
+React/TailwindUI
+NodeJS/Mongodb
+```
