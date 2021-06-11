@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
 import {
@@ -12,7 +12,9 @@ import * as Yup from "yup";
 import classNames from "classnames";
 import DropzoneUploader from "../DropzoneUploader/DropzoneUploader";
 import Editor from "../MDEditor/Editor";
-import { useJob } from "../../contexts/jobContext";
+import { useJobPost } from "../../contexts/jobContext";
+import { Link } from "react-router-dom";
+import JobPostDesign from "../JobPostDesign/JobPostDesign";
 
 const salaryOptions = Array(21)
   .fill(null)
@@ -35,7 +37,7 @@ const primaryTagOptions = [
 
 export default function JobPostForm(props) {
   const { open, setOpen } = props;
-  const { job, setJob } = useJob();
+  const { state, dispatch } = useJobPost();
 
   const validationSchema = Yup.object().shape({
     companyName: Yup.string().required("Company Name is required"),
@@ -82,22 +84,32 @@ export default function JobPostForm(props) {
 
   const { errors } = formState;
 
+  useEffect(() => {
+    dispatch({
+      type: "RESET_JOB",
+    });
+  }, []);
+
   function handleChange(fieldName, value) {
     if (fieldName === "tags") {
-      let { tags } = job;
+      console.log("JobPostForm:useJobPost", state);
 
+      let { tags } = state;
       tags = value.split(",").filter((tag) => tag !== "");
-      console.log("handleChange", tags);
-      setJob({
-        ...job,
-        tags,
+
+      dispatch({
+        type: "UPDATE_JOB_DETAIL",
+        payload: {
+          tags,
+        },
       });
       return;
     }
-
-    setJob({
-      ...job,
-      [fieldName]: value,
+    dispatch({
+      type: "UPDATE_JOB_DETAIL",
+      payload: {
+        [fieldName]: value,
+      },
     });
   }
 
@@ -121,7 +133,14 @@ export default function JobPostForm(props) {
                 Post a new job
               </Dialog.Title>
             </div>
+
             <div className="h-7 flex items-center">
+              <Link
+                to="/buy-bundle"
+                className="mr-4 inline-flex font-sans justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Buy a bundle
+              </Link>
               <button
                 type="button"
                 className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -230,7 +249,7 @@ export default function JobPostForm(props) {
               >
                 <option value="">Select a primary tag</option>
                 {primaryTagOptions.map((tag, index) => (
-                  <option key={index} value="dev">
+                  <option key={index} value={tag}>
                     {tag}
                   </option>
                 ))}
@@ -327,6 +346,8 @@ export default function JobPostForm(props) {
           </div>
         </div>
 
+        {/* Job Post design */}
+        <JobPostDesign />
         {/* Job detail container */}
         <div className="relative mt-6 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
           <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-2  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white ">
@@ -671,10 +692,10 @@ export default function JobPostForm(props) {
           {/* Pay option */}
           <div className="space-y-1 px-4 sm:space-y-0 flex justify-items-center sm:gap-4 sm:px-6 sm:py-5">
             <input
+              id="payLater"
               name="payLater"
               type="checkbox"
               {...register("payLater")}
-              id="acceptTerms"
               className={` my-auto block shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                 errors.payLater ? "bg-error" : ""
               }`}
@@ -694,7 +715,7 @@ export default function JobPostForm(props) {
             type="submit"
             className="inline-flex full-width justify-center px-12 py-5 border border-transparent shadow-sm text-3xl font-bold rounded-md text-white bg-orange hover:bg-white hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Post your job — $<span className="font-bold">299</span>{" "}
+            Post your job — $<span className="font-bold">{state.price}</span>{" "}
           </button>
         </div>
       </div>
