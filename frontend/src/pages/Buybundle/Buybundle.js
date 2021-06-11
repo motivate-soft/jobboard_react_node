@@ -28,7 +28,7 @@ export default function Buybundle() {
         <JobPostDesign />
       </div>
       <button className="mx-auto mb-20 px-4 py-4 max-w-lg inline-flex font-sans text-3xl justify-center  border border-transparent shadow-sm font-medium rounded-xl text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        Buy <span>{size}</span>-jobs bundle — $<span>{price}</span>
+        Buy{" "}<span>{size}</span>-jobs bundle — $<span>{price}</span>
       </button>
       <JosPostPreview />
     </div>
