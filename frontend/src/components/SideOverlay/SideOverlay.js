@@ -20,7 +20,7 @@ export default function SideOverlay(props) {
           <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex sm:pl-24">
             <Transition.Child
               as={"div"}
-              className="w-screen max-w-2xl relative border-l border-gray-200"
+              className="w-screen max-w-3xl relative border-l border-gray-200"
               enter="transform transition ease-in-out duration-500 sm:duration-700"
               enterFrom="translate-x-full"
               enterTo="translate-x-0"

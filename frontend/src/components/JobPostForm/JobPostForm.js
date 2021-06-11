@@ -713,7 +713,7 @@ export default function JobPostForm(props) {
         <div className="space-x-3 flex justify-center">
           <button
             type="submit"
-            className="inline-flex full-width justify-center px-12 py-5 border border-transparent shadow-sm text-3xl font-bold rounded-md text-white bg-orange hover:bg-white hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex full-width justify-center px-12 py-5 border border-transparent shadow-sm text-3xl font-bold rounded-md text-white bg-indigo-500 hover:bg-white hover:text-indigo-500 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Post your job — $<span className="font-bold">{state.price}</span>{" "}
           </button>

@@ -31,7 +31,7 @@ export default function JobPostDesign() {
   }
 
   return (
-    <div className="relative mt-20 px-12 pt-0 pb-6 border-2 border-gray-200 rounded-md">
+    <div className="relative px-12 pt-0 pb-6 border-2 border-gray-200 rounded-md">
       <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white ">
         <h5 className="uppercase font-bold">DESIGN YOUR JOB POSTS</h5>
       </div>
