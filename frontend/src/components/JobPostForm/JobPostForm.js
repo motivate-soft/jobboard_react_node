@@ -12,13 +12,31 @@ import * as Yup from "yup";
 import classNames from "classnames";
 import DropzoneUploader from "../DropzoneUploader/DropzoneUploader";
 import Editor from "../MDEditor/Editor";
+import { useJob } from "../../contexts/jobContext";
 
 const salaryOptions = Array(21)
   .fill(null)
   .map((u, i) => i * 10000);
 
+const primaryTagOptions = [
+  "Software Development",
+  "Customer Support",
+  "Sales",
+  "Marketing",
+  "Design",
+  "Front End",
+  "Back End",
+  "Legal",
+  "Testing",
+  "Quality Assurance",
+  "Non-Tech",
+  "Other",
+];
+
 export default function JobPostForm(props) {
   const { open, setOpen } = props;
+  const { job, setJob } = useJob();
+
   const validationSchema = Yup.object().shape({
     companyName: Yup.string().required("Company Name is required"),
     position: Yup.string().required("Position is required"),
@@ -63,6 +81,25 @@ export default function JobPostForm(props) {
   );
 
   const { errors } = formState;
+
+  function handleChange(fieldName, value) {
+    if (fieldName === "tags") {
+      let { tags } = job;
+
+      tags = value.split(",").filter((tag) => tag !== "");
+      console.log("handleChange", tags);
+      setJob({
+        ...job,
+        tags,
+      });
+      return;
+    }
+
+    setJob({
+      ...job,
+      [fieldName]: value,
+    });
+  }
 
   function onSubmit(data) {
     // display form data on success
@@ -121,6 +158,7 @@ export default function JobPostForm(props) {
                 className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                   errors.companyName ? "bg-error" : ""
                 }`}
+                onChange={(e) => handleChange("companyName", e.target.value)}
               />
             </div>
             <div className="flex flex-col">
@@ -145,15 +183,15 @@ export default function JobPostForm(props) {
               </label>
             </div>
             <div>
-              <textarea
+              <input
                 {...register("position")}
                 id="position"
                 name="position"
-                rows={3}
+                type="text"
                 className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                   errors.position ? "bg-error" : ""
                 }`}
-                defaultValue={""}
+                onChange={(e) => handleChange("position", e.target.value)}
               />
             </div>
             <div className="flex flex-col">
@@ -188,20 +226,14 @@ export default function JobPostForm(props) {
                 className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                   errors.primaryTag ? "bg-error" : ""
                 }`}
+                onChange={(e) => handleChange("primaryTag", e.target.value)}
               >
                 <option value="">Select a primary tag</option>
-                <option value="dev">Software Development</option>
-                <option value="customer support">Customer Support</option>
-                <option value="sales">Sales</option>
-                <option value="marketing">Marketing</option>
-                <option value="design">Design</option>
-                <option value="front end">Front End</option>
-                <option value="backend">Back End</option>
-                <option value="legal">Legal</option>
-                <option value="testing">Testing</option>
-                <option value="quality assurance">Quality Assurance</option>
-                <option value="non tech">Non-Tech</option>
-                <option value="other">Other</option>
+                {primaryTagOptions.map((tag, index) => (
+                  <option key={index} value="dev">
+                    {tag}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex flex-col">
@@ -236,6 +268,7 @@ export default function JobPostForm(props) {
                 className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                   errors.tags ? "bg-error" : ""
                 }`}
+                onChange={(e) => handleChange("tags", e.target.value)}
               />
             </div>
             <div className="flex flex-col">
@@ -273,6 +306,7 @@ export default function JobPostForm(props) {
                 className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
                   errors.location ? "bg-error" : ""
                 }`}
+                onChange={(e) => handleChange("location", e.target.value)}
               />
             </div>
             <div className="flex flex-col">
@@ -339,7 +373,9 @@ export default function JobPostForm(props) {
                 >
                   <option value="">Minimum per year</option>
                   {salaryOptions.map((value, index) => (
-                    <option value={value}>USD {value} per year</option>
+                    <option key={index} value={value}>
+                      USD {value} per year
+                    </option>
                   ))}
                 </select>
                 <div className="flex flex-col">
@@ -359,7 +395,9 @@ export default function JobPostForm(props) {
                 >
                   <option value="">Maximum per year</option>
                   {salaryOptions.map((value, index) => (
-                    <option value={value}>USD {value} per year</option>
+                    <option key={index} value={value}>
+                      USD {value} per year
+                    </option>
                   ))}
                 </select>
                 <div className="flex flex-col">
@@ -656,7 +694,7 @@ export default function JobPostForm(props) {
             type="submit"
             className="inline-flex full-width justify-center px-12 py-5 border border-transparent shadow-sm text-3xl font-bold rounded-md text-white bg-orange hover:bg-white hover:text-orange transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Post your job — $<span class="price">299</span>{" "}
+            Post your job — $<span className="font-bold">299</span>{" "}
           </button>
         </div>
       </div>
