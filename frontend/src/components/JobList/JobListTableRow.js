@@ -1,9 +1,12 @@
 import React from "react";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import jobActions from "../../redux/jobs/actions";
 
 export default function JobListTableRow(props) {
   const { job } = props;
   const {
+    id,
     logo,
     companyName,
     position,
@@ -22,6 +25,8 @@ export default function JobListTableRow(props) {
     isStickyMonth,
     postedAt,
   } = job;
+
+  const dispatch = useDispatch();
 
   function createHighlightStyle() {
     console.log("createHighlightStyle", isHighlight);
@@ -47,6 +52,10 @@ export default function JobListTableRow(props) {
       return <span className="mr-3">📌 {leftDays}d</span>;
     }
     return;
+  }
+
+  function handleClick(id) {
+    dispatch(jobActions.getJob(id));
   }
 
   return (
@@ -106,6 +115,7 @@ export default function JobListTableRow(props) {
               ? "bg-white text-indigo-500"
               : "bg-indigo-500 text-white"
           } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+          onClick={() => handleClick(id)}
         >
           Apply
         </button>
