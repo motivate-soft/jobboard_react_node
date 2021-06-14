@@ -1,42 +1,109 @@
+import moment from "moment";
 import React from "react";
-import { useJobPost } from "../../contexts/jobContext";
 
 export default function JosListCard(props) {
-  const { state: job } = useJobPost();
+  const {
+    logo,
+    companyName,
+    position,
+    primaryTag,
+    tags,
+    location,
+    minSalary,
+    maxSalary,
+    howtoApply,
+    isShowLogo,
+    isHighlight,
+    highlightColor,
+    isHighlightColor,
+    isStickyDay,
+    isStickyWeek,
+    isStickyMonth,
+    postedAt,
+  } = props.job;
 
-  console.log("JosPostPreview", job);
+  function createHighlightStyle() {
+    console.log("createHighlightStyle", isHighlight);
+    if (isHighlight) {
+      return {
+        backgroundColor: "#fff9c9",
+      };
+    }
+    if (isHighlightColor) {
+      return {
+        backgroundColor: highlightColor,
+      };
+    }
+    return;
+  }
+
+  function renderStickyWidget() {
+    if (isStickyWeek && postedAt) {
+      const leftDays = moment(postedAt).add(7, "d").diff(moment.now(), "d");
+      return <span className="mr-3">📌 {leftDays}d</span>;
+    }
+    if (isStickyMonth && postedAt) {
+      const leftDays = moment(postedAt).add(1, "M").diff(moment.now(), "d");
+      return <span className="mr-3">📌 {leftDays}d</span>;
+    }
+    return;
+  }
+
   return (
-    <div className="fixed left-0 right-0 bottom-0 px-10 py-4 bg-white border-t border-gray-200">
-      <div className="grid grid-cols-6">
+    <div
+      className="joblist-card mb-4 px-10 py-4 bg-white border border-gray-200 rounded-md"
+      style={createHighlightStyle()}
+      // style={{backgroundColor: "#fff9c9"}}
+    >
+      <div className="grid grid-cols-12">
         <div className="col-span-1">
-          <img src={job.logo} alt="company log" />
+          {isShowLogo ? (
+            <img src={logo ?? "/images/sample_logo.png"} alt="company log" />
+          ) : null}
         </div>
-        <div className="col-span-3 flex flex-col">
-          <h4>{job.companyName}</h4>
-          <div className="grid grid-cols-6">
-            <h4 className="font-bold text-2xl col-span-2">{job.position}</h4>
-            <div className="flex flex-wrap col-span-4">
-              {job.primaryTag && (
-                <div className="mr-1 mb-1 px-1 rounded border-black border-2">
-                  {job.primaryTag}
-                </div>
-              )}
-
-              {job.tags.map((tag, index) => (
-                <div
-                  key={index}
-                  className="mr-1 mb-1 px-1 rounded border-black border-2"
-                >
-                  {tag}
-                </div>
-              ))}
-            </div>
+        <div className="flex flex-col col-span-5">
+          <div>
+            <h4>{companyName}</h4>
           </div>
           <div>
+            <h4 className="font-bold text-xl">{position}</h4>
+          </div>
+          <div className="flex">
+            <div className="inline-flex mr-3 p-1 bg-gray-200 rounded">
+              🌏 {location}
+            </div>
             <div className="inline-flex p-1 bg-gray-200 rounded">
-              {job.location}
+              💰 ${minSalary / 1000}k - ${maxSalary / 1000}k
             </div>
           </div>
+        </div>
+        <div className="col-span-3 flex flex-wrap">
+          {primaryTag && (
+            <div className="mr-1 mb-1 px-1 max-h-7 rounded border-black border-2">
+              {primaryTag}
+            </div>
+          )}
+          {tags &&
+            tags.map((tag, index) => (
+              <div
+                key={index}
+                className="mr-1 mb-1 px-1 max-h-7 rounded border-black border-2"
+              >
+                {tag}
+              </div>
+            ))}
+        </div>
+        <div className="col-span-3">
+          {renderStickyWidget()}
+          <button
+            className={`apply-btn ${
+              isHighlight || isHighlightColor
+                ? "bg-indigo-500 text-white"
+                : "bg-white text-indigo-500"
+            } hidden mb-auto font-sans justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+          >
+            Apply
+          </button>
         </div>
       </div>
     </div>

@@ -3,8 +3,11 @@ import { useJobPost } from "../../contexts/jobContext";
 
 export default function JosPostPreview(props) {
   const { state: job } = useJobPost();
+  const { open } = props;
 
   console.log("JosPostPreview", job);
+  if (!open) return null;
+
   return (
     <div className="fixed left-0 right-0 bottom-0 px-10 py-4 bg-white border-t border-gray-200">
       <div className="grid grid-cols-6">

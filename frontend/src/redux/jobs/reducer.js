@@ -1,8 +1,9 @@
+import { singleJobData, jobsData } from "../data";
 import jobActions from "./actions";
 
 const initState = {
-  items: [],
-  selectedItem: "",
+  items: jobsData,
+  selectedItem: singleJobData,
   error: "",
   loading: false,
 };
@@ -92,7 +93,7 @@ export default function jobsReducer(state = initState, action) {
         error: action.error,
         loading: false,
       };
-      
+
     // Delete
     case jobActions.DELETE_JOB_REQUEST:
       return {
