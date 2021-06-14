@@ -3,12 +3,13 @@ import JosPostPreview from "../../components/JosPostPreview/JosPostPreview";
 import SideOverlay from "../../components/SideOverlay/SideOverlay";
 import JobPostForm from "../../components/JobPostForm/JobPostForm";
 import JobList from "../../components/JobList/JobList";
+import JobListTable from "../../components/JobList/JobListTable";
 
 export default function Home() {
   const [isJobpostOpened, setIsJobpostOpened] = useState(true);
 
   return (
-    <div className="relative flex flex-col h-screen pt-20">
+    <div className="relative flex flex-col h-screen pt-20 bg-gray-100">
       <button
         type="submit"
         className="mb-10 mr-auto ml-10  py-2 px-4 inline-flex font-sans justify-center border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -17,6 +18,7 @@ export default function Home() {
         Post a Job
       </button>
       <JobList />
+      <JobListTable />
       <SideOverlay open={isJobpostOpened} setOpen={setIsJobpostOpened}>
         <JobPostForm open={isJobpostOpened} setOpen={setIsJobpostOpened} />
       </SideOverlay>

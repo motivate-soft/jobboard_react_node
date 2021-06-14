@@ -24,17 +24,16 @@ export default function JosListCard(props) {
 
   function createHighlightStyle() {
     console.log("createHighlightStyle", isHighlight);
+    let bgColor = "#ffffff";
     if (isHighlight) {
-      return {
-        backgroundColor: "#fff9c9",
-      };
+      bgColor = "#fff9c9";
     }
     if (isHighlightColor) {
-      return {
-        backgroundColor: highlightColor,
-      };
+      bgColor = highlightColor;
     }
-    return;
+    return {
+      backgroundColor: bgColor,
+    };
   }
 
   function renderStickyWidget() {
@@ -51,7 +50,7 @@ export default function JosListCard(props) {
 
   return (
     <div
-      className="joblist-card mb-4 px-10 py-4 bg-white border border-gray-200 rounded-md"
+      className="joblist-card cursor-pointer mb-4 px-10 py-4 border border-gray-200 rounded-md"
       style={createHighlightStyle()}
       // style={{backgroundColor: "#fff9c9"}}
     >
@@ -98,9 +97,9 @@ export default function JosListCard(props) {
           <button
             className={`apply-btn ${
               isHighlight || isHighlightColor
-                ? "bg-indigo-500 text-white"
-                : "bg-white text-indigo-500"
-            } hidden mb-auto font-sans justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+                ? "bg-white text-indigo-500"
+                : "bg-indigo-500 text-white"
+            } hidden mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
           >
             Apply
           </button>

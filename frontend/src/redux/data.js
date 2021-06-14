@@ -45,12 +45,12 @@ export const jobsData = [
   {
     logo: "/images/sample_logo.png",
     companyName: "Nadine West",
-    position: "Position",
+    position: "Senior Full Stack Rails Developer",
     primaryTag: "Full stack",
     tags: ["ruby", "rails", "ecommerce"],
     location: "Worldwide",
-    minSalary: 50000,
-    maxSalary: 80000,
+    minSalary: 100000,
+    maxSalary: 150000,
     howtoApply:
       "Visit our [careers site](https://join.nadinewest.com/) to upload your resume. If your work experience suggests a potential match, you'll be invited to take a 10-hour, fully-paid [coding challenge](https://join.nadinewest.com/coding-challenge/). Top performers in the coding challenge will be invited to interview with the CEO and the tech leads.",
 
@@ -67,12 +67,12 @@ export const jobsData = [
   {
     logo: "/images/sample_logo.png",
     companyName: "Aliens.com",
-    position: "Position",
+    position: "Mobile Tech Lead",
     primaryTag: "exec",
     tags: ["tech lead", "mobile", "full stack"],
     location: "Worldwide",
-    minSalary: 50000,
-    maxSalary: 80000,
+    minSalary: 80000,
+    maxSalary: 120000,
     howtoApply:
       "Visit our [careers site](https://join.nadinewest.com/) to upload your resume. If your work experience suggests a potential match, you'll be invited to take a 10-hour, fully-paid [coding challenge](https://join.nadinewest.com/coding-challenge/). Top performers in the coding challenge will be invited to interview with the CEO and the tech leads.",
     isShowLogo: true,
