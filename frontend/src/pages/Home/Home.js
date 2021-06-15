@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import JosPostPreview from "../../components/JosPostPreview/JosPostPreview";
-import SideOverlay from "../../components/SideOverlay/SideOverlay";
+import SideOverlay from "../../components/Shared/SideOverlay/SideOverlay";
 import JobPostForm from "../../components/JobPostForm/JobPostForm";
 import JobList from "../../components/JobList/JobList";
 import JobListTable from "../../components/JobList/JobListTable";
