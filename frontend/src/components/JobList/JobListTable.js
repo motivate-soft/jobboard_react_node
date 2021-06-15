@@ -2,8 +2,13 @@ import React from "react";
 import { useSelector } from "react-redux";
 import JobListTableRow from "./JobListTableRow";
 
-export default function JobListTable() {
+export default function JobListTable(props) {
+  const { onClickRow } = props;
   const { items } = useSelector((state) => state.job);
+
+  function handleClick(id) {
+    onClickRow();
+  }
 
   return (
     <div className="container mx-auto flex flex-col">
@@ -44,7 +49,11 @@ export default function JobListTable() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {items.map((job, index) => (
-                  <JobListTableRow key={index} job={job} />
+                  <JobListTableRow
+                    key={index}
+                    job={job}
+                    onClick={handleClick}
+                  />
                 ))}
               </tbody>
             </table>

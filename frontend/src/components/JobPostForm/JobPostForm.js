@@ -1,20 +1,15 @@
-import { Fragment, useEffect, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
-import {
-  LinkIcon,
-  PlusIcon,
-  QuestionMarkCircleIcon,
-} from "@heroicons/react/solid";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import classNames from "classnames";
-import DropzoneUploader from "../DropzoneUploader/DropzoneUploader";
-import Editor from "../MDEditor/Editor";
-import { useJobPost } from "../../contexts/jobContext";
-import { Link } from "react-router-dom";
+import DropzoneUploader from "../Shared/DropzoneUploader/DropzoneUploader";
+import Editor from "../Shared/MDEditor/Editor";
 import JobPostDesign from "../JobPostDesign/JobPostDesign";
+import { useJobPost } from "../../contexts/jobContext";
+import classNames from "classnames";
 
 const salaryOptions = Array(21)
   .fill(null)
@@ -51,12 +46,12 @@ export default function JobPostForm(props) {
     jobDescription: Yup.string().required("Job description is required"),
     howtoApply: Yup.string().required("This field is required"),
     applyUrl: Yup.string().required("This field is required"),
-    applyEmail: Yup.string().required("This field description is required"),
+    applyEmail: Yup.string().required("This field is required"),
 
-    companyTwitter: Yup.string().required("This field description is required"),
-    companyEmail: Yup.string().required("This field description is required"),
-    invoiceAddress: Yup.string().required("This field description is required"),
-    invoiceNotes: Yup.string().required("This field description is required"),
+    companyTwitter: Yup.string().required("This field is required"),
+    companyEmail: Yup.string().required("This field is required"),
+    invoiceAddress: Yup.string().required("This field is required"),
+    invoiceNotes: Yup.string().required("This field is required"),
     payLater: Yup.bool(),
 
     // dob: Yup.string()
@@ -90,6 +85,10 @@ export default function JobPostForm(props) {
     });
   }, []);
 
+  useEffect(() => {
+    console.log("formState", formState);
+  });
+
   function handleChange(fieldName, value) {
     if (fieldName === "tags") {
       console.log("JobPostForm:useJobPost", state);
@@ -114,6 +113,7 @@ export default function JobPostForm(props) {
   }
 
   function onSubmit(data) {
+    console.log("onSubmit", data);
     // display form data on success
     alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
     return false;
@@ -154,7 +154,7 @@ export default function JobPostForm(props) {
         </div>
 
         {/* Job main info container */}
-        <div className="relative py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
+        <div className="relative mb-20 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
           <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white ">
             <h5 className="uppercase">LET'S START</h5>
           </div>
@@ -349,7 +349,7 @@ export default function JobPostForm(props) {
         {/* Job Post design */}
         <JobPostDesign />
         {/* Job detail container */}
-        <div className="relative mt-6 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
+        <div className="relative mt-20 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
           <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-2  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white ">
             <h5 className="uppercase">Job details</h5>
           </div>
@@ -431,55 +431,61 @@ export default function JobPostForm(props) {
           </div>
 
           {/* Job description*/}
-          {/* <div className="space-y-1 px-4 sm:space-y-0 flex flex-col sm:gap-4 sm:px-6 sm:py-5">
-          <div>
-            <label
-              htmlFor="jobDescription"
-              className="block font-bold text-lg uppercase text-gray-900 sm:mt-px sm:pt-2"
-            >
-              JOB DESCRIPTION*
-            </label>
+          <div className="space-y-1 px-4 sm:space-y-0 flex flex-col sm:gap-4 sm:px-6 sm:py-5">
+            <div>
+              <label
+                htmlFor="jobDescription"
+                className="block font-bold text-lg uppercase text-gray-900 sm:mt-px sm:pt-2"
+              >
+                JOB DESCRIPTION*
+              </label>
+            </div>
+            <div>
+              <Controller
+                control={control}
+                name="jobDescription"
+                // {...register("jobDescription")}
+                // rules={{
+                //   required: "Description must have some content.",
+                //   validate: (value) => {
+                //     console.log("Controller", value);
+                //     return (
+                //       value.split(" ").length > 10 ||
+                //       "Enter at least 10 words in the body."
+                //     );
+                //   },
+                // }}
+                render={({
+                  field: { onChange, onBlur, value, name, ref },
+                  fieldState: { invalid, isTouched, isDirty, error },
+                  formState,
+                }) => (
+                  <Editor
+                    onChange={(description, delta, source, editor) => {
+                      console.log(
+                        "onChange:description",
+                        description,
+                        delta,
+                        source,
+                        editor
+                      );
+                      console.log("inputRef", ref);
+                      onChange(description);
+                    }}
+                    value={value || ""}
+                    inputRef={ref}
+                    theme="snow"
+                    id="jobDescription"
+                  />
+                )}
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-indigo-500">
+                {errors.jobDescription?.message}
+              </span>
+            </div>
           </div>
-          <div>
-            <Controller
-              control={control}
-              name="jobDescription"
-              rules={{
-                required: "Description must have some content.",
-                validate: (value) => {
-                  console.log("Controller", value);
-                  return (
-                    value.split(" ").length > 10 ||
-                    "Enter at least 10 words in the body."
-                  );
-                },
-              }}
-              render={({
-                field: { onChange, onBlur, value, name, ref },
-                fieldState: {
-                  invalid,
-                  isTouched,
-                  isDirty,
-                  error,
-                },
-                formState,
-              }) => (
-                <Editor
-                  onChange={onChange}
-                  value={value}
-                  inputRef={ref}
-                  theme="snow"
-                  id="jobDescription"
-                />
-              )}
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-indigo-500">
-              {errors.jobDescription?.message}
-            </span>
-          </div>
-        </div> */}
 
           {/* How to apply*/}
           <div className="space-y-1 px-4 sm:space-y-0 flex flex-col sm:gap-4 sm:px-6 sm:py-5">

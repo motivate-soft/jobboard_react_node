@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import jobActions from "../../redux/jobs/actions";
 
 export default function JobListTableRow(props) {
-  const { job } = props;
+  const { job, onClick } = props;
   const {
     id,
     logo,
@@ -59,7 +59,11 @@ export default function JobListTableRow(props) {
   }
 
   return (
-    <tr style={createHighlightStyle()} className="text-gray-900">
+    <tr
+      style={createHighlightStyle()}
+      className="text-gray-900"
+      onClick={(e) => onClick(id)}
+    >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
