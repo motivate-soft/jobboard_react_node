@@ -50,9 +50,7 @@ const descriptionMD = `
 <p>Our business is backed by established and successful businesses, offering stability and security to our employees</p></div>
 `;
 
-const howtoApplyMD = `<div class="markdown"><h1 id="howdoyouapply">How do you apply?</h1>
-<pre><code>Make sure this job is the right fit for you, and make sure you’re the right fit for this job.
-</code></pre>
+const howtoApplyMD = `<div class="markdown">
 <p>Check out our <a href="https://alchemyandaim.com">website</a> and portfolio to see the type of projects we work on. If you’re interested in applying please send a cover letter via the application form on the Apply URL and in it include the following:</p>
 <ol>
 <li>Tell us what past project you loved working on most and why</li>
@@ -101,7 +99,8 @@ export const jobsData = [
     maxSalary: 80000,
     howtoApply:
       "Visit our [careers site](https://join.nadinewest.com/) to upload your resume. If your work experience suggests a potential match, you'll be invited to take a 10-hour, fully-paid [coding challenge](https://join.nadinewest.com/coding-challenge/). Top performers in the coding challenge will be invited to interview with the CEO and the tech leads.",
-
+    applyUrl: "",
+    applyEmail: "john@email.com",
     isShowLogo: true,
     isHighlight: true,
     //   isHighlightColor: false,
@@ -123,6 +122,9 @@ export const jobsData = [
     maxSalary: 150000,
     howtoApply:
       "Visit our [careers site](https://join.nadinewest.com/) to upload your resume. If your work experience suggests a potential match, you'll be invited to take a 10-hour, fully-paid [coding challenge](https://join.nadinewest.com/coding-challenge/). Top performers in the coding challenge will be invited to interview with the CEO and the tech leads.",
+    applyUrl:
+      "https://alchemyandaim.com/the-team/apply/front-end-developer/?utm_source=remoteok.io&ref=remoteok.io",
+    applyEmail: "",
 
     isShowLogo: true,
     // isHighlight: false,
@@ -146,6 +148,9 @@ export const jobsData = [
     maxSalary: 120000,
     howtoApply:
       "Visit our [careers site](https://join.nadinewest.com/) to upload your resume. If your work experience suggests a potential match, you'll be invited to take a 10-hour, fully-paid [coding challenge](https://join.nadinewest.com/coding-challenge/). Top performers in the coding challenge will be invited to interview with the CEO and the tech leads.",
+    applyUrl: "",
+    applyEmail: "jhon@email.com",
+
     isShowLogo: true,
     isHighlight: false,
     //   isHighlightColor: false,

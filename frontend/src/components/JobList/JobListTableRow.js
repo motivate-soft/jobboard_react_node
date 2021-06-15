@@ -16,6 +16,8 @@ export default function JobListTableRow(props) {
     minSalary,
     maxSalary,
     howtoApply,
+    applyUrl,
+    applyEmail,
     isShowLogo,
     isHighlight,
     highlightColor,
@@ -52,6 +54,42 @@ export default function JobListTableRow(props) {
       return <span className="mr-3">📌 {leftDays}d</span>;
     }
     return;
+  }
+
+  function renderApplyButton() {
+    if (applyEmail && applyEmail !== "") {
+      return (
+        <a
+          class="button action-apply apply_104042"
+          href={`mailto:${applyEmail}?subject=New applicant`}
+          target="_blank"
+          rel="nofollow"
+          className={`apply-btn ${
+            isHighlight || isHighlightColor
+              ? "bg-white text-indigo-500"
+              : "bg-indigo-500 text-white"
+          } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+        >
+          Apply
+        </a>
+      );
+    }
+
+    if (applyUrl && applyUrl !== "") {
+      return (
+        <a
+          href={applyUrl}
+          target="_blank"
+          className={`apply-btn ${
+            isHighlight || isHighlightColor
+              ? "bg-white text-indigo-500"
+              : "bg-indigo-500 text-white"
+          } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+        >
+          Apply
+        </a>
+      );
+    }
   }
 
   function handleClick(id) {
@@ -101,28 +139,13 @@ export default function JobListTableRow(props) {
           </div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="inline-flex mr-3 p-1 bg-gray-200 rounded">
-          🌏 {location}
-        </div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm">
-        <div className="inline-flex p-1 bg-gray-200 rounded">
-          💰 ${minSalary / 1000}k - ${maxSalary / 1000}k
-        </div>
+      <td className="px-6 py-4 whitespace-nowrap text-lg">{location}</td>
+      <td className="px-6 py-4 whitespace-nowrap text-lg">
+        ${minSalary / 1000}k - ${maxSalary / 1000}k
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         {renderStickyWidget()}
-        <button
-          className={`apply-btn ${
-            isHighlight || isHighlightColor
-              ? "bg-white text-indigo-500"
-              : "bg-indigo-500 text-white"
-          } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
-          onClick={() => handleClick(id)}
-        >
-          Apply
-        </button>
+        {renderApplyButton()}
       </td>
     </tr>
   );
