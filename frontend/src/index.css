@@ -173,3 +173,7 @@ input[type="range"]:focus::-ms-fill-upper {
 .joblist-card:hover button.apply-btn {
   display: inline-flex;
 }
+
+.ql-container {
+  min-height: 200px;
+}
