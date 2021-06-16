@@ -1,5 +1,5 @@
 const descriptionMD = `
-<div class="description" itemprop="description"><br><h1 style="text-align:left;font-size:24px;">Pleased.com is hiring a Remote Quality Assurance Engineer</h1><div class="markdown"><p>At Pleased, our mission is to please you and your customers. To achieve that, we offer an all-inclusive, easy-to-use and affordable support software.</p>
+<div class="description" itemprop="description"><br><div class="markdown"><p>At Pleased, our mission is to please you and your customers. To achieve that, we offer an all-inclusive, easy-to-use and affordable support software.</p>
 <p>We’re looking for people who are passionate about our product and serving our clients. We retain our team members with a dynamic and flexible work life which empowers them to create value, and rewards them generously based upon their contribution.</p>
 <p>In this role, you’ll be responsible for running the end to end quality assurance testing for the software, both manually and through automation testing. You’ll be working on complex systems that are used to serve hundred and thousands customers a day. We wrote our system from scratch about 1 year ago, so you’ll be working with the latest technology and won’t have to worry about decades old legacy code.</p>
 <p><strong>Who We Are</strong></p>
@@ -10,44 +10,6 @@ const descriptionMD = `
 <p>DB: MySQL / SQL database</p>
 <p>DevOps: AWS / Jenkins / K8S</p>
 <p>Frond-end: Vue.js </p>
-<p><strong>Responsibilities</strong></p>
-<p>Testing (black box, white box, integration, and performance) of the Web and Android/iOS platforms</p>
-<p>Create automated Web / Mobile / API test cases</p>
-<p>Track and analyze automated tests to improve test efficiency</p>
-<p>Track and record product issues and analyze the problems through various tools, giving feedback to relevant personnel to make corrections</p>
-<p>Share test-related information with other team members</p>
-<p>Develop automated tests and test frameworks</p>
-<p>Improve our Continuous Integration pipeline</p>
-<p>Identify and execute on opportunities to improve or establish quality processes</p>
-<p>Help automate all aspects of the software engineering process</p>
-<p>Write test plans / test cases and output test reports according to feature requirements</p>
-<p>Simulate user needs and actual usage scenarios from a user perspective</p>
-<p>Review designs and code done by others and provide constructive feedback</p>
-<p>Continuously develop your own skills </p>
-<p>Mentor less experienced members of the team </p>
-<p><strong>Requirements</strong></p>
-<p>2+ years of testing experience</p>
-<p>BS / MS in Computer Science, Information Systems, Electrical Engineering</p>
-<p>Working knowledge of a programming language (e.g. Java / Python)</p>
-<p>Familiarity with Web / Android / iOS manual testing</p>
-<p>Familiarity with the test tool (Postman / Chrome console)</p>
-<p>Familiarity with various tests (function / integration / regression / stress / API)</p>
-<p>Experience in developing and running a Continuous Integration system</p>
-<p>Familiarity with Automation testing knowledge with REST APIs</p>
-<p>Familiarity with Automation testing knowledge with Mobile UI / Function</p>
-<p>Familiarity with MySQL / SQL database</p>
-<p>Docker and Kubernetes experience would be advantageous </p>
-<p>Familiarity with Jira / Jenkins would be advantageous </p>
-<p><strong>Benefits</strong></p>
-<p>Quarterly and flash bonuses</p>
-<p>Flexible working hours</p>
-<p>Top-of-the-line equipment</p>
-<p>Education allowance </p>
-<p>Referral bonuses </p>
-<p>Annual company holidays - we’re hoping to make it to Koh Samui in 2021!</p>
-<p>Highly talented, dependable co-workers </p>
-<p>Our team is small enough for you to be impactful </p>
-<p>Our business is backed by established and successful businesses, offering stability and security to our employees</p></div>
 `;
 
 const howtoApplyMD = `<div class="markdown">
@@ -65,8 +27,8 @@ const howtoApplyMD = `<div class="markdown">
 
 export const singleJobData = {
   logo: "/images/sample_logo.png",
-  companyName: "Company",
-  position: "Position",
+  companyName: "Pleased.com",
+  position: "Full Stack Engineer",
   primaryTag: "Full stack",
   tags: ["ruby", "rails", "ecommerce"],
   location: "Worldwide",

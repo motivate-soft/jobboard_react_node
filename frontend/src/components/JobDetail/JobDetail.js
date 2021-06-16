@@ -67,7 +67,7 @@ export default function JobDetail(props) {
           <div className="flex items-start justify-between space-x-3">
             <div className="space-y-1">
               <Dialog.Title className="text-2xl text-center font-bold text-gray-900">
-                Job Detail
+                {companyName} is hiring a {position}
               </Dialog.Title>
             </div>
             <div className="h-7 flex items-center">
@@ -86,18 +86,8 @@ export default function JobDetail(props) {
         {/* Divider container */}
         <div className="py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200">
           {/* Job description */}
-          <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
-            <div>
-              <label
-                htmlFor="jobDescription"
-                className="block text-lg font-medium text-gray-900 sm:mt-px sm:pt-2"
-              >
-                Description
-              </label>
-            </div>
-            <div className="sm:col-span-2">
-              <div dangerouslySetInnerHTML={{ __html: description }} />
-            </div>
+          <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:px-6 sm:py-5">
+            <div dangerouslySetInnerHTML={{ __html: description }} />
           </div>
 
           {/* Salary */}
