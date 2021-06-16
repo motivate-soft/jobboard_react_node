@@ -31,12 +31,13 @@ export default function JobPostDesign() {
   }
 
   return (
-    <div className="relative px-12 pt-0 pb-6 border-2 border-gray-200 rounded-md">
-      <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white ">
-        <h5 className="uppercase font-bold">DESIGN YOUR JOB POSTS</h5>
-      </div>
+    <div className="relative px-4 py-6 border-2 border-gray-200 rounded-md sm:px-6 sm:py-5">
+      {/* <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white "> */}
+      <h3 class="mb-8 text-xl leading-6 font-bold text-gray-900">
+        Design your job posts
+      </h3>
       <div>
-        <h5 className="text-center text-xl mt-12 font-semibold">
+        <h5 className="text-center text-xl font-semibold">
           Every job post in your bundle will have the features you select below
           and will be valid for 24 months
         </h5>
