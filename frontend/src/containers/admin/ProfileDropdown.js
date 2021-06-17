@@ -1,8 +1,10 @@
 import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { SelectorIcon } from "@heroicons/react/solid";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import authActions from "../../redux/auth/actions";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -10,6 +12,13 @@ function classNames(...classes) {
 
 export default function ProfileDropdown(props) {
   const { isMobile } = props;
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  function handleLogout() {
+    dispatch(authActions.logout(history));
+  }
+
   return (
     <Menu as="div" className="px-3 mt-6 relative inline-block text-left">
       {({ open }) => (
@@ -97,15 +106,15 @@ export default function ProfileDropdown(props) {
               <div className="py-1">
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      href="#"
+                    <button
                       className={classNames(
                         active ? "bg-gray-100 text-gray-900" : "text-gray-700",
                         "block px-4 py-2 text-sm"
                       )}
+                      onClick={handleLogout}
                     >
                       Logout
-                    </a>
+                    </button>
                   )}
                 </Menu.Item>
               </div>

@@ -120,7 +120,7 @@ export default function JobListTableRow(props) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-xl font-bold">{position}</div>
-        <div className="text-sm">
+        {/* <div className="text-sm">
           <div className="col-span-3 flex flex-wrap">
             {primaryTag && (
               <div className="mr-1 mb-1 px-1 max-h-7 rounded border-black border-2">
@@ -137,7 +137,7 @@ export default function JobListTableRow(props) {
                 </div>
               ))}
           </div>
-        </div>
+        </div> */}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-lg">{location}</td>
       <td className="px-6 py-4 whitespace-nowrap text-lg">

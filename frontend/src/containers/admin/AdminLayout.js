@@ -5,13 +5,9 @@ import Sidebar from "./Sidebar";
 import AppTopbar from "./AppTopbar";
 import Loader from "../../components/Shared/Loader/Loader";
 import { Switch } from "react-router-dom";
-import { Route } from "react-router-dom";
 import { Redirect } from "react-router-dom";
 import routes from "../../routes/adminRoutes";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import PrivateRoute from "../../components/Shared/PrivateRoute/PrivateRoute";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,12 +25,12 @@ export default function AdminLayout() {
             <Switch>
               {routes.map((route, idx) => {
                 return route.component ? (
-                  <Route
+                  <PrivateRoute
                     key={idx}
                     path={route.path}
                     exact={route.exact}
                     name={route.name}
-                    render={(props) => <route.component {...props} />}
+                    component={route.component}
                   />
                 ) : null;
               })}

@@ -3,8 +3,14 @@ import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
+import { Link, useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import authActions from "../../redux/auth/actions";
 
 export default function Login() {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const validationSchema = yup.object().shape({
     email: yup
       .string()
@@ -26,8 +32,7 @@ export default function Login() {
 
   function onSubmit(data) {
     console.log("onSubmit", data);
-    // display form data on success
-    alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
+    dispatch(authActions.login(data, history));
     return false;
   }
   return (
@@ -112,13 +117,19 @@ export default function Login() {
               </div> */}
             </div>
 
-            <div>
+            <div className="flex gap-4">
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sign in
               </button>
+              <Link
+                to="/admin/register"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Sign up
+              </Link>
             </div>
           </form>
         </div>

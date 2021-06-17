@@ -3,8 +3,14 @@ import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import authActions from "./../../redux/auth/actions";
 
 export default function Register() {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const validationSchema = yup.object().shape({
     email: yup
       .string()
@@ -26,7 +32,6 @@ export default function Register() {
       .required("Confirm password is required"),
     // acceptTerms: Yup.bool().oneOf([true], "Accept Ts & Cs is required"),
   });
-
   const { register, handleSubmit, reset, control, formState } = useForm({
     resolver: yupResolver(validationSchema),
   });
@@ -34,8 +39,7 @@ export default function Register() {
 
   function onSubmit(data) {
     console.log("onSubmit", data);
-    // display form data on success
-    alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
+    dispatch(authActions.register(data, history));
     return false;
   }
 
