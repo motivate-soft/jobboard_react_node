@@ -22,25 +22,21 @@ export default function authReducer(state = initialState, action) {
     case USER_LOGIN_REQUEST:
       return { ...state, loading: true };
     case USER_LOGIN_SUCCESS:
-      return { ...state, loading: false, token: action.payload };
+      return { ...state, loading: false, token: action.payload, error: null };
     case USER_LOGIN_FAIL:
       return { ...state, loading: false, error: action.payload };
 
     case USER_REGISTER_REQUEST:
       return { ...state, loading: true };
     case USER_REGISTER_SUCCESS:
-      return { ...state, loading: false, token: action.payload };
+      return { ...state, loading: false, token: action.payload, error: null };
     case USER_REGISTER_FAIL:
       return { ...state, loading: false, error: action.payload };
 
     case USER_UPDATE_PROFILE_REQUEST:
       return { ...state, loading: true };
     case USER_UPDATE_PROFILE_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        token: action.payload,
-      };
+      return { ...state, loading: false, token: action.payload, error: null };
     case USER_UPDATE_PROFILE_FAIL:
       return { ...state, loading: false, error: action.payload };
 

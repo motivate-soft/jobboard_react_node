@@ -18,8 +18,8 @@ export default function Register() {
       .required("Email is required"),
     username: yup
       .string()
-      .min(5, "Name should be at least 4 characters")
-      .required("Name is required"),
+      .min(4, "Username should be at least 4 characters")
+      .required("Username is required"),
     firstName: yup.string().required("First name is required"),
     lastName: yup.string().required("Last name is required"),
     password: yup
