@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "data:import": "node ./database/seeder",
+    "data:destroy": "node ./database/seeder -d"
   },
   "dependencies": {
     "async": "^3.2.0",
