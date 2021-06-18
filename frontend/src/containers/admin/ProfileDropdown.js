@@ -16,6 +16,9 @@ export default function ProfileDropdown(props) {
   const dispatch = useDispatch();
   const history = useHistory();
   const { token } = useSelector((state) => state.auth);
+  
+  if (!token) return null;
+
   const profile = getProfile(token);
 
   function handleLogout() {

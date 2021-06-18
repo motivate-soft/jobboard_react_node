@@ -1,5 +1,5 @@
 {
   "mongoURI": "mongodb://127.0.0.1:27017/job-board",
   "jwtSecret": "wfab34assdfsfasdfASD3423",
-  "jwtExpiry": 3600
+  "jwtExpiry": 60
 }

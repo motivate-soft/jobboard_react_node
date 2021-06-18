@@ -15,7 +15,6 @@ import {
   CHANGE_PASSWORD_FAIL,
 } from "./actionTypes";
 import axiosInstance from "../../service/axiosInstance";
-import jwtDecode from "jwt-decode";
 
 const authActions = {
   login: (user, history) => async (dispatch) => {
@@ -27,7 +26,6 @@ const authActions = {
       const {
         data: { token },
       } = await axiosInstance.post(`api/auth/login`, user);
-      console.log("jwtDecode", jwtDecode(token));
 
       localStorage.setItem("token", token);
 
@@ -105,7 +103,6 @@ const authActions = {
       const {
         data: { token },
       } = await axiosInstance.put(`api/auth/`, user);
-      console.log("jwtDecode", jwtDecode(token));
 
       localStorage.setItem("token", token);
 

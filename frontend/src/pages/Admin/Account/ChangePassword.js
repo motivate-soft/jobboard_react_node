@@ -6,7 +6,6 @@ import classNames from "classnames";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import authActions from "./../../../redux/auth/actions";
-import jwtDecode from "jwt-decode";
 
 export default function ChangePassword() {
   const history = useHistory();

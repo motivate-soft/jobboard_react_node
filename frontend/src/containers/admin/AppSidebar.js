@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { navigation } from "./navigation";
 import { XIcon } from "@heroicons/react/outline";
+import { Link } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -69,9 +70,9 @@ export default function AppSidebar(props) {
               <nav className="px-2">
                 <div className="space-y-1">
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.to}
                       className={classNames(
                         item.current
                           ? "bg-gray-100 text-gray-900"
@@ -90,7 +91,7 @@ export default function AppSidebar(props) {
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </nav>

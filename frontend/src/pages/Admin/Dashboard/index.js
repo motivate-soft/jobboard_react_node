@@ -1,13 +1,7 @@
 import React from "react";
 import { Fragment, Suspense, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import {
-  ClockIcon,
-  HomeIcon,
-  MenuAlt1Icon,
-  ViewListIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+
 import {
   ChevronRightIcon,
   DotsVerticalIcon,

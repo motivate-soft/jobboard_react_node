@@ -1,7 +1,12 @@
-import { ClockIcon, HomeIcon, ViewListIcon } from "@heroicons/react/outline";
+import {
+  ClockIcon,
+  HomeIcon,
+  ViewListIcon,
+  UsersIcon,
+} from "@heroicons/react/outline";
 
 export const navigation = [
-  { name: "Home", href: "#", icon: HomeIcon, current: true },
-  { name: "My tasks", href: "#", icon: ViewListIcon, current: false },
-  { name: "Recent", href: "#", icon: ClockIcon, current: false },
+  { name: "Home", to: "/admin", icon: HomeIcon, current: true },
+  { name: "Users", to: "/admin/user", icon: UsersIcon, current: false },
+  { name: "Recent", to: "/admin", icon: ClockIcon, current: false },
 ];

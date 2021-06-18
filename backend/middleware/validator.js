@@ -58,5 +58,13 @@ module.exports.validate = (method) => {
         check("email", "email name is required").isEmail(),
       ];
     }
+    case "updateUser": {
+      return [
+        check("firstName", "firstName name is required").not().isEmpty(),
+        check("lastName", "lastName name is required").not().isEmpty(),
+        check("username", "username name is required").not().isEmpty(),
+        check("email", "email name is required").isEmail(),
+      ];
+    }
   }
 };

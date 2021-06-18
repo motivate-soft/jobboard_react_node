@@ -20,23 +20,25 @@ export default function AdminLayout() {
       {/* Main column */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <AppTopbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-          <Suspense fallback={<Loader />}>
-            <Switch>
-              {routes.map((route, idx) => {
-                return route.component ? (
-                  <PrivateRoute
-                    key={idx}
-                    path={route.path}
-                    exact={route.exact}
-                    name={route.name}
-                    component={route.component}
-                  />
-                ) : null;
-              })}
-              <Redirect from="/admin" to="/admin/dashboard" />
-            </Switch>
-          </Suspense>
+        <main className="flex flex-col relative z-0 min-w-full min-h-full overflow-y-auto py-4 bg-gray-200 focus:outline-none sm:px-6 lg:px-8">
+          <div className="shadow overflow-hidden bg-white min-h-full border-b sm:rounded-lg">
+            <Suspense fallback={<Loader />}>
+              <Switch>
+                {routes.map((route, idx) => {
+                  return route.component ? (
+                    <PrivateRoute
+                      key={idx}
+                      path={route.path}
+                      exact={route.exact}
+                      name={route.name}
+                      component={route.component}
+                    />
+                  ) : null;
+                })}
+                <Redirect from="/admin" to="/admin/dashboard" />
+              </Switch>
+            </Suspense>
+          </div>
         </main>
       </div>
     </div>

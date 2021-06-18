@@ -13,6 +13,7 @@ export const checkExpirity = (token) => {
 };
 
 export const getProfile = (token) => {
+  console.log("getProfile", jwtDecode(token));
   const { email, username, fullName } = jwtDecode(token);
 
   return { email, username, fullName };

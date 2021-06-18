@@ -4,7 +4,7 @@ import JobListTableRow from "./JobListTableRow";
 
 export default function JobListTable(props) {
   const { onClickRow } = props;
-  const { items } = useSelector((state) => state.job);
+  const { items } = useSelector((state) => state.jobs);
 
   function handleClick(id) {
     onClickRow();

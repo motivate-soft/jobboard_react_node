@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { navigation } from "./navigation";
 import { SearchIcon, SelectorIcon } from "@heroicons/react/solid";
 import ProfileDropdown from "./ProfileDropdown";
+import { Link } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -55,9 +56,9 @@ export default function Sidebar(props) {
             <nav className="px-3 mt-6">
               <div className="space-y-1">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.to}
                     className={classNames(
                       item.current
                         ? "bg-gray-200 text-gray-900"
@@ -76,7 +77,7 @@ export default function Sidebar(props) {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </nav>

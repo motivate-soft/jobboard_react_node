@@ -2,6 +2,7 @@ import React from "react";
 
 const Dashboard = React.lazy(() => import("../pages/Admin/Dashboard"));
 const Job = React.lazy(() => import("../pages/Admin/Job"));
+const User = React.lazy(() => import("../pages/Admin/User"));
 const Profile = React.lazy(() => import("../pages/Admin/Account/Profile"));
 const ChangePassword = React.lazy(() =>
   import("../pages/Admin/Account/ChangePassword")
@@ -17,6 +18,8 @@ const routes = [
     name: "Password",
     component: ChangePassword,
   },
+
+  { path: "/admin/user", name: "User", component: User },
 ];
 
 export default routes;
