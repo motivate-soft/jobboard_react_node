@@ -14,6 +14,9 @@ function mainRoutes(router, middleware, controllers) {
   router.get("/version", function (req, res) {
     return res.json({ version: packagejson.version });
   });
+  router.get("/", function (req, res) {
+    return res.status(200).send("Job board api is working...");
+  });
 
   // API
   require("../controllers/api/routes")(middleware, router, controllers);
@@ -21,25 +24,7 @@ function mainRoutes(router, middleware, controllers) {
 
 function handleErrors(err, req, res) {
   var status = err.status || 500;
-  res.status(err.status);
-
-  if (status === 404) {
-    res.render("404", { layout: false });
-    return;
-  }
-
-  if (status === 503) {
-    res.render("503", { layout: false });
-    return;
-  }
-
-  logger.warn(err.stack);
-
-  return res.status(404).send({
-    message: err.message,
-    error: err,
-    layout: false,
-  });
+  return res.status(status).send(err.message);
 }
 
 function handle404(req, res) {
