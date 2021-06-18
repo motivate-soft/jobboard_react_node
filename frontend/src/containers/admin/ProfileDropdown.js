@@ -3,8 +3,9 @@ import { Menu, Transition } from "@headlessui/react";
 import { SelectorIcon } from "@heroicons/react/solid";
 import { Link, useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import authActions from "../../redux/auth/actions";
+import { getProfile } from "../../lib/utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -14,6 +15,8 @@ export default function ProfileDropdown(props) {
   const { isMobile } = props;
   const dispatch = useDispatch();
   const history = useHistory();
+  const { token } = useSelector((state) => state.auth);
+  const profile = getProfile(token);
 
   function handleLogout() {
     dispatch(authActions.logout(history));
@@ -44,10 +47,10 @@ export default function ProfileDropdown(props) {
                     />
                     <span className="flex-1 flex flex-col min-w-0">
                       <span className="text-gray-900 text-sm font-medium truncate">
-                        Jhon Doe
+                        {profile.fullName}
                       </span>
                       <span className="text-gray-500 text-sm truncate">
-                        jhon@email.com
+                        {profile.email}
                       </span>
                     </span>
                   </span>

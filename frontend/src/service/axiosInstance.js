@@ -13,13 +13,14 @@ const instance = axios.create({
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
-instance.defaults.headers.common[
-  "Authorization"
-] = `Bearer ${localStorage.getItem("token")}`;
+// instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-// instance.interceptors.request.use((config) => {
-//   config.headers.post["Authorization"] = "value";
-//   return config;
-// });
+instance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  console.log("instance", token);
+
+  config.headers.common["Authorization"] = `Bearer ${token}`;
+  return config;
+});
 
 export default instance;

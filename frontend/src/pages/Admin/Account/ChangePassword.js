@@ -3,8 +3,15 @@ import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import authActions from "./../../../redux/auth/actions";
+import jwtDecode from "jwt-decode";
 
 export default function ChangePassword() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
   const validationSchema = yup.object().shape({
     currentPassword: yup.string().required("Current password is required"),
     newPassword: yup
@@ -13,7 +20,7 @@ export default function ChangePassword() {
       .min(8, `New password has to be at least ${8} characters!`),
     confirmPassword: yup
       .string()
-      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .oneOf([yup.ref("newPassword"), null], "Passwords must match")
       .required("Confirm password is required"),
   });
 
@@ -24,9 +31,7 @@ export default function ChangePassword() {
 
   function onSubmit(data) {
     console.log("onSubmit", data);
-    // display form data on success
-    alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
-    return false;
+    dispatch(authActions.changePassword(data, history));
   }
 
   return (

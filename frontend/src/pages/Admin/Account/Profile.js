@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import classNames from "classnames";
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import authActions from "./../../../redux/auth/actions";
+import jwtDecode from "jwt-decode";
 
 export default function Profile() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
+
   const validationSchema = yup.object().shape({
     email: yup
       .string()
@@ -23,11 +31,19 @@ export default function Profile() {
   });
   const { errors } = formState;
 
+  useEffect(() => {
+    const profile = jwtDecode(token);
+    if (profile) {
+      const { fullName, email, username } = profile;
+      const firstName = fullName.split(" ")[0];
+      const lastName = fullName.split(" ")[1];
+      reset({ firstName, lastName, email, username });
+    }
+  }, []);
+
   function onSubmit(data) {
     console.log("onSubmit", data);
-    // display form data on success
-    alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
-    return false;
+    dispatch(authActions.updateProfile(data, history));
   }
 
   return (

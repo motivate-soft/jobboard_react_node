@@ -5,6 +5,7 @@ const User = require("../models/user");
 const JwtStrategy = require("passport-jwt").Strategy;
 
 const ExtractJwt = require("passport-jwt").ExtractJwt;
+const logger = require("../helpers/logger");
 
 let opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -13,6 +14,8 @@ let opts = {
 
 passport.use(
   new JwtStrategy(opts, (payload, done) => {
+    logger.info("JwtStrategy");
+    
     User.findById(payload.id)
       .then((user) => {
         if (user) {

@@ -9,11 +9,14 @@ import {
   USER_UPDATE_PROFILE_FAIL,
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
-  USER_UPDATE_PROFILE_RESET,
+  CHANGE_PASSWORD_REQUEST,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_FAIL,
+  CHANGE_PASSWORD_RESET,
 } from "./actionTypes";
 
 const initialState = {
-  token: null,
+  token: localStorage.getItem("token"),
   loading: false,
 };
 
@@ -38,6 +41,13 @@ export default function authReducer(state = initialState, action) {
     case USER_UPDATE_PROFILE_SUCCESS:
       return { ...state, loading: false, token: action.payload, error: null };
     case USER_UPDATE_PROFILE_FAIL:
+      return { ...state, loading: false, error: action.payload };
+
+    case CHANGE_PASSWORD_REQUEST:
+      return { ...state, loading: true };
+    case CHANGE_PASSWORD_SUCCESS:
+      return { ...state, loading: false, token: action.payload, error: null };
+    case CHANGE_PASSWORD_FAIL:
       return { ...state, loading: false, error: action.payload };
 
     case USER_LOGOUT:

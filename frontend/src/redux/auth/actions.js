@@ -10,7 +10,9 @@ import {
   USER_UPDATE_PROFILE_FAIL,
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
-  USER_UPDATE_PROFILE_RESET,
+  CHANGE_PASSWORD_REQUEST,
+  CHANGE_PASSWORD_SUCCESS,
+  CHANGE_PASSWORD_FAIL,
 } from "./actionTypes";
 import axiosInstance from "../../service/axiosInstance";
 import jwtDecode from "jwt-decode";
@@ -27,7 +29,7 @@ const authActions = {
       } = await axiosInstance.post(`api/auth/login`, user);
       console.log("jwtDecode", jwtDecode(token));
 
-      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("token", token);
 
       dispatch({
         type: USER_LOGIN_SUCCESS,
@@ -67,7 +69,7 @@ const authActions = {
         payload: token,
       });
 
-      localStorage.setItem("token", JSON.stringify(token));
+      localStorage.setItem("token", token);
 
       toast.success("Registered successful!");
       history.push("/admin");
@@ -94,59 +96,78 @@ const authActions = {
     dispatch({ type: USER_LOGOUT });
   },
 
-  //   updateUserProfile: (userObj) => async (dispatch, getState) => {
-  //     try {
-  //       dispatch({
-  //         type: USER_UPDATE_PROFILE_REQUEST,
-  //       });
+  updateProfile: (user, history) => async (dispatch) => {
+    try {
+      dispatch({
+        type: USER_UPDATE_PROFILE_REQUEST,
+      });
 
-  //       const {
-  //         auth: { user },
-  //       } = getState();
+      const {
+        data: { token },
+      } = await axiosInstance.put(`api/auth/`, user);
+      console.log("jwtDecode", jwtDecode(token));
 
-  //       const config = {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //       };
-  //       const { data } = await axios.put(
-  //         `${API_URL}/api/user/profile`,
-  //         userObj,
-  //         config
-  //       );
-  //       dispatch({
-  //         type: USER_UPDATE_PROFILE_SUCCESS,
-  //         payload: data,
-  //       });
-  //       const state = JSON.parse(localStorage.getItem("state"));
-  //       state.auth.user = data;
-  //       if (userObj.password) {
-  //         toast.success("Password has been updated");
-  //       } else {
-  //         toast.success("Profile has been updated");
-  //       }
-  //       localStorage.setItem("state", JSON.stringify(state));
-  //       localStorage.setItem("user", JSON.stringify(data));
-  //     } catch (error) {
-  //       if (!error.response) {
-  //         toast.warning("Can't find server!");
-  //       } else {
-  //         const message =
-  //           error.response && error.response.data.message
-  //             ? error.response.data.message
-  //             : error.message;
-  //         if (message === "Not authorized, token failed") {
-  //           dispatch(logout());
-  //         }
-  //         dispatch({
-  //           type: USER_UPDATE_PROFILE_FAIL,
-  //           payload: message,
-  //         });
-  //         toast.warning(message);
-  //       }
-  //     }
-  //   },
+      localStorage.setItem("token", token);
+
+      dispatch({
+        type: USER_UPDATE_PROFILE_SUCCESS,
+        payload: token,
+      });
+      toast.success("Profile updated successful!");
+      history.push("/admin");
+    } catch (error) {
+      console.log("error", error);
+      if (!error.response) {
+        toast.warning("Can't find server!");
+        return;
+      }
+
+      toast.warning(error.response.data.message || "Server error");
+      dispatch({
+        type: USER_UPDATE_PROFILE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  },
+
+  changePassword: (user, history) => async (dispatch) => {
+    try {
+      console.log("changePassword->");
+      dispatch({
+        type: CHANGE_PASSWORD_REQUEST,
+      });
+
+      const {
+        data: { token },
+      } = await axiosInstance.post(`api/password/change`, user);
+
+      localStorage.setItem("token", token);
+
+      dispatch({
+        type: CHANGE_PASSWORD_SUCCESS,
+        payload: token,
+      });
+      toast.success("Password updated successful!");
+      history.push("/admin");
+    } catch (error) {
+      if (!error.response) {
+        toast.warning("Can't find server!");
+        return;
+      }
+
+      toast.warning(error.response.data.message || "Server error");
+      dispatch({
+        type: CHANGE_PASSWORD_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  },
 };
 
 export default authActions;
