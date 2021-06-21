@@ -6,17 +6,63 @@ const User = require("../../models/job");
 const Job = require("../../models/job");
 
 exports.paginate = async function (req, res) {
-  const limit = Number(req.query.limit) || 5;
+  const limit = Number(req.query.limit) || 10;
   const page = Number(req.query.page) || 1;
 
+  let query = [
+    { $skip: limit * page },
+    {
+      $limit: limit,
+    },
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    {
+      $unwind: "$company",
+    },
+    {
+      $lookup: {
+        from: "media",
+        localField: "company.logo",
+        foreignField: "_id",
+        as: "company.companyLogo",
+      },
+    },
+    {
+      $unwind: "$company.companyLogo",
+    },
+    {
+      $addFields: {
+        "company.logo": "$company.companyLogo.url",
+      },
+    },
+    {
+      $project: {
+        "company.companyLogo": 0,
+      },
+    },
+    // {
+    //   $sort: {
+    //     createdAt: -1,
+    //   },
+    // },
+  ];
+
   const total = await Job.countDocuments({});
-  const products = await Job.find({})
-    .limit(limit)
-    .skip(limit * (page - 1))
-    .populate({
-      path: "company",
-      select: "-createdAt -updatedAt",
-    });
+  // const products = await Job.find({})
+  //   .limit(limit)
+  //   .skip(limit * (page - 1))
+  //   .populate({
+  //     path: "company",
+  //     select: "-createdAt -updatedAt",
+  //   });
+
+  const products = await Job.aggregate(query);
 
   const from = limit * (page - 1) + 1;
   const to = from + limit - 1 < total ? from + limit - 1 : total;

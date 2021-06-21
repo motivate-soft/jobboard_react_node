@@ -69,6 +69,11 @@ const jobSchema = mongoose.Schema(
       type: String,
       enum: ["week", "month"],
     },
+    status: {
+      type: String,
+      enum: ["approved", "pending"],
+      default: "pending",
+    },
     // payLater: {
     //   type: Boolean,
     // },

@@ -16,6 +16,7 @@ const COMPANY_COUNT = 100;
 const JOB_COUNT = 100;
 const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
 const STICKY_OPTIONS = ["week", "month"];
+const STATUS_OPTIONS = ["approved", "pending"];
 
 const SALEARY_OPTIONS = Array(20)
   .fill(null)
@@ -76,15 +77,17 @@ const importData = async () => {
     array = Array(JOB_COUNT)
       .fill(null)
       .map((a, i) => {
-        console.log("companyData[i]._id", companyData[i]._id);
+        console.log("seeder->jobdata");
         return {
           company: companyData[i]._id,
           position: faker.name.jobTitle(),
           primaryTag: faker.name.jobArea(),
-          tags: Array(_.random(3, 5)).map((a, i) => faker.name.jobArea()),
+          tags: Array(_.random(3, 5))
+            .fill(null)
+            .map((a, i) => faker.name.jobArea()),
           location: LOCATION_OPTIONS[_.random(0, LOCATION_OPTIONS.length - 1)],
-          minSalary: SALEARY_OPTIONS[_.random(0, 10)],
-          maxSalary: SALEARY_OPTIONS[_.random(11, 20)],
+          minSalary: SALEARY_OPTIONS[_.random(0, 9)],
+          maxSalary: SALEARY_OPTIONS[_.random(10, 19)],
           jobDescription: faker.lorem.text(),
           howtoApply: faker.lorem.text(),
           applyUrl: faker.internet.url(),
@@ -95,6 +98,7 @@ const importData = async () => {
           highlightColor: faker.internet.color(),
           isStickyDay: _.random(1.0) > 0.5,
           stickyDuration: STICKY_OPTIONS[_.random(0, 1)],
+          status: STATUS_OPTIONS[_.random(0, 1)],
         };
       });
     const jobData = await Job.insertMany(array);
