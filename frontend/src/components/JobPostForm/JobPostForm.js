@@ -9,10 +9,13 @@ import DropzoneUploader from "../Shared/DropzoneUploader/DropzoneUploader";
 import Editor from "../Shared/MDEditor/Editor";
 import JobPostDesign from "../JobPostDesign/JobPostDesign";
 import { useJobPost } from "../../contexts/jobContext";
+import companyApi from "../../service/companyApi";
+import jobApi from "../../service/jobApi";
+import { toast } from "react-toastify";
 
-const salaryOptions = Array(21)
+const salaryOptions = Array(20)
   .fill(null)
-  .map((u, i) => i * 10000);
+  .map((u, i) => (i + 1) * 10000);
 
 const primaryTagOptions = [
   "Software Development",
@@ -40,26 +43,33 @@ export default function JobPostForm(props) {
     tags: Yup.string().required("Tags are required"),
     location: Yup.string().required("Location are required"),
 
-    minSalary: Yup.number().required("Minimum salary is required"),
-    maxSalary: Yup.number().required("Maximum salary is required"),
+    minSalary: Yup.string().required("Minimum salary is required"),
+    maxSalary: Yup.string().required("Maximum salary is required"),
     jobDescription: Yup.string().required("Job description is required"),
     howtoApply: Yup.string().required("This field is required"),
     applyUrl: Yup.string().required("This field is required"),
     applyEmail: Yup.string().required("This field is required"),
 
+    companyLogo: Yup.string().required("This field is required"),
     companyTwitter: Yup.string().required("This field is required"),
     companyEmail: Yup.string().required("This field is required"),
     invoiceAddress: Yup.string().required("This field is required"),
     invoiceNotes: Yup.string().required("This field is required"),
-    payLater: Yup.bool(),
+    // payLater: Yup.bool(),
   });
 
   const formOptions = { resolver: yupResolver(validationSchema) };
 
   // get functions to build form with useForm() hook
-  const { register, handleSubmit, reset, control, formState } = useForm(
-    formOptions
-  );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    getValues,
+    control,
+    formState,
+  } = useForm(formOptions);
 
   const { errors } = formState;
 
@@ -71,12 +81,13 @@ export default function JobPostForm(props) {
 
   useEffect(() => {
     console.log("formState", formState);
+    console.log("getValues", getValues());
   });
 
   function handleChange(fieldName, value) {
-    if (fieldName === "tags") {
-      console.log("JobPostForm:useJobPost", state);
+    console.log("JobPostForm->handleChange:useJobpost", state);
 
+    if (fieldName === "tags") {
       let { tags } = state;
       tags = value.split(",").filter((tag) => tag !== "");
 
@@ -96,11 +107,73 @@ export default function JobPostForm(props) {
     });
   }
 
-  function onSubmit(data) {
-    console.log("onSubmit", data);
-    // display form data on success
-    alert("SUCCESS!! :-)\n\n" + JSON.stringify(data, null, 4));
-    return false;
+  function handleUpload(file) {
+    console.log("handleUpload", file);
+    setValue("companyLogo", file._id, { shouldValidate: true });
+  }
+
+  async function onSubmit(formData) {
+    console.log("onSubmit", formData);
+
+    try {
+      const company = {
+        name: formData.companyName,
+        logo: formData.companyLogo,
+        twitter: formData.companyTwitter,
+        email: formData.companyEmail,
+        invoiceAddress: formData.invoiceAddress,
+        invoiceNotes: formData.invoiceNotes,
+      };
+      let {
+        data: { _id: companyId },
+      } = await companyApi.create(company);
+
+      const {
+        tags,
+        isShowLogo,
+        isBlastEmail,
+        isHighlight,
+        isHighlightColor,
+        highlightColor,
+        isStickyDay,
+        isStickyWeek,
+        isStickyMonth,
+      } = state;
+
+      let stickyDuration;
+      if (isStickyWeek) {
+        stickyDuration = "week";
+      }
+      if (isStickyMonth) {
+        stickyDuration = "month";
+      }
+
+      const job = {
+        company: companyId,
+        position: formData.position,
+        primaryTag: formData.primaryTag,
+        location: formData.location,
+        minSalary: formData.minSalary,
+        maxSalary: formData.maxSalary,
+        jobDescription: formData.jobDescription,
+        howtoApply: formData.howtoApply,
+        applyUrl: formData.applyUrl,
+        applyEmail: formData.applyEmail,
+
+        tags: tags,
+        isShowLogo,
+        isBlastEmail,
+        isHighlight: isHighlight || isHighlightColor,
+        highlightColor: isHighlightColor ? highlightColor : null,
+        isStickyDay,
+        stickyDuration,
+      };
+
+      let { data } = await jobApi.create(job);
+      toast.success("Job posted successfully" + data._id);
+    } catch (error) {
+      console.log("JobPostForm->onSubmit", error);
+    }
   }
 
   return (
@@ -160,7 +233,7 @@ export default function JobPostForm(props) {
                 }`}
                 onChange={(e) => handleChange("companyName", e.target.value)}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.companyName?.message}
               </span>
             </div>
@@ -187,7 +260,7 @@ export default function JobPostForm(props) {
                 }`}
                 onChange={(e) => handleChange("position", e.target.value)}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.position?.message}
               </span>
             </div>
@@ -218,7 +291,7 @@ export default function JobPostForm(props) {
                   </option>
                 ))}
               </select>
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.primaryTag?.message}
               </span>
             </div>
@@ -245,7 +318,7 @@ export default function JobPostForm(props) {
                 }`}
                 onChange={(e) => handleChange("tags", e.target.value)}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.tags?.message}
               </span>
             </div>
@@ -273,7 +346,7 @@ export default function JobPostForm(props) {
                 }`}
                 onChange={(e) => handleChange("location", e.target.value)}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.location?.message}
               </span>
             </div>
@@ -298,52 +371,64 @@ export default function JobPostForm(props) {
                 Company logo <br /> (.jpg or .png)
               </label>
             </div>
+            <input
+              {...register("companyLogo")}
+              id="companyLogo"
+              name="companyLogo"
+              type="text"
+              className="sr-only"
+            />
             <div className="col-span-2">
               <div className="flex flex-col">
-                <div className="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                  <div className="space-y-1 text-center">
-                    <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
-                      stroke="currentColor"
-                      fill="none"
-                      viewBox="0 0 48 48"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>
-                    </svg>
-                    <div className="flex text-sm text-gray-600">
-                      <label
-                        for="companyLogo"
-                        className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                      >
-                        <span>Upload a file</span>
-                        <input
-                          id="companyLogo"
-                          name="companyLogo"
-                          type="file"
-                          className="sr-only"
-                        />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
+                <DropzoneUploader onUpload={handleUpload}>
+                  <div className="dz-message">
+                    <div className="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                        <div className="flex text-sm text-gray-600">
+                          <label
+                            for="companyLogo"
+                            className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                          >
+                            <span>Upload a file</span>
+                            {/* <input
+                              hidden
+                              {...register("companyLogo")}
+                              id="companyLogo"
+                              name="companyLogo"
+                              type="text"
+                              className="sr-only"
+                            /> */}
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          PNG, JPG, GIF up to 10MB
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      PNG, JPG, GIF up to 10MB
-                    </p>
                   </div>
-                </div>
-                {/* <DropzoneUploader /> */}
-                <span className="text-xs text-indigo-500">
+                </DropzoneUploader>
+                <span className="mt-2 text-xs text-pink-500">
                   {errors.companyLogo?.message}
                 </span>
               </div>
             </div>
           </div>
-
+          {/* <DropzoneUploader /> */}
           {/* Annual Salary */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
@@ -371,7 +456,7 @@ export default function JobPostForm(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="text-xs text-indigo-500">
+                    <span className="mt-2 text-xs text-pink-500">
                       {errors.minSalary?.message}
                     </span>
                   </div>
@@ -393,7 +478,7 @@ export default function JobPostForm(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="text-xs text-indigo-500">
+                    <span className="mt-2 text-xs text-pink-500">
                       {errors.maxSalary?.message}
                     </span>
                   </div>
@@ -428,9 +513,8 @@ export default function JobPostForm(props) {
                 //   },
                 // }}
                 render={({
-                  field: { onChange, onBlur, value, name, ref },
+                  field: { onChange, value, ref },
                   fieldState: { invalid, isTouched, isDirty, error },
-                  formState,
                 }) => (
                   <Editor
                     onChange={(description, delta, source, editor) => {
@@ -441,7 +525,7 @@ export default function JobPostForm(props) {
                         source,
                         editor
                       );
-                      console.log("inputRef", ref);
+                      console.log("onChange:inputRef", ref);
                       onChange(description);
                     }}
                     value={value || ""}
@@ -451,7 +535,7 @@ export default function JobPostForm(props) {
                   />
                 )}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.jobDescription?.message}
               </span>
             </div>
@@ -477,7 +561,7 @@ export default function JobPostForm(props) {
                   errors.howtoApply ? "bg-error" : ""
                 }`}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.howtoApply?.message}
               </span>
             </div>
@@ -504,7 +588,7 @@ export default function JobPostForm(props) {
                 }`}
                 placeholder="https://"
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.applyUrl?.message}
               </span>
             </div>
@@ -531,7 +615,7 @@ export default function JobPostForm(props) {
                 }`}
                 placeholder="Apply email"
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.applyEmail?.message}
               </span>
             </div>
@@ -565,7 +649,7 @@ export default function JobPostForm(props) {
                 }`}
                 placeholder="username"
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.companyTwitter?.message}
               </span>
             </div>
@@ -592,7 +676,7 @@ export default function JobPostForm(props) {
                   errors.companyEmail ? "bg-error" : ""
                 }`}
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.companyEmail?.message}
               </span>
             </div>
@@ -619,7 +703,7 @@ export default function JobPostForm(props) {
                 }`}
                 placeholder="e.g. your company's full name and full invoice address, including building, street, city and country; also things like your VAT number, this is shown on the invoice."
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.invoiceAddress?.message}
               </span>
             </div>
@@ -646,7 +730,7 @@ export default function JobPostForm(props) {
                 }`}
                 placeholder="e.g. PO number 1234"
               />
-              <span className="text-xs text-indigo-500">
+              <span className="mt-2 text-xs text-pink-500">
                 {errors.invoiceNotes?.message}
               </span>
             </div>

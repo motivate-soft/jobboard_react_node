@@ -1,19 +1,22 @@
 import React from "react";
 import Dropzone from "react-dropzone-component";
 import "dropzone/dist/min/dropzone.min.css";
+import mediaApi from "../../../service/mediaApi";
 
 export default function DropzoneUploader(props) {
+  const { onUpload } = props;
   const componentConfig = {
-    iconFiletypes: [".jpg", ".png", ".gif"],
+    iconFiletypes: [".jpg", ".png"],
     method: true,
     showFiletypeIcon: true,
     uploadMultiple: false,
     maxFilesize: 2, // MB
-    maxFiles: 2,
-    dictMaxFilesExceeded: "You can only upload upto 2 images",
+    maxFiles: 1,
+    dictMaxFilesExceeded: "You can only upload upto 1 image",
     dictRemoveFile: "Delete",
     dictCancelUploadConfirmation: "Are you sure to cancel upload?",
     postUrl: "no-url",
+    // dropzoneSelector: "#dropzone",
   };
   const djsConfig = { autoProcessQueue: false };
   const eventHandlers = {
@@ -23,9 +26,15 @@ export default function DropzoneUploader(props) {
   };
 
   async function onAddedFile(file) {
-    console.log("onAddFile", file);
     const body = new FormData();
     body.append("file", file);
+    try {
+      const { data } = await mediaApi.create(body);
+      console.log("onAddedFile->mediaApi->create:res", data);
+      onUpload(data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -33,7 +42,8 @@ export default function DropzoneUploader(props) {
       config={componentConfig}
       eventHandlers={eventHandlers}
       djsConfig={djsConfig}
-      className=""
-    />
+    >
+      {props.children}
+    </Dropzone>
   );
 }

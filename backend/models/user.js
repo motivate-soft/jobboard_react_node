@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 var SALT_FACTOR = 10;
-var COLLECTION = "accounts";
+var COLLECTION = "user";
 
 const userSchema = mongoose.Schema(
   {

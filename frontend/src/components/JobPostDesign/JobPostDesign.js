@@ -21,11 +21,20 @@ export default function JobPostDesign() {
   }
 
   function handleChange(e) {
-    console.log("JobPostDesign", e.target.name);
+    console.log("JobPostDesign->handleChange", e.target.name);
     dispatch({
       type: "UPDATE_JOB_UPSELLS",
       payload: {
         [e.target.name]: !state[e.target.name],
+      },
+    });
+  }
+
+  function handleColorChange(e) {
+    dispatch({
+      type: "UPDATE_JOB_UPSELLS",
+      payload: {
+        [e.target.name]: e.target.value,
       },
     });
   }
@@ -79,8 +88,8 @@ export default function JobPostDesign() {
           htmlFor="isBlastEmail"
           className="ml-2 block text-sm text-gray-900"
         >
-          Email blast my job post to <span class="big">📮95,131</span> remote
-          candidates (+$<span>49</span>){"     "}
+          Email blast my job post to <span>📮95,131</span> remote candidates (+$
+          <span>49</span>){"     "}
           {renderOutlinedBadge("3X MORE VIEWS")}
           {renderBadge("Highly recommended")}
         </label>
@@ -115,14 +124,22 @@ export default function JobPostDesign() {
           checked={state.isHighlightColor}
           onChange={handleChange}
         />
+
         <label
           htmlFor="isHighlightColor"
           className="ml-2 block text-sm text-gray-900"
         >
-          <span class="span_highlight_color">
+          <span class="flex items-center">
             Highlight with your company's 🌈 brand color (+$
-            <span>349</span>) (you can change the color later when posting each
-            job){" "}
+            <span>349</span>)
+            <input
+              id="highlightColor"
+              name="highlightColor"
+              type="color"
+              onChange={handleColorChange}
+              className="mx-4 w-8 h-4"
+            />
+            {/* (you can change the color later when posting each job){" "} */}
           </span>
           {renderOutlinedBadge("3X MORE VIEWS")}
         </label>

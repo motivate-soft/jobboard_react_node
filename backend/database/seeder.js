@@ -1,11 +1,25 @@
 const mongoose = require("mongoose");
 const nconf = require("nconf");
+const faker = require("faker");
 const logger = require("../helpers/logger");
 const User = require("../models/user");
+const Media = require("../models/media");
+const Company = require("../models/company");
+const Job = require("../models/job");
 const { users } = require("./data");
+const _ = require("lodash");
 
 nconf.file(`./config/default.json`);
 const CONNECTION_URI = nconf.get("mongoURI");
+
+const COMPANY_COUNT = 100;
+const JOB_COUNT = 100;
+const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
+const STICKY_OPTIONS = ["week", "month"];
+
+const SALEARY_OPTIONS = Array(20)
+  .fill(null)
+  .map((u, i) => (i + 1) * 10000);
 
 let options = {
   keepAlive: 1,
@@ -30,6 +44,60 @@ const importData = async () => {
   try {
     await User.deleteMany();
     await User.insertMany(users);
+
+    await Media.deleteMany();
+    let array = Array(10)
+      .fill(null)
+      .map((a, i) => ({
+        filename: faker.company.companyName(),
+        url: `${_.random(1, 10)}.png`,
+      }));
+    const mediaData = await Media.insertMany(array);
+
+    await Company.deleteMany();
+    array = Array(COMPANY_COUNT)
+      .fill(null)
+      .map((a, i) => {
+        let ranInt = _.random(0, 9);
+        logger.info(mediaData[ranInt]);
+
+        return {
+          name: faker.company.companyName(),
+          logo: mediaData[ranInt]._id,
+          twitter: faker.internet.userName(),
+          email: faker.internet.email(),
+          invoiceAddress: `${faker.address.cityName()},${faker.address.country()}`,
+          invoiceNotes: faker.lorem.text(),
+        };
+      });
+    const companyData = await Company.insertMany(array);
+
+    await Job.deleteMany();
+    array = Array(JOB_COUNT)
+      .fill(null)
+      .map((a, i) => {
+        console.log("companyData[i]._id", companyData[i]._id);
+        return {
+          company: companyData[i]._id,
+          position: faker.name.jobTitle(),
+          primaryTag: faker.name.jobArea(),
+          tags: Array(_.random(3, 5)).map((a, i) => faker.name.jobArea()),
+          location: LOCATION_OPTIONS[_.random(0, LOCATION_OPTIONS.length - 1)],
+          minSalary: SALEARY_OPTIONS[_.random(0, 10)],
+          maxSalary: SALEARY_OPTIONS[_.random(11, 20)],
+          jobDescription: faker.lorem.text(),
+          howtoApply: faker.lorem.text(),
+          applyUrl: faker.internet.url(),
+          applyEmailL: faker.internet.email(),
+          isShowLogo: true,
+          isBlastEmail: true,
+          isHighlight: _.random(1.0) > 0.5,
+          highlightColor: faker.internet.color(),
+          isStickyDay: _.random(1.0) > 0.5,
+          stickyDuration: STICKY_OPTIONS[_.random(0, 1)],
+        };
+      });
+    const jobData = await Job.insertMany(array);
 
     logger.info("Seed data imported!");
     process.exit();

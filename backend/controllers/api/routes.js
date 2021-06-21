@@ -1,5 +1,38 @@
 const pkg = require("../../package.json");
+var multer = require("multer");
 const { validate } = require("../../middleware/validator");
+const path = require("path");
+const logger = require("../../helpers/logger");
+const { v4: uuidv4 } = require("uuid");
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, "public/uploads/");
+  },
+  filename(req, file, cb) {
+    console.log("storage->filename", file);
+    cb(null, `${uuidv4()}${path.extname(file.originalname)}`);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype == "image/png" ||
+    file.mimetype == "image/jpg" ||
+    file.mimetype == "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+    req.errorCode = "invalidFormat";
+    return cb(false);
+  }
+};
+
+const uploadPhoto = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+});
 
 module.exports = function (middleware, router, controllers) {
   const apiCtrl = controllers.api;
@@ -7,6 +40,9 @@ module.exports = function (middleware, router, controllers) {
   router.get("/api/version", function (req, res) {
     return res.json({ version: pkg.version });
   });
+
+  // Media
+  router.post("/api/media/", uploadPhoto.single("file"), apiCtrl.media.create);
 
   // auth
   router.post("/api/auth/login", validate("login"), apiCtrl.auth.login);
@@ -61,4 +97,15 @@ module.exports = function (middleware, router, controllers) {
     middleware.checkRole("admin"),
     apiCtrl.user.delete
   );
+
+  // Company
+  router.post(
+    "/api/company/",
+    validate("createCompany"),
+    apiCtrl.company.create
+  );
+
+  // Job
+  router.get("/api/job/", apiCtrl.job.paginate);
+  router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
 };

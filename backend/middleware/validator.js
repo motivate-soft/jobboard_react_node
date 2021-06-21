@@ -3,6 +3,7 @@ const checkBodyAndParams = buildCheckFunction(["body", "params"]);
 
 module.exports.validate = (method) => {
   switch (method) {
+    // Auth
     case "register": {
       return [
         check("firstName", "firstName name is required").not().isEmpty(),
@@ -50,6 +51,8 @@ module.exports.validate = (method) => {
           }),
       ];
     }
+
+    // User
     case "createUser": {
       return [
         check("firstName", "firstName name is required").not().isEmpty(),
@@ -64,6 +67,35 @@ module.exports.validate = (method) => {
         check("lastName", "lastName name is required").not().isEmpty(),
         check("username", "username name is required").not().isEmpty(),
         check("email", "email name is required").isEmail(),
+      ];
+    }
+
+    // Company
+    case "createCompany": {
+      return [
+        check("name", "company logo is required").not().isEmpty(),
+        check("logo", "company logo is required").not().isEmpty(),
+        check("twitter", "company twitter is required").not().isEmpty(),
+        check("email", "company email is required").not().isEmpty(),
+        check("invoiceAddress", "invoice address is required").not().isEmpty(),
+        check("invoiceNotes", "invoice notes is required").not().isEmpty(),
+      ];
+    }
+
+    // Job
+    case "createJob": {
+      return [
+        check("company", "company is required").not().isEmpty(),
+        check("position", "position is required").not().isEmpty(),
+        check("primaryTag", "primaryTag is required").not().isEmpty(),
+        check("tags", "tags are required").not().isEmpty(),
+        check("location", "location is required").not().isEmpty(),
+        check("minSalary", "minSalary is required").not().isEmpty(),
+        check("maxSalary", "maxSalary is required").not().isEmpty(),
+        check("jobDescription", "jobDescription is required").not().isEmpty(),
+        check("howtoApply", "howtoApply is required").not().isEmpty(),
+        check("applyUrl", "applyUrl is required").not().isEmpty(),
+        check("applyEmail", "applyEmail is required").not().isEmpty(),
       ];
     }
   }

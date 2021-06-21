@@ -4,6 +4,10 @@ const moment = require("moment");
 const { combine, timestamp, label, printf, colorize } = format;
 
 const logFormat = printf(({ level, message, label, timestamp }) => {
+  if (message.constructor === Object) {
+    message = JSON.stringify(message, null, 4);
+  }
+
   return `${timestamp} [${label}] ${level}: ${message}`;
 });
 

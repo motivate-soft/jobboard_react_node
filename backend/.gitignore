@@ -23,3 +23,5 @@ yarn-error.log*
 # log files
 /logs
 *.log
+
+# /public/uploads
