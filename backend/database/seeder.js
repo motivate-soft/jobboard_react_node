@@ -98,7 +98,7 @@ const importData = async () => {
           highlightColor: faker.internet.color(),
           isStickyDay: _.random(1.0) > 0.5,
           stickyDuration: STICKY_OPTIONS[_.random(0, 1)],
-          status: STATUS_OPTIONS[_.random(0, 1)],
+          status: STATUS_OPTIONS[_.random(0, 2)],
         };
       });
     const jobData = await Job.insertMany(array);

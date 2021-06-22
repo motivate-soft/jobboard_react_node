@@ -106,6 +106,7 @@ module.exports = function (middleware, router, controllers) {
   );
 
   // Job
+  router.get("/api/job/filter/", apiCtrl.job.getFilter);
   router.get("/api/job/", apiCtrl.job.paginate);
   router.get("/api/job/:id", apiCtrl.job.retrieve);
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);

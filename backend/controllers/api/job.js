@@ -5,6 +5,10 @@ const { handleError, responseWithResult } = require("../../helpers/handlers");
 const User = require("../../models/job");
 const Job = require("../../models/job");
 
+const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
+const STICKY_OPTIONS = ["week", "month"];
+const STATUS_OPTIONS = ["pending", "approved", "declined"];
+
 exports.paginate = async function (req, res) {
   const pageSize = Number(req.query.limit) || 10;
   const pageIndex = Number(req.query.page) || 1;
@@ -70,17 +74,35 @@ exports.paginate = async function (req, res) {
     from + pageSize - 1 < recordsFiltered
       ? from + pageSize - 1
       : recordsFiltered;
-  // const pageTotal = Math.ceil(recordsFiltered / pageSize);
+  const pageCount = Math.ceil(recordsFiltered / pageSize);
   const sort = "default";
 
   res.json({
     items: jobs,
     pageIndex,
+    pageSize,
+    pageCount,
     from,
     to,
     recordsFiltered,
     recordsTotal,
   });
+};
+
+exports.getFilter = async function (req, res) {
+  try {
+    // max and min salary from job
+
+    return res.status(200).json({
+      minSalary: 10000,
+      maxSalary: 200000,
+      status: STATUS_OPTIONS,
+      sticky: STICKY_OPTIONS,
+    });
+  } catch (error) {
+    logger.error(err);
+    return handleError(res, req, 500, err);
+  }
 };
 
 exports.retrieve = async function (req, res) {

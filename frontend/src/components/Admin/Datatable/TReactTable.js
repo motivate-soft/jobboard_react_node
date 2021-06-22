@@ -1,5 +1,4 @@
 import React from "react";
-import Pagination from "./Pagination";
 import {
   useTable,
   useFilters,
@@ -107,14 +106,14 @@ function TReactTable({ columns, data }) {
 
   return (
     <div className="divide-y">
-      <Pagination
+      {/* <Pagination
         defaultCurrent={1}
         current={pageIndex + 1}
         pageSize={pageSize}
         pageIndex={pageIndex}
         total={rows.length}
         onChange={onPageChange}
-      />
+      /> */}
 
       <table
         {...getTableProps()}

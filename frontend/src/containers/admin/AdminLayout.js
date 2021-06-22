@@ -20,8 +20,8 @@ export default function AdminLayout() {
       {/* Main column */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         <AppTopbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex flex-col relative z-0 min-w-full min-h-full overflow-y-auto py-4 bg-gray-200 focus:outline-none sm:px-6 lg:px-8">
-          <div className="shadow overflow-hidden bg-white min-h-full border-b sm:rounded-lg">
+        <main className="flex flex-col relative z-0 min-w-full h-auto min-h-full overflow-y-auto py-4 bg-gray-200 focus:outline-none sm:px-6 lg:px-8">
+          <div className="shadow bg-white border-b sm:rounded-lg">
             <Suspense fallback={<Loader />}>
               <Switch>
                 {routes.map((route, idx) => {

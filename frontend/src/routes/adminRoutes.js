@@ -10,7 +10,6 @@ const ChangePassword = React.lazy(() =>
 
 const routes = [
   { path: "/admin/dashboard", name: "Dashboard", component: Dashboard },
-  { path: "/admin/job", name: "Job", component: Job },
 
   { path: "/admin/account/profile", name: "Profile", component: Profile },
   {
@@ -20,6 +19,7 @@ const routes = [
   },
 
   { path: "/admin/user", name: "User", component: User },
+  { path: "/admin/job", name: "Job", component: Job },
 ];
 
 export default routes;
