@@ -1,42 +1,36 @@
-import React from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { singleJobData } from "./../../redux/data";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
+import jobApi from "../../service/jobApi";
+import Loader from "../Shared/Loader/Loader";
 
 export default function JobDetail(props) {
-  const { open, setOpen } = props;
-  const {
-    id,
-    logo,
-    description,
-    companyName,
-    position,
-    primaryTag,
-    tags,
-    location,
-    minSalary,
-    maxSalary,
-    howtoApply,
-    applyEmail,
-    applyUrl,
+  const { jobId, open, setOpen } = props;
+  const [job, setJob] = useState(null);
 
-    isShowLogo,
-    isHighlight,
-    highlightColor,
-    isHighlightColor,
-    isStickyDay,
-    isStickyWeek,
-    isStickyMonth,
-    postedAt,
-  } = singleJobData;
+  useEffect(() => {
+    try {
+      if (jobId) {
+        fetchJobDetail();
+      }
+    } catch (error) {
+      console.log("JobDetail->fetchJobDetail", error);
+    }
+  }, [jobId]);
 
-  function renderApplyButton() {
-    if (applyEmail && applyEmail !== "") {
+  async function fetchJobDetail() {
+    const { data } = await jobApi.retrieve(jobId);
+    console.log("JobDetail->fetchJobDetail", data);
+    setJob(data);
+  }
+
+  function renderApplyButton(job) {
+    if (job.applyEmail && job.applyEmail !== "") {
       return (
         <a
           class="button action-apply apply_104042"
-          href={`mailto:${applyEmail}?subject=New applicant`}
+          href={`mailto:${job.applyEmail}?subject=New applicant`}
           target="_blank"
           rel="nofollow"
           className="bg-indigo-500 text-white mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md"
@@ -46,10 +40,10 @@ export default function JobDetail(props) {
       );
     }
 
-    if (applyUrl && applyUrl !== "") {
+    if (job.applyUrl && job.applyUrl !== "") {
       return (
         <a
-          href={applyUrl}
+          href={job.applyUrl}
           target="_blank"
           className="bg-indigo-500 text-white mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md"
         >
@@ -59,30 +53,49 @@ export default function JobDetail(props) {
     }
   }
 
-  return (
-    <div className="h-full flex flex-col bg-white shadow-xl overflow-y-scroll">
-      <div className="flex-1 pb-20">
-        {/* Header */}
-        <div className="px-4 py-6 bg-gray-50 sm:px-6">
-          <div className="flex items-start justify-between space-x-3">
-            <div className="space-y-1">
-              <Dialog.Title className="text-2xl text-center font-bold text-gray-900">
-                {companyName} is hiring a {position}
-              </Dialog.Title>
-            </div>
-            <div className="h-7 flex items-center">
-              <button
-                type="button"
-                className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                onClick={() => setOpen(false)}
-              >
-                <span className="sr-only">Close panel</span>
-                <XIcon className="h-6 w-6" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-        </div>
+  function renderDialogTitle() {
+    if (!job)
+      return (
+        <Dialog.Title className="text-2xl text-center font-bold text-gray-900">
+          Job detail
+        </Dialog.Title>
+      );
 
+    return (
+      <Dialog.Title className="text-2xl text-center font-bold text-gray-900">
+        {job.company.name} is hiring a {job.position}
+      </Dialog.Title>
+    );
+  }
+
+  function renderContent() {
+    if (!job) return <Loader />;
+
+    const {
+      position,
+      primaryTag,
+      tags,
+      location,
+      minSalary,
+      maxSalary,
+      description,
+      howtoApply,
+      applyUrl,
+      applyEmail,
+      isShowLogo,
+      isBlastEmail,
+      isHighlight,
+      highlightColor,
+      isStickyDay,
+      stickyDuration,
+      status,
+      company,
+      createdAt,
+      updatedAt,
+    } = job;
+
+    return (
+      <Fragment>
         {/* Divider container */}
         <div className="py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200">
           {/* Job description */}
@@ -133,10 +146,34 @@ export default function JobDetail(props) {
                 className="mb-8 w-full max-w-full"
                 dangerouslySetInnerHTML={{ __html: howtoApply }}
               />
-              {renderApplyButton()}
+              {renderApplyButton(job)}
             </div>
           </div>
         </div>
+      </Fragment>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-white shadow-xl overflow-y-scroll">
+      <div className="flex-1 pb-20">
+        {/* Header */}
+        <div className="px-4 py-6 bg-gray-50 sm:px-6">
+          <div className="flex items-start justify-between space-x-3">
+            <div className="space-y-1">{renderDialogTitle()}</div>
+            <div className="h-7 flex items-center">
+              <button
+                type="button"
+                className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                onClick={() => setOpen(false)}
+              >
+                <span className="sr-only">Close panel</span>
+                <XIcon className="h-6 w-6" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </div>
+        {renderContent()}
       </div>
     </div>
   );

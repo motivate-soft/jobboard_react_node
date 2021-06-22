@@ -3,40 +3,45 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import jobActions from "../../redux/jobs/actions";
 
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 export default function JobListTableRow(props) {
   const { job, onClick } = props;
   const {
-    id,
-    logo,
-    companyName,
+    _id,
     position,
     primaryTag,
     tags,
     location,
     minSalary,
     maxSalary,
+    description,
     howtoApply,
     applyUrl,
     applyEmail,
     isShowLogo,
+    isBlastEmail,
     isHighlight,
     highlightColor,
-    isHighlightColor,
     isStickyDay,
-    isStickyWeek,
-    isStickyMonth,
-    postedAt,
+    stickyDuration,
+    status,
+    company,
+    createdAt,
+    updatedAt,
   } = job;
 
-  const dispatch = useDispatch();
-
-  function createHighlightStyle() {
-    console.log("createHighlightStyle", isHighlight);
+  function createBackgroundStyle() {
+    console.log(
+      "JobListTableRow->createBackgroundStyle",
+      isHighlight,
+      highlightColor
+    );
     let bgColor = "#ffffff";
     if (isHighlight) {
       bgColor = "#fff9c9";
     }
-    if (isHighlightColor) {
+    if (isHighlight && highlightColor) {
       bgColor = highlightColor;
     }
     return {
@@ -45,14 +50,15 @@ export default function JobListTableRow(props) {
   }
 
   function renderStickyWidget() {
-    if (isStickyWeek && postedAt) {
-      const leftDays = moment(postedAt).add(7, "d").diff(moment.now(), "d");
+    if (isStickyDay) {
+      return <span className="mr-3">📌</span>;
+    }
+
+    if (stickyDuration && createdAt) {
+      const leftDays = moment(createdAt).add(7, "d").diff(moment.now(), "d");
       return <span className="mr-3">📌 {leftDays}d</span>;
     }
-    if (isStickyMonth && postedAt) {
-      const leftDays = moment(postedAt).add(1, "M").diff(moment.now(), "d");
-      return <span className="mr-3">📌 {leftDays}d</span>;
-    }
+
     return;
   }
 
@@ -65,7 +71,7 @@ export default function JobListTableRow(props) {
           target="_blank"
           rel="nofollow"
           className={`apply-btn ${
-            isHighlight || isHighlightColor
+            isHighlight || highlightColor
               ? "bg-white text-indigo-500"
               : "bg-indigo-500 text-white"
           } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
@@ -81,7 +87,7 @@ export default function JobListTableRow(props) {
           href={applyUrl}
           target="_blank"
           className={`apply-btn ${
-            isHighlight || isHighlightColor
+            isHighlight || highlightColor
               ? "bg-white text-indigo-500"
               : "bg-indigo-500 text-white"
           } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
@@ -92,29 +98,29 @@ export default function JobListTableRow(props) {
     }
   }
 
-  function handleClick(id) {
-    dispatch(jobActions.getJob(id));
-  }
-
   return (
     <tr
-      style={createHighlightStyle()}
+      style={createBackgroundStyle()}
       className="text-gray-900"
-      onClick={(e) => onClick(id)}
+      onClick={(e) => onClick(_id)}
     >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
             {isShowLogo ? (
               <img
-                src={logo ?? "/images/sample_logo.png"}
+                src={
+                  company.logo
+                    ? `${BASE_URL}/uploads/${company.logo}`
+                    : "/images/sample_logo.png"
+                }
                 className="h-10 w-10"
                 alt="company log"
               />
             ) : null}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-semibold">{companyName}</div>
+            <div className="text-sm font-semibold">{company.name}</div>
           </div>
         </div>
       </td>

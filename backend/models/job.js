@@ -10,6 +10,10 @@ const jobSchema = mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "company",
     },
+    position: {
+      type: String,
+      require: true,
+    },
     primaryTag: {
       type: String,
       required: true,
@@ -31,7 +35,7 @@ const jobSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    jobDescription: {
+    description: {
       type: String,
       required: true,
     },
@@ -71,7 +75,7 @@ const jobSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["approved", "pending"],
+      enum: ["pending", "approved", "declined"],
       default: "pending",
     },
     // payLater: {

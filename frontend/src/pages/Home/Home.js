@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import JosPostPreview from "../../components/JosPostPreview/JosPostPreview";
 import SideOverlay from "../../components/Shared/SideOverlay/SideOverlay";
 import JobPostForm from "../../components/JobPostForm/JobPostForm";
@@ -10,10 +9,14 @@ import JobDetail from "../../components/JobDetail/JobDetail";
 export default function Home() {
   const [isJobpostOpened, setIsJobpostOpened] = useState(false);
   const [isJobdetailOpened, setIsJobdetailOpened] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState(null);
 
-  function handleRowClick() {
+  function handleClick(id) {
+    console.log("handleClick", id);
     setIsJobdetailOpened(true);
+    setSelectedJobId(id);
   }
+
   return (
     <div className="relative flex flex-col h-screen pt-20 bg-gray-100">
       <button
@@ -24,13 +27,17 @@ export default function Home() {
         Post a Job
       </button>
       {/* <JobList /> */}
-      <JobListTable onClickRow={handleRowClick} />
+      <JobListTable onClickRow={handleClick} />
       <SideOverlay
         className="w-screen max-w-4xl relative border-l border-gray-200"
         open={isJobdetailOpened}
         setOpen={setIsJobdetailOpened}
       >
-        <JobDetail open={isJobdetailOpened} setOpen={setIsJobdetailOpened} />
+        <JobDetail
+          jobId={selectedJobId}
+          open={isJobdetailOpened}
+          setOpen={setIsJobdetailOpened}
+        />
       </SideOverlay>
       <SideOverlay
         className="w-screen max-w-3xl relative border-l border-gray-200"

@@ -6,13 +6,13 @@ const User = require("../../models/job");
 const Job = require("../../models/job");
 
 exports.paginate = async function (req, res) {
-  const limit = Number(req.query.limit) || 10;
-  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.limit) || 10;
+  const pageIndex = Number(req.query.page) || 1;
 
   let query = [
-    { $skip: limit * page },
+    { $skip: pageSize * (pageIndex - 1) },
     {
-      $limit: limit,
+      $limit: pageSize,
     },
     {
       $lookup: {
@@ -53,33 +53,48 @@ exports.paginate = async function (req, res) {
     // },
   ];
 
-  const total = await Job.countDocuments({});
-  // const products = await Job.find({})
-  //   .limit(limit)
-  //   .skip(limit * (page - 1))
+  const recordsTotal = await Job.countDocuments({});
+  // const jobs = await Job.find({})
+  //   .limit(pageSize)
+  //   .skip(pageSize * (page - 1))
   //   .populate({
   //     path: "company",
   //     select: "-createdAt -updatedAt",
   //   });
 
-  const products = await Job.aggregate(query);
+  const jobs = await Job.aggregate(query);
+  const recordsFiltered = await Job.countDocuments({});
 
-  const from = limit * (page - 1) + 1;
-  const to = from + limit - 1 < total ? from + limit - 1 : total;
+  const from = pageSize * (pageIndex - 1) + 1;
+  const to =
+    from + pageSize - 1 < recordsFiltered
+      ? from + pageSize - 1
+      : recordsFiltered;
+  // const pageTotal = Math.ceil(recordsFiltered / pageSize);
   const sort = "default";
 
   res.json({
-    items: products,
-    page,
-    pages: Math.ceil(total / limit),
+    items: jobs,
+    pageIndex,
     from,
     to,
-    total,
+    recordsFiltered,
+    recordsTotal,
   });
 };
 
 exports.retrieve = async function (req, res) {
   //
+  const jobId = req.params.id;
+  console.log("jobId", jobId);
+
+  try {
+    let job = await Job.findById(jobId).populate("company");
+    return res.status(200).json(job);
+  } catch (error) {
+    logger.error(err);
+    return handleError(res, req, 500, err);
+  }
 };
 
 exports.create = async function (req, res) {
@@ -95,7 +110,7 @@ exports.create = async function (req, res) {
     location,
     minSalary,
     maxSalary,
-    jobDescription,
+    description,
     howtoApply,
     applyUrl,
     applyEmail,
@@ -118,7 +133,7 @@ exports.create = async function (req, res) {
       location,
       minSalary,
       maxSalary,
-      jobDescription,
+      description,
       howtoApply,
       applyUrl,
       applyEmail,

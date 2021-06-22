@@ -1,10 +1,18 @@
 import { handleError } from "./utils";
 import axiosInstance from "./axiosInstance";
+import qs from "query-string";
 
 const jobApi = {
   getAll: async () => {
     try {
       return await axiosInstance.get(`api/job/`);
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+  getListing: async (query = {}) => {
+    try {
+      return await axiosInstance.get(`api/job?${qs.stringify(query)}`);
     } catch (error) {
       return handleError(error);
     }

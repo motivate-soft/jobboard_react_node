@@ -16,7 +16,7 @@ const COMPANY_COUNT = 100;
 const JOB_COUNT = 100;
 const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
 const STICKY_OPTIONS = ["week", "month"];
-const STATUS_OPTIONS = ["approved", "pending"];
+const STATUS_OPTIONS = ["pending", "approved", "declined"];
 
 const SALEARY_OPTIONS = Array(20)
   .fill(null)
@@ -88,7 +88,7 @@ const importData = async () => {
           location: LOCATION_OPTIONS[_.random(0, LOCATION_OPTIONS.length - 1)],
           minSalary: SALEARY_OPTIONS[_.random(0, 9)],
           maxSalary: SALEARY_OPTIONS[_.random(10, 19)],
-          jobDescription: faker.lorem.text(),
+          description: faker.lorem.text(),
           howtoApply: faker.lorem.text(),
           applyUrl: faker.internet.url(),
           applyEmailL: faker.internet.email(),
