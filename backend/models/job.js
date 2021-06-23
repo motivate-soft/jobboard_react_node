@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 var COLLECTION = "job";
 const Schema = mongoose.Schema;
-const defaultHightlightColor = "red";
+const STICKY_OPTIONS = ["day", "week", "month"];
+const STATUS_OPTIONS = ["pending", "approved", "declined"];
 
 const jobSchema = mongoose.Schema(
   {
@@ -63,7 +64,6 @@ const jobSchema = mongoose.Schema(
     },
     highlightColor: {
       type: String,
-      default: defaultHightlightColor,
     },
     isStickyDay: {
       type: Boolean,
@@ -71,11 +71,11 @@ const jobSchema = mongoose.Schema(
     },
     stickyDuration: {
       type: String,
-      enum: ["week", "month"],
+      enum: STICKY_OPTIONS,
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "declined"],
+      enum: STATUS_OPTIONS,
       default: "pending",
     },
     // payLater: {

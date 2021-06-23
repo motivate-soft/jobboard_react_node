@@ -71,7 +71,8 @@ module.exports.validate = (method) => {
     }
 
     // Company
-    case "createCompany": {
+    case "createCompany":
+    case "updateCompany": {
       return [
         check("name", "company logo is required").not().isEmpty(),
         check("logo", "company logo is required").not().isEmpty(),
@@ -83,7 +84,8 @@ module.exports.validate = (method) => {
     }
 
     // Job
-    case "createJob": {
+    case "createJob":
+    case "updateJob": {
       return [
         check("company", "company is required").not().isEmpty(),
         check("position", "position is required").not().isEmpty(),
@@ -92,7 +94,7 @@ module.exports.validate = (method) => {
         check("location", "location is required").not().isEmpty(),
         check("minSalary", "minSalary is required").not().isEmpty(),
         check("maxSalary", "maxSalary is required").not().isEmpty(),
-        check("jobDescription", "jobDescription is required").not().isEmpty(),
+        check("description", "description is required").not().isEmpty(),
         check("howtoApply", "howtoApply is required").not().isEmpty(),
         check("applyUrl", "applyUrl is required").not().isEmpty(),
         check("applyEmail", "applyEmail is required").not().isEmpty(),

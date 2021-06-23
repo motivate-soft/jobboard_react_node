@@ -1,5 +1,5 @@
 const descriptionMD = `
-<div class="description" itemprop="description"><br><div class="markdown"><p>At Pleased, our mission is to please you and your customers. To achieve that, we offer an all-inclusive, easy-to-use and affordable support software.</p>
+<div className="description" itemprop="description"><br><div className="markdown"><p>At Pleased, our mission is to please you and your customers. To achieve that, we offer an all-inclusive, easy-to-use and affordable support software.</p>
 <p>We’re looking for people who are passionate about our product and serving our clients. We retain our team members with a dynamic and flexible work life which empowers them to create value, and rewards them generously based upon their contribution.</p>
 <p>In this role, you’ll be responsible for running the end to end quality assurance testing for the software, both manually and through automation testing. You’ll be working on complex systems that are used to serve hundred and thousands customers a day. We wrote our system from scratch about 1 year ago, so you’ll be working with the latest technology and won’t have to worry about decades old legacy code.</p>
 <p><strong>Who We Are</strong></p>
@@ -12,7 +12,7 @@ const descriptionMD = `
 <p>Frond-end: Vue.js </p>
 `;
 
-const howtoApplyMD = `<div class="markdown">
+const howtoApplyMD = `<div className="markdown">
 <p>Check out our <a href="https://alchemyandaim.com">website</a> and portfolio to see the type of projects we work on. If you’re interested in applying please send a cover letter via the application form on the Apply URL and in it include the following:</p>
 <ol>
 <li>Tell us what past project you loved working on most and why</li>

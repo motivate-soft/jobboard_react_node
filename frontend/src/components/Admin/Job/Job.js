@@ -1,9 +1,5 @@
 import React, { Fragment, useEffect, useReducer, useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu } from "@headlessui/react";
-import { Transition } from "@headlessui/react";
 import qs from "query-string";
-
 import SideOverlay from "../../Shared/SideOverlay/SideOverlay";
 import {
   DotsVerticalIcon,
@@ -13,16 +9,12 @@ import {
   TrashIcon,
   JobAddIcon,
 } from "@heroicons/react/solid";
-// import JobDetail from "./JobDetail";
+import EditJob from "./EditJob";
 import { useHistory } from "react-router";
 import JobTable from "./JobTable";
 import { useSelector } from "react-redux";
 import jobApi from "../../../service/jobApi";
 import Loader from "../../Shared/Loader/Loader";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 
 function parseQueryOptions(location) {
   const query = qs.parse(location);
@@ -142,6 +134,7 @@ function init(state) {
 export default function Job() {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditting, setIsEditting] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const [state, dispatch] = useReducer(reducer, initialState, init);
 
@@ -207,12 +200,34 @@ export default function Job() {
   }
 
   function handleEditClick(id) {
-    console.log("handleEditClick", id);
     setIsEditting(true);
+    const {
+      jobsList: { items },
+    } = state;
+    console.log("handleEditClick", id);
+
+    console.log(
+      "handleEditClick",
+      items,
+      items.findIndex((obj) => obj._id === id)
+    );
+    let selectedJob = items[items.findIndex((obj) => obj._id === id)];
+    setSelectedJob(selectedJob);
     setIsOpen(true);
   }
 
   function handleDeleteClick(id) {}
+
+  function handleClick(action, id) {
+    if (action === "edit") {
+      handleEditClick(id);
+      return;
+    }
+    if (action === "delete") {
+      handleDeleteClick(id);
+      return;
+    }
+  }
 
   if (
     state.filterListIsLoading ||
@@ -237,16 +252,17 @@ export default function Job() {
           options={state.options}
           filters={state.filters}
           dispatch={dispatch}
+          onClick={handleClick}
         />
       )}
 
-      {/* <SideOverlay
+      <SideOverlay
         className="w-screen max-w-3xl relative border-l border-gray-200"
         open={isOpen}
         setOpen={setIsOpen}
       >
-        <JobDetail isEdit={isEditting} setIsOpen={setIsOpen} />
-      </SideOverlay> */}
+        {selectedJob && <EditJob jobId={selectedJob._id} setOpen={setIsOpen} />}
+      </SideOverlay>
     </div>
   );
 }

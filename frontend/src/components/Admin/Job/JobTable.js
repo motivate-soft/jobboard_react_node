@@ -18,7 +18,7 @@ function useSetOption(option, filter, dispatch) {
 }
 
 export default function JobTable(props) {
-  const { isLoading, jobsList, options, filters, dispatch } = props;
+  const { isLoading, jobsList, options, filters, dispatch, onClick } = props;
 
   const handlePageChange = useSetOption("page", parseFloat, dispatch);
   const handleSortChange = useSetOption(
@@ -41,7 +41,7 @@ export default function JobTable(props) {
     .filter((x) => x).length;
 
   const jobsListItems = jobsList.items.map((job) => (
-    <JobTableRow key={job._id} job={job} />
+    <JobTableRow key={job._id} job={job} onClick={onClick} />
   ));
 
   return (
@@ -111,6 +111,12 @@ export default function JobTable(props) {
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
               Status
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Action
             </th>
           </tr>
         </thead>

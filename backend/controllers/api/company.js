@@ -16,9 +16,14 @@ exports.getAll = async function (req, res) {
 };
 
 exports.retrieve = async function (req, res) {
-  const companyId = req.params.id;
   try {
-    let company = await Company.findById(companyId).select("-password");
+    const companyId = req.params.id;
+    let company = await Company.findById(companyId);
+    if (!company) {
+      message = `Company with id ${companyId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+
     return res.status(200).json(company);
   } catch (error) {
     logger.error(err);
@@ -27,21 +32,22 @@ exports.retrieve = async function (req, res) {
 };
 
 exports.create = async function (req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return handleError(res, req, 400, errors.array(), "invalidData");
-  }
-  const { name, logo, twitter, email, invoiceAddress, invoiceNotes } = req.body;
-
-  logger.info(req.body);
-
   try {
-    // let company = await Company.findOne({ companyName });
-    // if (company) {
-    //   message = `Company with ${companyname} already exists.`;
-    //   logger.debug(message);
-    //   return handleError(res, req, 400, message);
-    // }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return handleError(res, req, 400, errors.array(), "invalidData");
+    }
+
+    const {
+      name,
+      logo,
+      twitter,
+      email,
+      invoiceAddress,
+      invoiceNotes,
+    } = req.body;
+
+    logger.info(req.body);
 
     company = new Company({
       name,
@@ -54,7 +60,7 @@ exports.create = async function (req, res) {
     const newCompany = await company.save();
 
     if (!newCompany) {
-      message = `Failed to create a Company with name ${companyName}`;
+      message = `Failed to create a company`;
       logger.debug(message);
       return handleError(res, req, 400, message);
     }
@@ -62,6 +68,70 @@ exports.create = async function (req, res) {
     return res.status(200).json(newCompany);
   } catch (err) {
     logger.error(err);
+    return handleError(res, req, 500, err);
+  }
+};
+
+exports.update = async function (req, res) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return handleError(res, req, 400, errors.array(), "invalidData");
+    }
+
+    const companyId = req.params.id;
+    let company = await Company.findById(companyId);
+    if (!company) {
+      message = `Company with id ${companyId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+
+    const {
+      name,
+      logo,
+      twitter,
+      email,
+      invoiceAddress,
+      invoiceNotes,
+    } = req.body;
+    logger.info(req.body);
+
+    company.name = name;
+    company.logo = logo;
+    company.twitter = twitter;
+    company.email = email;
+    company.invoiceAddress = invoiceAddress;
+    company.invoiceNotes = invoiceNotes;
+
+    const newCompany = await company.save();
+
+    if (!newCompany) {
+      message = `Failed to save company`;
+      logger.debug(message);
+      return handleError(res, req, 400, message);
+    }
+
+    return res.status(200).json(newCompany);
+  } catch (err) {
+    logger.error(err);
+    return handleError(res, req, 500, err);
+  }
+};
+
+exports.delete = async function (req, res) {
+  const companyId = req.params.id;
+  try {
+    let company = await Company.findById(companyId);
+
+    if (!company) {
+      message = `Company with id ${companyId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+    await company.remove();
+
+    return res.status(204);
+  } catch (error) {
+    logger.error(error);
     return handleError(res, req, 500, err);
   }
 };

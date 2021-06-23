@@ -1,5 +1,15 @@
 import React from "react";
 import moment from "moment";
+import {
+  ChevronRightIcon,
+  DotsVerticalIcon,
+  DuplicateIcon,
+  PencilAltIcon,
+  SearchIcon,
+  SelectorIcon,
+  TrashIcon,
+  UserAddIcon,
+} from "@heroicons/react/solid";
 
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -54,7 +64,7 @@ export default function JobTableRow(props) {
   }
 
   return (
-    <tr className="text-gray-900" onClick={(e) => onClick(_id)}>
+    <tr className="text-gray-900">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
@@ -100,8 +110,24 @@ export default function JobTableRow(props) {
       <td className="px-6 py-4 whitespace-nowrap text-lg">
         ${minSalary / 1000}k - ${maxSalary / 1000}k
       </td>
-      <td className="flex px-6 py-4 whitespace-nowrap">
+      <td className="px-6 py-4 whitespace-nowrap">
         {renderStatusBadge(status)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-lg">
+        <div className="flex">
+          <span onClick={() => onClick("edit", _id)}>
+            <PencilAltIcon
+              className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+              aria-hidden="true"
+            />
+          </span>
+          <span onClick={() => onClick("delete", _id)}>
+            <TrashIcon
+              className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+              aria-hidden="true"
+            />
+          </span>
+        </div>
       </td>
     </tr>
   );

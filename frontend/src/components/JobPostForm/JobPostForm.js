@@ -357,7 +357,7 @@ export default function JobPostForm(props) {
         <JobPostDesign />
         {/* Job detail container */}
         <div className="relative mt-20 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
-          <h3 class="px-4 py-4 text-xl leading-6 font-bold text-gray-900 sm:px-6 sm:py-5">
+          <h3 className="px-4 py-4 text-xl leading-6 font-bold text-gray-900 sm:px-6 sm:py-5">
             Job details
           </h3>
 
@@ -400,7 +400,7 @@ export default function JobPostForm(props) {
                         </svg>
                         <div className="flex text-sm text-gray-600">
                           <label
-                            for="companyLogo"
+                            htmlFor="companyLogo"
                             className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
                           >
                             <span>Upload a file</span>
@@ -624,7 +624,7 @@ export default function JobPostForm(props) {
 
         {/* COMPANY detail container */}
         <div className="relative mt-6 py-6 space-y-6 sm:py-0 sm:space-y-0 sm:divide-y sm:divide-gray-200 border-2 border-gray-200 rounded-md">
-          <h3 class="px-4 py-4 text-xl leading-6 font-bold text-gray-900 sm:px-6 sm:py-5">
+          <h3 className="px-4 py-4 text-xl leading-6 font-bold text-gray-900 sm:px-6 sm:py-5">
             Company
           </h3>
 

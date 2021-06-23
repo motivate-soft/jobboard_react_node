@@ -66,7 +66,7 @@ export default function JobListTableRow(props) {
     if (applyEmail && applyEmail !== "") {
       return (
         <a
-          class="button action-apply apply_104042"
+          className="button action-apply apply_104042"
           href={`mailto:${applyEmail}?subject=New applicant`}
           target="_blank"
           rel="nofollow"

@@ -104,10 +104,19 @@ module.exports = function (middleware, router, controllers) {
     validate("createCompany"),
     apiCtrl.company.create
   );
+  router.get("/api/company/:id", apiCtrl.company.retrieve);
+  router.put(
+    "/api/company/:id",
+    validate("updateCompany"),
+    apiCtrl.company.update
+  );
+  router.delete("/api/company/:id", apiCtrl.company.delete);
 
   // Job
   router.get("/api/job/filter/", apiCtrl.job.getFilter);
   router.get("/api/job/", apiCtrl.job.paginate);
   router.get("/api/job/:id", apiCtrl.job.retrieve);
+  router.put("/api/job/:id", validate("updateJob"), apiCtrl.job.update);
+  router.delete("/api/job/:id", apiCtrl.job.delete);
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
 };

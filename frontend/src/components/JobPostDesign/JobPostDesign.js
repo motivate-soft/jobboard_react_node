@@ -42,7 +42,7 @@ export default function JobPostDesign() {
   return (
     <div className="relative px-4 py-6 border-2 border-gray-200 rounded-md sm:px-6 sm:py-5">
       {/* <div className="absolute  left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1  rounded-top rounded-md rounded-b-none border border-b-0 border-gray-200 bg-white "> */}
-      <h3 class="mb-8 text-xl leading-6 font-bold text-gray-900">
+      <h3 className="mb-8 text-xl leading-6 font-bold text-gray-900">
         Design your job posts
       </h3>
       <div>
@@ -129,7 +129,7 @@ export default function JobPostDesign() {
           htmlFor="isHighlightColor"
           className="ml-2 block text-sm text-gray-900"
         >
-          <span class="flex items-center">
+          <span className="flex items-center">
             Highlight with your company's 🌈 brand color (+$
             <span>349</span>)
             <input

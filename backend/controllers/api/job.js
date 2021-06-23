@@ -106,47 +106,59 @@ exports.getFilter = async function (req, res) {
 };
 
 exports.retrieve = async function (req, res) {
-  //
   const jobId = req.params.id;
   console.log("jobId", jobId);
 
   try {
-    let job = await Job.findById(jobId).populate("company");
+    // let job = await Job.findById(jobId).populate("company").populate("logo");
+    let job = await Job.findById(jobId).populate({
+      path: "company",
+      model: "company",
+      populate: {
+        path: "logo",
+        model: "media",
+      },
+    });
+    if (!job) {
+      message = `Job with id ${jobId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
     return res.status(200).json(job);
   } catch (error) {
-    logger.error(err);
+    logger.error(error);
     return handleError(res, req, 500, err);
   }
 };
 
 exports.create = async function (req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return handleError(res, req, 400, errors.array(), "invalidData");
-  }
-  const {
-    company,
-    position,
-    primaryTag,
-    tags,
-    location,
-    minSalary,
-    maxSalary,
-    description,
-    howtoApply,
-    applyUrl,
-    applyEmail,
-    isShowLogo,
-    isBlastEmail,
-    isHighlight,
-    highlightColor,
-    isStickyDay,
-    stickyDuration,
-  } = req.body;
-
-  logger.info(req.body);
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return handleError(res, req, 400, errors.array(), "invalidData");
+    }
+
+    const {
+      company,
+      position,
+      primaryTag,
+      tags,
+      location,
+      minSalary,
+      maxSalary,
+      description,
+      howtoApply,
+      applyUrl,
+      applyEmail,
+      isShowLogo,
+      isBlastEmail,
+      isHighlight,
+      highlightColor,
+      isStickyDay,
+      stickyDuration,
+    } = req.body;
+
+    logger.info(req.body);
+
     job = new Job({
       company,
       position,
@@ -182,9 +194,90 @@ exports.create = async function (req, res) {
 };
 
 exports.update = async function (req, res) {
-  //
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return handleError(res, req, 400, errors.array(), "invalidData");
+    }
+
+    const jobId = req.params.id;
+    let job = await Job.findById(jobId);
+    if (!job) {
+      message = `Job with id ${jobId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+
+    const {
+      company,
+      position,
+      primaryTag,
+      tags,
+      location,
+      minSalary,
+      maxSalary,
+      description,
+      howtoApply,
+      applyUrl,
+      applyEmail,
+      isShowLogo,
+      isBlastEmail,
+      isHighlight,
+      highlightColor,
+      isStickyDay,
+      stickyDuration,
+      status,
+    } = req.body;
+
+    job.company = company;
+    job.position = position;
+    job.primaryTag = primaryTag;
+    job.tags = tags;
+    job.location = location;
+    job.minSalary = minSalary;
+    job.maxSalary = maxSalary;
+    job.description = description;
+    job.howtoApply = howtoApply;
+    job.applyUrl = applyUrl;
+    job.applyEmail = applyEmail;
+    job.isShowLogo = isShowLogo;
+    job.isBlastEmail = isBlastEmail;
+    job.isHighlight = isHighlight;
+    job.highlightColor = highlightColor;
+    job.isStickyDay = isStickyDay;
+    job.stickyDuration = stickyDuration;
+    job.status = status;
+
+    logger.info(req.body);
+
+    let newJob = await job.save();
+
+    if (!newJob) {
+      message = `Failed to update a Job`;
+      logger.debug(message);
+      return handleError(res, req, 400, message);
+    }
+
+    return res.status(200).json(newJob);
+  } catch (err) {
+    logger.error(err);
+    return handleError(res, req, 500, err);
+  }
 };
 
 exports.delete = async function (req, res) {
-  //
+  const jobId = req.params.id;
+  try {
+    let job = await Job.findById(jobId);
+
+    if (!job) {
+      message = `Job with id ${jobId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+    await job.remove();
+
+    return res.status(204);
+  } catch (error) {
+    logger.error(error);
+    return handleError(res, req, 500, err);
+  }
 };

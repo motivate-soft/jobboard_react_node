@@ -14,13 +14,34 @@ const CONNECTION_URI = nconf.get("mongoURI");
 
 const COMPANY_COUNT = 100;
 const JOB_COUNT = 100;
+const PRIMARYTAG_OPTIONS = [
+  "Software Development",
+  "Customer Support",
+  "Sales",
+  "Marketing",
+  "Design",
+  "Front End",
+  "Back End",
+  "Legal",
+  "Testing",
+  "Quality Assurance",
+  "Non-Tech",
+  "Other",
+];
 const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
-const STICKY_OPTIONS = ["week", "month"];
+const STICKY_OPTIONS = ["day", "week", "month"];
 const STATUS_OPTIONS = ["pending", "approved", "declined"];
-
-const SALEARY_OPTIONS = Array(20)
+const SALARY_OPTIONS = Array(20)
   .fill(null)
   .map((u, i) => (i + 1) * 10000);
+const COLORS_OPTIONS = [
+  "#ff4742", // default color
+  "#ffed51",
+  "#0042aa",
+  "#ff00a2",
+  "#00ff00",
+  "#fff9c9",
+];
 
 let options = {
   keepAlive: 1,
@@ -81,21 +102,25 @@ const importData = async () => {
         return {
           company: companyData[i]._id,
           position: faker.name.jobTitle(),
-          primaryTag: faker.name.jobArea(),
+          primaryTag:
+            PRIMARYTAG_OPTIONS[_.random(0, PRIMARYTAG_OPTIONS.length - 1)],
           tags: Array(_.random(3, 5))
             .fill(null)
             .map((a, i) => faker.name.jobArea()),
           location: LOCATION_OPTIONS[_.random(0, LOCATION_OPTIONS.length - 1)],
-          minSalary: SALEARY_OPTIONS[_.random(0, 9)],
-          maxSalary: SALEARY_OPTIONS[_.random(10, 19)],
+          minSalary: SALARY_OPTIONS[_.random(0, 9)],
+          maxSalary: SALARY_OPTIONS[_.random(10, 19)],
           description: faker.lorem.text(),
           howtoApply: faker.lorem.text(),
           applyUrl: faker.internet.url(),
-          applyEmailL: faker.internet.email(),
+          applyEmail: faker.internet.email(),
           isShowLogo: true,
           isBlastEmail: true,
           isHighlight: _.random(1.0) > 0.5,
-          highlightColor: faker.internet.color(),
+          highlightColor:
+            _.random(1.0) > 0.5
+              ? COLORS_OPTIONS[_.random(0, COLORS_OPTIONS.length - 1)]
+              : null,
           isStickyDay: _.random(1.0) > 0.5,
           stickyDuration: STICKY_OPTIONS[_.random(0, 1)],
           status: STATUS_OPTIONS[_.random(0, 2)],
