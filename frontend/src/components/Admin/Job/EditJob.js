@@ -10,6 +10,7 @@ import Editor from "../../Shared/MDEditor/Editor";
 import companyApi from "../../../service/companyApi";
 import jobApi from "../../../service/jobApi";
 import { toast } from "react-toastify";
+import classNames from "classnames";
 
 const baseUrl = "http://localhost:5000";
 const salaryOptions = Array(20)
@@ -114,6 +115,8 @@ export default function EditJob(props) {
     try {
       if (!jobId) return;
       let { data } = await jobApi.retrieve(jobId);
+      console.log("Editjob->fetchJobDetail->data", data);
+
       setCompanyId(data.company._id);
       const {
         company: { name, logo, twitter, email, invoiceAddress, invoiceNotes },
@@ -166,7 +169,7 @@ export default function EditJob(props) {
       });
       setValue("companyLogo", logo, { shouldValidate: true });
     } catch (error) {
-      console.log("Editjob->fetchJobDetail", error);
+      console.log("Editjob->fetchJobDetail->error", error);
     }
   }
 
@@ -226,11 +229,12 @@ export default function EditJob(props) {
 
   function handleApprove(e) {
     setValue("status", "approved");
-    handleSubmit(onSubmit);
+    console.log("handleApprove", getValues());
+    handleSubmit();
   }
   function handleDecline(e) {
     setValue("status", "declined");
-    handleSubmit(onSubmit);
+    handleSubmit();
   }
 
   function renderActionButtons() {
@@ -308,10 +312,7 @@ export default function EditJob(props) {
           {/* Company name */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyName"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyName" className="label-default">
                 Company name*
               </label>
             </div>
@@ -321,23 +322,18 @@ export default function EditJob(props) {
                 type="text"
                 name="companyName"
                 id="companyName"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyName ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyName,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.companyName?.message}
-              </span>
+              <span className="span-error">{errors.companyName?.message}</span>
             </div>
           </div>
 
           {/* Company Logo */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyLogo"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyLogo" className="label-default">
                 Company logo <br /> (.jpg or .png)
               </label>
             </div>
@@ -360,40 +356,7 @@ export default function EditJob(props) {
                   )}
                 </div>
 
-                <DropzoneUploader onUpload={handleUpload}>
-                  <div className="dz-message">
-                    <div className="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                      <div className="space-y-1 text-center">
-                        <svg
-                          className="mx-auto h-12 w-12 text-gray-400"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 48 48"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          ></path>
-                        </svg>
-                        <div className="flex text-sm text-gray-600">
-                          <label
-                            htmlFor="companyLogo"
-                            className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                          >
-                            <span>Upload a file</span>
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </DropzoneUploader>
+                <DropzoneUploader onUpload={handleUpload} />
                 <span className="mt-2 text-xs text-pink-500">
                   {errors.companyLogo?.message}
                 </span>
@@ -404,10 +367,7 @@ export default function EditJob(props) {
           {/* Company twitter */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyTwitter"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyTwitter" className="label-default">
                 Company twitter
               </label>
             </div>
@@ -417,12 +377,12 @@ export default function EditJob(props) {
                 id="companyTwitter"
                 name="companyTwitter"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyTwitter ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyTwitter,
+                })}
                 placeholder="username"
               />
-              <span className="mt-2 text-xs text-pink-500">
+              <span className="span-error">
                 {errors.companyTwitter?.message}
               </span>
             </div>
@@ -431,10 +391,7 @@ export default function EditJob(props) {
           {/* Company email */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyEmail"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyEmail" className="label-default">
                 Company email*
                 <br /> (stays private, for invoice + edit link)
               </label>
@@ -445,23 +402,18 @@ export default function EditJob(props) {
                 id="companyEmail"
                 name="companyEmail"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyEmail ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyEmail,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.companyEmail?.message}
-              </span>
+              <span className="span-error">{errors.companyEmail?.message}</span>
             </div>
           </div>
 
           {/* Invoice address */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="invoiceAddress"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="invoiceAddress" className="label-default">
                 Invoice address
               </label>
             </div>
@@ -471,12 +423,12 @@ export default function EditJob(props) {
                 id="invoiceAddress"
                 name="invoiceAddress"
                 rows={5}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.invoiceAddress ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.invoiceAddress,
+                })}
                 placeholder="e.g. your company's full name and full invoice address, including building, street, city and country; also things like your VAT number, this is shown on the invoice."
               />
-              <span className="mt-2 text-xs text-pink-500">
+              <span className="span-error">
                 {errors.invoiceAddress?.message}
               </span>
             </div>
@@ -485,10 +437,7 @@ export default function EditJob(props) {
           {/* Invoice notes/po number */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="invoiceNotes"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="invoiceNotes" className="label-default">
                 Invoice notes / po number
               </label>
             </div>
@@ -498,14 +447,12 @@ export default function EditJob(props) {
                 id="invoiceNotes"
                 name="invoiceNotes"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.invoiceNotes ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.invoiceNotes,
+                })}
                 placeholder="e.g. PO number 1234"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.invoiceNotes?.message}
-              </span>
+              <span className="span-error">{errors.invoiceNotes?.message}</span>
             </div>
           </div>
         </div>
@@ -519,10 +466,7 @@ export default function EditJob(props) {
           {/* Position*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="position"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="position" className="label-default">
                 Position*
               </label>
             </div>
@@ -532,32 +476,27 @@ export default function EditJob(props) {
                 id="position"
                 name="position"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.position ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.position,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.position?.message}
-              </span>
+              <span className="span-error">{errors.position?.message}</span>
             </div>
           </div>
 
           {/* Primary Tag */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="company_name"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="company_name" className="label-default">
                 Primary tag*
               </label>
             </div>
             <div className="sm:col-span-2">
               <select
                 {...register("primaryTag")}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.primaryTag ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.primaryTag,
+                })}
               >
                 <option value="">Select a primary tag</option>
                 {primaryTagOptions.map((tag, index) => (
@@ -566,20 +505,15 @@ export default function EditJob(props) {
                   </option>
                 ))}
               </select>
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.primaryTag?.message}
-              </span>
+              <span className="span-error">{errors.primaryTag?.message}</span>
             </div>
           </div>
 
           {/* Tags */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="tags"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
-                Tags separated by comma*
+              <label htmlFor="tags" className="label-default">
+                Tags*
               </label>
             </div>
             <div className="sm:col-span-2">
@@ -588,24 +522,19 @@ export default function EditJob(props) {
                 type="text"
                 name="tags"
                 id="tags"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.tags ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.tags,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.tags?.message}
-              </span>
+              <span className="span-error">{errors.tags?.message}</span>
             </div>
           </div>
 
           {/* Location */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="location"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
-                Job is restricted to location?*
+              <label htmlFor="location" className="label-default">
+                location*
               </label>
             </div>
             <div className="sm:col-span-2">
@@ -615,20 +544,18 @@ export default function EditJob(props) {
                 name="location"
                 id="location"
                 defaultValue="Worldwide"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.location ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.location,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.location?.message}
-              </span>
+              <span className="span-error">{errors.location?.message}</span>
             </div>
           </div>
 
           {/* Annual Salary */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2">
+              <label className="label-default">
                 Annual salary or compensation in usd <br />
                 (or annualized, in usd equivalent)*
               </label>
@@ -640,9 +567,9 @@ export default function EditJob(props) {
                     {...register("minSalary")}
                     id="minSalary"
                     name="minSalary"
-                    className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                      errors.minSalary ? "bg-error" : ""
-                    }`}
+                    className={classNames("block", "w-full", "input-indigo", {
+                      "bg-pink-200": errors.minSalary,
+                    })}
                   >
                     <option value="">Minimum per year</option>
                     {salaryOptions.map((value, index) => (
@@ -652,7 +579,7 @@ export default function EditJob(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="mt-2 text-xs text-pink-500">
+                    <span className="span-error">
                       {errors.minSalary?.message}
                     </span>
                   </div>
@@ -662,9 +589,9 @@ export default function EditJob(props) {
                     {...register("maxSalary")}
                     id="maxSalary"
                     name="maxSalary"
-                    className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                      errors.maxSalary ? "bg-error" : ""
-                    }`}
+                    className={classNames("block", "w-full", "input-indigo", {
+                      "bg-pink-200": errors.maxSalary,
+                    })}
                   >
                     <option value="">Maximum per year</option>
                     {salaryOptions.map((value, index) => (
@@ -674,7 +601,7 @@ export default function EditJob(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="mt-2 text-xs text-pink-500">
+                    <span className="span-error">
                       {errors.maxSalary?.message}
                     </span>
                   </div>
@@ -686,10 +613,7 @@ export default function EditJob(props) {
           {/* Job description*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="description"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="description" className="label-default">
                 Job description*
               </label>
             </div>
@@ -731,19 +655,14 @@ export default function EditJob(props) {
                   />
                 )}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.description?.message}
-              </span>
+              <span className="span-error">{errors.description?.message}</span>
             </div>
           </div>
 
           {/* How to apply*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="howtoApply"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="howtoApply" className="label-default">
                 How to apply*
               </label>
             </div>
@@ -753,23 +672,18 @@ export default function EditJob(props) {
                 id="howtoApply"
                 name="howtoApply"
                 rows={3}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.howtoApply ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.howtoApply,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.howtoApply?.message}
-              </span>
+              <span className="span-error">{errors.howtoApply?.message}</span>
             </div>
           </div>
 
           {/* Apply url */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="applyUrl"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="applyUrl" className="label-default">
                 Apply url*
               </label>
             </div>
@@ -779,24 +693,19 @@ export default function EditJob(props) {
                 id="applyUrl"
                 name="applyUrl"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.applyUrl ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.applyUrl,
+                })}
                 placeholder="https://"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.applyUrl?.message}
-              </span>
+              <span className="span-error">{errors.applyUrl?.message}</span>
             </div>
           </div>
 
           {/* Apply email */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="applyEmail"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="applyEmail" className="label-default">
                 Apply email*
               </label>
             </div>
@@ -806,14 +715,12 @@ export default function EditJob(props) {
                 id="applyEmail"
                 name="applyEmail"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.applyEmail ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.applyEmail,
+                })}
                 placeholder="Apply email"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.applyEmail?.message}
-              </span>
+              <span className="span-error">{errors.applyEmail?.message}</span>
             </div>
           </div>
         </div>
@@ -917,7 +824,7 @@ export default function EditJob(props) {
             <div>
               <select
                 {...register("stickyDuration")}
-                className="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md "
+                className="block w-full input-indigo "
               >
                 {stickyDurationOptions.map((option, index) => (
                   <option key={index} value={option}>
@@ -944,7 +851,7 @@ export default function EditJob(props) {
           {/* <div className="w-32">
             <select
               {...register("status")}
-              className="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md "
+              className="block w-full input-indigo "
             >
               {statusOptions.map((option, index) => (
                 <option key={index} value={option}>
@@ -955,10 +862,7 @@ export default function EditJob(props) {
           </div> */}
           <div>{renderActionButtons()}</div>
 
-          <button
-            type="submit"
-            className="inline-flex full-width justify-center px-4 py-2 border border-transparent shadow-sm text-base font-bold rounded-md text-white bg-indigo-500 hover:bg-white hover:text-indigo-500 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
+          <button type="submit" className="btn-indigo">
             Save
           </button>
         </div>

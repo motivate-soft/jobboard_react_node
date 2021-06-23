@@ -4,7 +4,7 @@ import PageTitle from "../../../containers/admin/PageTitle";
 
 export default function JobPage() {
   return (
-    <div>
+    <div className="shadow bg-white border-b sm:rounded-lg">
       <PageTitle title={"Job"} />
       <Job />
     </div>

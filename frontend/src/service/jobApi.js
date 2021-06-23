@@ -10,6 +10,14 @@ const jobApi = {
       return handleError(error);
     }
   },
+  getListing: async (query = {}) => {
+    try {
+      return await axiosInstance.get(`api/job/listing?${qs.stringify(query)}`);
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
   getFilter: async () => {
     try {
       return await axiosInstance.get(`api/job/filter/`);
@@ -17,7 +25,7 @@ const jobApi = {
       return handleError(error);
     }
   },
-  getListing: async (query = {}) => {
+  getList: async (query = {}) => {
     try {
       return await axiosInstance.get(`api/job?${qs.stringify(query)}`);
     } catch (error) {

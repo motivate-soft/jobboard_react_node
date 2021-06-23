@@ -2,6 +2,8 @@ import React, { Fragment, useCallback } from "react";
 import JobTableRow from "./JobTableRow";
 import Pagination from "./Pagination";
 
+const statusOptions = ["pending", "approved", "declined"];
+
 function useSetOption(option, filter, dispatch) {
   const callback = useCallback(filter, []);
 
@@ -67,8 +69,8 @@ export default function JobTable(props) {
           </div>
         </div>
       </div>
-      <div className="flex justify-between mb-6">
-        <div className="flex items-center">
+      <div className="relative flex justify-center mb-12 w-full">
+        <div className="absolute left-0 leading-10 p-0">
           {`Showing ${jobsList.from}—${jobsList.to} of ${jobsList.recordsFiltered} jobs`}
         </div>
         <Pagination
@@ -79,43 +81,25 @@ export default function JobTable(props) {
         />
       </div>
 
-      <table className="min-w-full overflow-scroll divide-y divide-gray-200">
+      <table className="min-w-full overflow-scroll divide-y divide-gray-200 border-b border-gray-200">
         <thead className="bg-gray-200">
           <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Name
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Position
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Location
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Salary
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Status
             </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
+            <th scope="col" className="th-default">
               Action
             </th>
           </tr>
@@ -124,6 +108,14 @@ export default function JobTable(props) {
           {jobsListItems}
         </tbody>
       </table>
+      <div className="flex justify-center mt-12 mb-20 w-full">
+        <Pagination
+          siblings={2}
+          current={jobsList.pageIndex}
+          total={jobsList.pageCount}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </Fragment>
   );
 }

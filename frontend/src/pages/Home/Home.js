@@ -17,14 +17,17 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex flex-col h-screen pt-20 bg-gray-100">
-      <button
-        type="submit"
-        className="mb-10 mr-auto ml-10  py-2 px-4 inline-flex font-sans justify-center border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        onClick={() => setIsJobpostOpened(true)}
-      >
-        Post a Job
-      </button>
+    <div className="relative flex flex-col min-h-screen pt-20 bg-gray-100">
+      <div className="container mx-auto">
+        <button
+          type="submit"
+          className="btn-indigo mr-auto mb-12"
+          onClick={() => setIsJobpostOpened(true)}
+        >
+          Post a Job
+        </button>
+      </div>
+
       <JobListTable onClickRow={handleClick} />
       <SideOverlay
         className="w-screen max-w-4xl relative border-l border-gray-200"

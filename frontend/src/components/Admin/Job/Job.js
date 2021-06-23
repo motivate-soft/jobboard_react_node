@@ -180,7 +180,7 @@ export default function Job() {
         params[`filter_${slug}`] = filters[slug];
       });
 
-      const { data } = await jobApi.getListing(params);
+      const { data } = await jobApi.getList(params);
       dispatch({ type: "FETCH_JOBS_LIST_SUCCESS", jobsList: data });
     } catch (error) {
       console.log("admin->job->fetchJobs:error", error);

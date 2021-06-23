@@ -29,7 +29,7 @@ export default function JobDetail(props) {
     if (job.applyEmail && job.applyEmail !== "") {
       return (
         <a
-          className="button action-apply apply_104042"
+          className="button action-apply btn-indigo"
           href={`mailto:${job.applyEmail}?subject=New applicant`}
           target="_blank"
           rel="nofollow"

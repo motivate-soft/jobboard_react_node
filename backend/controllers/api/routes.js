@@ -36,15 +36,21 @@ const uploadPhoto = multer({
 
 module.exports = function (middleware, router, controllers) {
   const apiCtrl = controllers.api;
-
+  /**
+   *  Common api
+   */
   router.get("/api/version", function (req, res) {
     return res.json({ version: pkg.version });
   });
-
-  // Media
+  
+  /**
+   *  Media api
+   */
   router.post("/api/media/", uploadPhoto.single("file"), apiCtrl.media.create);
 
-  // auth
+  /**
+   *  Auth api
+   */
   router.post("/api/auth/login", validate("login"), apiCtrl.auth.login);
   router.post(
     "/api/auth/register",
@@ -64,7 +70,9 @@ module.exports = function (middleware, router, controllers) {
     apiCtrl.auth.changePassword
   );
 
-  // user
+  /**
+   *  User api
+   */
   router.get(
     "/api/user/",
     middleware.checkAuth,
@@ -98,25 +106,67 @@ module.exports = function (middleware, router, controllers) {
     apiCtrl.user.delete
   );
 
-  // Company
+  /**
+   *  Company api
+   */
   router.post(
     "/api/company/",
     validate("createCompany"),
     apiCtrl.company.create
   );
   router.get("/api/company/:id", apiCtrl.company.retrieve);
+
+  // admin
   router.put(
     "/api/company/:id",
     validate("updateCompany"),
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
     apiCtrl.company.update
   );
-  router.delete("/api/company/:id", apiCtrl.company.delete);
+  router.delete(
+    "/api/company/:id",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    apiCtrl.company.delete
+  );
 
-  // Job
-  router.get("/api/job/filter/", apiCtrl.job.getFilter);
-  router.get("/api/job/", apiCtrl.job.paginate);
-  router.get("/api/job/:id", apiCtrl.job.retrieve);
-  router.put("/api/job/:id", validate("updateJob"), apiCtrl.job.update);
-  router.delete("/api/job/:id", apiCtrl.job.delete);
+  /**
+   *  Job api
+   */
+  router.get("/api/job/listing", apiCtrl.job.listing); // user api
+  router.get(
+    "/api/job/filter/",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    apiCtrl.job.getFilter
+  );
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
+
+  // admin
+  router.get(
+    "/api/job",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    apiCtrl.job.paginate
+  );
+  router.get(
+    "/api/job/:id",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    apiCtrl.job.retrieve
+  );
+  router.put(
+    "/api/job/:id",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    validate("updateJob"),
+    apiCtrl.job.update
+  );
+  router.delete(
+    "/api/job/:id",
+    middleware.checkAuth,
+    middleware.checkRole("admin"),
+    apiCtrl.job.delete
+  );
 };

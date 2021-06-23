@@ -4,6 +4,27 @@
 @tailwind utilities;
 
 @layer base {
+  /* heading */
+  h1 {
+    @apply text-5xl;
+  }
+  h2 {
+    @apply text-4xl;
+  }
+  h3 {
+    @apply text-3xl;
+  }
+  h4 {
+    @apply text-2xl;
+  }
+  h5 {
+    @apply text-xl;
+  }
+  h6 {
+    @apply text-lg;
+  }
+
+  /* font */
   @font-face {
     font-family: Nunito;
     font-weight: 200;
@@ -80,6 +101,41 @@
     font-weight: 900;
     font-style: italic;
     src: url(./assets/fonts/Nunito/Nunito-BlackItalic.ttf) format("woff");
+  }
+}
+
+@layer components {
+  .btn-blue {
+    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
+  }
+  .btn-indigo {
+    @apply inline-flex px-4 py-2 font-sans justify-center border  border-none shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none;
+    /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
+  }
+  .btn-indigo-outlined {
+    @apply inline-flex px-4 py-2 font-sans justify-center border  border-indigo-500 shadow-sm text-lg font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none;
+    /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
+  }
+  .btn-indigo-sm {
+    @apply inline-flex px-2 py-1 font-sans justify-center border  border-none shadow-sm text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none;
+  }
+  .btn-indigo-outlined-sm {
+    @apply inline-flex px-2 py-1 font-sans justify-center border border-indigo-500 shadow-sm text-base font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none;
+    /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
+  }
+
+  .th-default {
+    @apply px-6 py-3 text-base text-left font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .input-indigo {
+    @apply shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md;
+  }
+  .span-error {
+    @apply mt-2 text-xs text-pink-500;
+  }
+  .label-default {
+    @apply block text-base font-semibold text-gray-900 sm:mt-px sm:pt-2;
   }
 }
 
@@ -176,4 +232,13 @@ input[type="range"]:focus::-ms-fill-upper {
 
 .ql-container {
   min-height: 200px;
+}
+
+/* dropzone */
+.filepicker.dropzone {
+  border-style: dashed;
+  border-color: #e5e7eb;
+  border-width: 2px;
+  border-radius: 8px;
+  /* border-2 border-gray-300 border-dashed rounded-md */
 }

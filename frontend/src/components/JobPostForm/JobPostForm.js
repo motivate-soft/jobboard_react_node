@@ -12,6 +12,7 @@ import { useJobPost } from "../../contexts/jobContext";
 import companyApi from "../../service/companyApi";
 import jobApi from "../../service/jobApi";
 import { toast } from "react-toastify";
+import classNames from "classnames";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -36,41 +37,45 @@ export default function JobPostForm(props) {
   const { open, setOpen } = props;
   const { state, dispatch } = useJobPost();
 
-  const validationSchema = Yup.object().shape({
-    companyName: Yup.string().required("Company Name is required"),
-    position: Yup.string().required("Position is required"),
-    primaryTag: Yup.string().required("PrimaryTag is required"),
-    tags: Yup.string().required("Tags are required"),
-    location: Yup.string().required("Location are required"),
+  const validationSchema = Yup.object().shape(
+    {
+      companyName: Yup.string().required("Company Name is required"),
+      position: Yup.string().required("Position is required"),
+      primaryTag: Yup.string().required("PrimaryTag is required"),
+      tags: Yup.string().required("Tags are required"),
+      location: Yup.string().required("Location are required"),
 
-    minSalary: Yup.string().required("Minimum salary is required"),
-    maxSalary: Yup.string().required("Maximum salary is required"),
-    jobDescription: Yup.string().required("Job description is required"),
-    howtoApply: Yup.string().required("This field is required"),
-    applyUrl: Yup.string().required("This field is required"),
-    applyEmail: Yup.string().required("This field is required"),
+      minSalary: Yup.string().required("Minimum salary is required"),
+      maxSalary: Yup.string().required("Maximum salary is required"),
+      description: Yup.string().required("Job description is required"),
+      howtoApply: Yup.string().required("This field is required"),
+      applyUrl: Yup.string().when("applyEmail", {
+        is: (applyEmail) => !applyEmail || applyEmail.length === 0,
+        then: Yup.string().required("Apply url is required"),
+        otherwise: Yup.string(),
+      }),
+      applyEmail: Yup.string().when("applyUrl", {
+        is: (applyUrl) => !applyUrl || applyUrl.length === 0,
+        then: Yup.string()
+          .email("Email is not valid")
+          .required("Apply email is required"),
+        otherwise: Yup.string(),
+      }),
 
-    companyLogo: Yup.string().required("This field is required"),
-    companyTwitter: Yup.string().required("This field is required"),
-    companyEmail: Yup.string().required("This field is required"),
-    invoiceAddress: Yup.string().required("This field is required"),
-    invoiceNotes: Yup.string().required("This field is required"),
-    // payLater: Yup.bool(),
-  });
+      companyLogo: Yup.string().required("This field is required"),
+      companyTwitter: Yup.string().required("This field is required"),
+      companyEmail: Yup.string().email().required("This field is required"),
+      invoiceAddress: Yup.string().required("This field is required"),
+      invoiceNotes: Yup.string().required("This field is required"),
+      payLater: Yup.bool(),
+    },
+    ["applyEmail", "applyUrl"]
+  );
 
   const formOptions = { resolver: yupResolver(validationSchema) };
-
-  // get functions to build form with useForm() hook
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    getValues,
-    control,
-    formState,
-  } = useForm(formOptions);
-
+  const { register, handleSubmit, setValue, control, formState } = useForm(
+    formOptions
+  );
   const { errors } = formState;
 
   useEffect(() => {
@@ -78,11 +83,6 @@ export default function JobPostForm(props) {
       type: "RESET_JOB",
     });
   }, []);
-
-  useEffect(() => {
-    console.log("formState", formState);
-    console.log("getValues", getValues());
-  });
 
   function handleChange(fieldName, value) {
     console.log("JobPostForm->handleChange:useJobpost", state);
@@ -155,7 +155,7 @@ export default function JobPostForm(props) {
         location: formData.location,
         minSalary: formData.minSalary,
         maxSalary: formData.maxSalary,
-        jobDescription: formData.jobDescription,
+        description: formData.description,
         howtoApply: formData.howtoApply,
         applyUrl: formData.applyUrl,
         applyEmail: formData.applyEmail,
@@ -170,9 +170,10 @@ export default function JobPostForm(props) {
       };
 
       let { data } = await jobApi.create(job);
-      toast.success("Job posted successfully" + data._id);
+      console.log("JobPostForm->onSubmit->success", data);
+      toast.success("Job posted successfully");
     } catch (error) {
-      console.log("JobPostForm->onSubmit", error);
+      console.log("JobPostForm->onSubmit->error", error);
     }
   }
 
@@ -192,10 +193,7 @@ export default function JobPostForm(props) {
             </div>
 
             <div className="h-7 flex items-center">
-              <Link
-                to="/buy-bundle"
-                className="mr-4 inline-flex font-sans justify-center py-2 px-4 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
+              <Link to="/buy-bundle" className="mr-4  btn-indigo">
                 Buy a bundle
               </Link>
               <button
@@ -215,10 +213,7 @@ export default function JobPostForm(props) {
           {/* Company name */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyName"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyName" className="label-default">
                 Company name*
               </label>
             </div>
@@ -228,24 +223,19 @@ export default function JobPostForm(props) {
                 type="text"
                 name="companyName"
                 id="companyName"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyName ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyName,
+                })}
                 onChange={(e) => handleChange("companyName", e.target.value)}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.companyName?.message}
-              </span>
+              <span className="span-error">{errors.companyName?.message}</span>
             </div>
           </div>
 
           {/* Position*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="position"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="position" className="label-default">
                 Position*
               </label>
             </div>
@@ -255,33 +245,28 @@ export default function JobPostForm(props) {
                 id="position"
                 name="position"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.position ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.position,
+                })}
                 onChange={(e) => handleChange("position", e.target.value)}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.position?.message}
-              </span>
+              <span className="span-error">{errors.position?.message}</span>
             </div>
           </div>
 
           {/* Primary Tag */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="company_name"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="company_name" className="label-default">
                 Primary tag*
               </label>
             </div>
             <div className="sm:col-span-2">
               <select
                 {...register("primaryTag")}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.primaryTag ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.primaryTag,
+                })}
                 onChange={(e) => handleChange("primaryTag", e.target.value)}
               >
                 <option value="">Select a primary tag</option>
@@ -291,19 +276,14 @@ export default function JobPostForm(props) {
                   </option>
                 ))}
               </select>
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.primaryTag?.message}
-              </span>
+              <span className="span-error">{errors.primaryTag?.message}</span>
             </div>
           </div>
 
           {/* Tags */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="tags"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="tags" className="label-default">
                 Tags separated by comma*
               </label>
             </div>
@@ -313,24 +293,19 @@ export default function JobPostForm(props) {
                 type="text"
                 name="tags"
                 id="tags"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.tags ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.tags,
+                })}
                 onChange={(e) => handleChange("tags", e.target.value)}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.tags?.message}
-              </span>
+              <span className="span-error">{errors.tags?.message}</span>
             </div>
           </div>
 
           {/* Location */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="location"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="location" className="label-default">
                 Job is restricted to location?*
               </label>
             </div>
@@ -341,14 +316,12 @@ export default function JobPostForm(props) {
                 name="location"
                 id="location"
                 defaultValue="Worldwide"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.location ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.location,
+                })}
                 onChange={(e) => handleChange("location", e.target.value)}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.location?.message}
-              </span>
+              <span className="span-error">{errors.location?.message}</span>
             </div>
           </div>
         </div>
@@ -364,10 +337,7 @@ export default function JobPostForm(props) {
           {/* Company Logo */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyLogo"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyLogo" className="label-default">
                 Company logo <br /> (.jpg or .png)
               </label>
             </div>
@@ -380,59 +350,17 @@ export default function JobPostForm(props) {
             />
             <div className="col-span-2">
               <div className="flex flex-col">
-                <DropzoneUploader onUpload={handleUpload}>
-                  <div className="dz-message">
-                    <div className="max-w-lg flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                      <div className="space-y-1 text-center">
-                        <svg
-                          className="mx-auto h-12 w-12 text-gray-400"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 48 48"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                          ></path>
-                        </svg>
-                        <div className="flex text-sm text-gray-600">
-                          <label
-                            htmlFor="companyLogo"
-                            className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                          >
-                            <span>Upload a file</span>
-                            {/* <input
-                              hidden
-                              {...register("companyLogo")}
-                              id="companyLogo"
-                              name="companyLogo"
-                              type="text"
-                              className="sr-only"
-                            /> */}
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </DropzoneUploader>
-                <span className="mt-2 text-xs text-pink-500">
+                <DropzoneUploader onUpload={handleUpload} />
+                <span className="span-error">
                   {errors.companyLogo?.message}
                 </span>
               </div>
             </div>
           </div>
-          {/* <DropzoneUploader /> */}
           {/* Annual Salary */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2">
+              <label className="label-default">
                 Annual salary or compensation in usd <br />
                 (or annualized, in usd equivalent)*
               </label>
@@ -444,9 +372,9 @@ export default function JobPostForm(props) {
                     {...register("minSalary")}
                     id="minSalary"
                     name="minSalary"
-                    className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                      errors.minSalary ? "bg-error" : ""
-                    }`}
+                    className={classNames("block", "w-full", "input-indigo", {
+                      "bg-pink-200": errors.minSalary,
+                    })}
                   >
                     <option value="">Minimum per year</option>
                     {salaryOptions.map((value, index) => (
@@ -456,7 +384,7 @@ export default function JobPostForm(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="mt-2 text-xs text-pink-500">
+                    <span className="span-error">
                       {errors.minSalary?.message}
                     </span>
                   </div>
@@ -466,9 +394,9 @@ export default function JobPostForm(props) {
                     {...register("maxSalary")}
                     id="maxSalary"
                     name="maxSalary"
-                    className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                      errors.maxSalary ? "bg-error" : ""
-                    }`}
+                    className={classNames("block", "w-full", "input-indigo", {
+                      "bg-pink-200": errors.maxSalary,
+                    })}
                   >
                     <option value="">Maximum per year</option>
                     {salaryOptions.map((value, index) => (
@@ -478,7 +406,7 @@ export default function JobPostForm(props) {
                     ))}
                   </select>
                   <div className="flex flex-col">
-                    <span className="mt-2 text-xs text-pink-500">
+                    <span className="span-error">
                       {errors.maxSalary?.message}
                     </span>
                   </div>
@@ -490,18 +418,15 @@ export default function JobPostForm(props) {
           {/* Job description*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="jobDescription"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="description" className="label-default">
                 Job description*
               </label>
             </div>
             <div className="sm:col-span-2">
               <Controller
                 control={control}
-                name="jobDescription"
-                // {...register("jobDescription")}
+                name="description"
+                // {...register("description")}
                 // rules={{
                 //   required: "Description must have some content.",
                 //   validate: (value) => {
@@ -531,23 +456,18 @@ export default function JobPostForm(props) {
                     value={value || ""}
                     inputRef={ref}
                     theme="snow"
-                    id="jobDescription"
+                    id="description"
                   />
                 )}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.jobDescription?.message}
-              </span>
+              <span className="span-error">{errors.description?.message}</span>
             </div>
           </div>
 
           {/* How to apply*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="howtoApply"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="howtoApply" className="label-default">
                 How to apply*
               </label>
             </div>
@@ -557,23 +477,18 @@ export default function JobPostForm(props) {
                 id="howtoApply"
                 name="howtoApply"
                 rows={3}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.howtoApply ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.howtoApply,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.howtoApply?.message}
-              </span>
+              <span className="span-error">{errors.howtoApply?.message}</span>
             </div>
           </div>
 
           {/* Apply url */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="applyUrl"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="applyUrl" className="label-default">
                 Apply url*
               </label>
             </div>
@@ -583,24 +498,19 @@ export default function JobPostForm(props) {
                 id="applyUrl"
                 name="applyUrl"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.applyUrl ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.applyUrl,
+                })}
                 placeholder="https://"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.applyUrl?.message}
-              </span>
+              <span className="span-error">{errors.applyUrl?.message}</span>
             </div>
           </div>
 
           {/* Apply email */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="applyEmail"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="applyEmail" className="label-default">
                 Apply email*
               </label>
             </div>
@@ -610,14 +520,12 @@ export default function JobPostForm(props) {
                 id="applyEmail"
                 name="applyEmail"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.applyEmail ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.applyEmail,
+                })}
                 placeholder="Apply email"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.applyEmail?.message}
-              </span>
+              <span className="span-error">{errors.applyEmail?.message}</span>
             </div>
           </div>
         </div>
@@ -631,10 +539,7 @@ export default function JobPostForm(props) {
           {/* Company twitter */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyTwitter"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyTwitter" className="label-default">
                 Company twitter
               </label>
             </div>
@@ -644,12 +549,12 @@ export default function JobPostForm(props) {
                 id="companyTwitter"
                 name="companyTwitter"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyTwitter ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyTwitter,
+                })}
                 placeholder="username"
               />
-              <span className="mt-2 text-xs text-pink-500">
+              <span className="span-error">
                 {errors.companyTwitter?.message}
               </span>
             </div>
@@ -658,10 +563,7 @@ export default function JobPostForm(props) {
           {/* Company email */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="companyEmail"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="companyEmail" className="label-default">
                 Company email*
                 <br /> (stays private, for invoice + edit link)
               </label>
@@ -672,23 +574,18 @@ export default function JobPostForm(props) {
                 id="companyEmail"
                 name="companyEmail"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.companyEmail ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.companyEmail,
+                })}
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.companyEmail?.message}
-              </span>
+              <span className="span-error">{errors.companyEmail?.message}</span>
             </div>
           </div>
 
           {/* Invoice address */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="invoiceAddress"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="invoiceAddress" className="label-default">
                 Invoice address
               </label>
             </div>
@@ -698,12 +595,12 @@ export default function JobPostForm(props) {
                 id="invoiceAddress"
                 name="invoiceAddress"
                 rows={5}
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.invoiceAddress ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.invoiceAddress,
+                })}
                 placeholder="e.g. your company's full name and full invoice address, including building, street, city and country; also things like your VAT number, this is shown on the invoice."
               />
-              <span className="mt-2 text-xs text-pink-500">
+              <span className="span-error">
                 {errors.invoiceAddress?.message}
               </span>
             </div>
@@ -712,10 +609,7 @@ export default function JobPostForm(props) {
           {/* Invoice notes/po number */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <label
-                htmlFor="invoiceNotes"
-                className="block text-md font-semibold text-gray-900 sm:mt-px sm:pt-2"
-              >
+              <label htmlFor="invoiceNotes" className="label-default">
                 Invoice notes / po number
               </label>
             </div>
@@ -725,32 +619,30 @@ export default function JobPostForm(props) {
                 id="invoiceNotes"
                 name="invoiceNotes"
                 type="text"
-                className={`block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                  errors.invoiceNotes ? "bg-error" : ""
-                }`}
+                className={classNames("block", "w-full", "input-indigo", {
+                  "bg-pink-200": errors.invoiceNotes,
+                })}
                 placeholder="e.g. PO number 1234"
               />
-              <span className="mt-2 text-xs text-pink-500">
-                {errors.invoiceNotes?.message}
-              </span>
+              <span className="span-error">{errors.invoiceNotes?.message}</span>
             </div>
           </div>
 
           {/* Pay option */}
           <div className="space-y-1 px-4 pt-5 py-40 sm:space-y-0 flex justify-items-center sm:gap-4 sm:px-6">
             <input
+              {...register("payLater")}
               id="payLater"
               name="payLater"
               type="checkbox"
-              {...register("payLater")}
-              className={` my-auto block shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md ${
-                errors.payLater ? "bg-error" : ""
-              }`}
+              className={classNames("block", "my-auto", "input-indigo", {
+                "bg-pink-200": errors.payLater,
+              })}
             />
             <label htmlFor="payLater" className="form-check-label">
               PAY LATER
             </label>
-            <div className="invalid-feedback">{errors.payLater?.message}</div>
+            <span className="span-error">{errors.payLater?.message}</span>
           </div>
         </div>
       </div>
@@ -758,10 +650,7 @@ export default function JobPostForm(props) {
       {/* Action buttons */}
       <div className="absolute left-0 right-0 bottom-0 flex-shrink-0 px-4 border-t border-gray-200 py-5 sm:px-6 bg-white">
         <div className="space-x-3 flex justify-center">
-          <button
-            type="submit"
-            className="inline-flex full-width justify-center px-12 py-5 border border-transparent shadow-sm text-3xl font-bold rounded-md text-white bg-indigo-500 hover:bg-white hover:text-indigo-500 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
+          <button type="submit" className="px-12 py-5 text-3xl btn-indigo">
             Post your job — $<span className="font-bold">{state.price}</span>{" "}
           </button>
         </div>

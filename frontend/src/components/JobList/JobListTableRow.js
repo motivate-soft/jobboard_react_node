@@ -2,6 +2,7 @@ import React from "react";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import jobActions from "../../redux/jobs/actions";
+import classNames from "classnames";
 
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -66,15 +67,13 @@ export default function JobListTableRow(props) {
     if (applyEmail && applyEmail !== "") {
       return (
         <a
-          className="button action-apply apply_104042"
           href={`mailto:${applyEmail}?subject=New applicant`}
           target="_blank"
           rel="nofollow"
-          className={`apply-btn ${
-            isHighlight || highlightColor
-              ? "bg-white text-indigo-500"
-              : "bg-indigo-500 text-white"
-          } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+          className={classNames("px-6", {
+            "btn-indigo-sm": highlightColor !== null,
+            "btn-indigo-outlined-sm": highlightColor === null,
+          })}
         >
           Apply
         </a>
@@ -86,11 +85,10 @@ export default function JobListTableRow(props) {
         <a
           href={applyUrl}
           target="_blank"
-          className={`apply-btn ${
-            isHighlight || highlightColor
-              ? "bg-white text-indigo-500"
-              : "bg-indigo-500 text-white"
-          } mb-auto font-sans justify-center py-2 px-10 border border-transparent shadow-sm text-lg font-medium rounded-md text-white`}
+          className={classNames("px-6", {
+            "btn-indigo-sm": highlightColor !== null,
+            "btn-indigo-outlined-sm": highlightColor === null,
+          })}
         >
           Apply
         </a>

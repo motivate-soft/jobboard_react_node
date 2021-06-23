@@ -99,7 +99,7 @@ const importData = async () => {
       .fill(null)
       .map((a, i) => {
         console.log("seeder->jobdata");
-        return {
+        let job = {
           company: companyData[i]._id,
           position: faker.name.jobTitle(),
           primaryTag:
@@ -122,9 +122,12 @@ const importData = async () => {
               ? COLORS_OPTIONS[_.random(0, COLORS_OPTIONS.length - 1)]
               : null,
           isStickyDay: _.random(1.0) > 0.5,
-          stickyDuration: STICKY_OPTIONS[_.random(0, 1)],
           status: STATUS_OPTIONS[_.random(0, 2)],
         };
+        if (_.random(1.0) > 0.5) {
+          job.stickyDuration = STICKY_OPTIONS[_.random(0, 3)];
+        }
+        return job;
       });
     const jobData = await Job.insertMany(array);
 
