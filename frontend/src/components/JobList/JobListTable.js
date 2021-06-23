@@ -68,7 +68,7 @@ export default function JobListTable(props) {
   }
 
   return (
-    <div className="container mx-auto flex flex-col">
+    <div className="container mx-auto mb-20 flex flex-col">
       <div className="shadow border-b border-gray-200 sm:rounded-lg">
         <InfiniteScroll
           // style={{
@@ -83,7 +83,7 @@ export default function JobListTable(props) {
           loader={<Loader />}
           endMessage={
             <p style={{ textAlign: "center" }}>
-              <b>end of job posts</b>
+              {/* <b>end of job posts</b> */}
             </p>
           }
         >

@@ -69,7 +69,9 @@ exports.listing = async function (req, res) {
   //   });
 
   const jobs = await Job.aggregate(query);
-  const recordsFiltered = await Job.countDocuments({});
+  const recordsFiltered = await Job.countDocuments({
+    status: "approved",
+  });
 
   const from = pageSize * (pageIndex - 1) + 1;
   const to =
