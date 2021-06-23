@@ -43,10 +43,10 @@ const connectDB = async () => {
 const importData = async () => {
   await connectDB();
   try {
-    await User.deleteMany();
+    await User.deleteMany({});
     await User.insertMany(users);
 
-    await Media.deleteMany();
+    await Media.deleteMany({});
     let array = Array(10)
       .fill(null)
       .map((a, i) => ({
@@ -55,7 +55,7 @@ const importData = async () => {
       }));
     const mediaData = await Media.insertMany(array);
 
-    await Company.deleteMany();
+    await Company.deleteMany({});
     array = Array(COMPANY_COUNT)
       .fill(null)
       .map((a, i) => {
@@ -73,7 +73,7 @@ const importData = async () => {
       });
     const companyData = await Company.insertMany(array);
 
-    await Job.deleteMany();
+    await Job.deleteMany({});
     array = Array(JOB_COUNT)
       .fill(null)
       .map((a, i) => {
@@ -114,7 +114,10 @@ const importData = async () => {
 const destroyData = async () => {
   await connectDB();
   try {
-    await User.deleteMany();
+    await User.deleteMany({});
+    await Media.deleteMany({});
+    await Company.deleteMany({});
+    await Job.deleteMany({});
 
     logger.info("Seed data deleted!");
     process.exit();
