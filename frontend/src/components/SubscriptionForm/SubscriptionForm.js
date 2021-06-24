@@ -125,6 +125,7 @@ export default function SubscriptionForm() {
       }
 
       const res = await mailApi.newsletter({ email });
+      console.log("SubscriptionForm", res);
       if (res.sucess) {
         toast.success(res.message);
       }

@@ -1,6 +1,7 @@
 const Mailchimp = require("mailchimp-api-v3");
 const nconf = require("nconf");
 const logger = require("../helpers/logger");
+require("../config");
 
 const { key, listKey } = nconf.get("mailchimp");
 

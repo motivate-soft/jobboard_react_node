@@ -54,6 +54,11 @@ module.exports = function (middleware, router, controllers) {
   router.post("/api/email/newsletter", apiCtrl.email.newsletter);
 
   /**
+   *  Payment api
+   */
+  router.post("/api/payment/postCharge", apiCtrl.payment.postCharge);
+
+  /**
    *  Auth api
    */
   router.post("/api/auth/login", validate("login"), apiCtrl.auth.login);

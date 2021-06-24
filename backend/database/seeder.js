@@ -64,7 +64,8 @@ const connectDB = async () => {
 const importData = async () => {
   await connectDB();
   try {
-    await User.deleteMany({});
+    // await User.deleteMany({});
+    await User.collection.drop();
     await User.insertMany(users);
 
     await Media.deleteMany({});
@@ -76,7 +77,9 @@ const importData = async () => {
       }));
     const mediaData = await Media.insertMany(array);
 
-    await Company.deleteMany({});
+    // await Company.deleteMany({});
+    await Company.collection.drop;
+
     array = Array(COMPANY_COUNT)
       .fill(null)
       .map((a, i) => {
@@ -94,7 +97,9 @@ const importData = async () => {
       });
     const companyData = await Company.insertMany(array);
 
-    await Job.deleteMany({});
+    // await Job.deleteMany({});
+    await Job.collection.drop;
+
     array = Array(JOB_COUNT)
       .fill(null)
       .map((a, i) => {

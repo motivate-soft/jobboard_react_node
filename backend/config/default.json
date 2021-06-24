@@ -4,11 +4,16 @@
   "jwtExpiry": 3600,
   "mailchimp": {
     "key": "",
-    "listKey": ""
+    "listKey": "",
+    "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s"
+
   },
   "mailgun": {
     "key": "",
     "domain": "",
     "sender": ""
+  },
+  "stripe": {
+    "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s"
   }
 }
