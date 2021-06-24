@@ -12,8 +12,8 @@ const _ = require("lodash");
 nconf.file(`./config/default.json`);
 const CONNECTION_URI = nconf.get("mongoURI");
 
-const COMPANY_COUNT = 100;
-const JOB_COUNT = 100;
+const COMPANY_COUNT = 500;
+const JOB_COUNT = 500;
 const PRIMARYTAG_OPTIONS = [
   "Software Development",
   "Customer Support",

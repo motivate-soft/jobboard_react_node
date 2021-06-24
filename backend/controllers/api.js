@@ -1,5 +1,6 @@
 const apiController = {};
 
+apiController.email = require("./api/email");
 apiController.auth = require("./api/auth");
 apiController.user = require("./api/user");
 apiController.media = require("./api/media");

@@ -42,11 +42,16 @@ module.exports = function (middleware, router, controllers) {
   router.get("/api/version", function (req, res) {
     return res.json({ version: pkg.version });
   });
-  
+
   /**
    *  Media api
    */
   router.post("/api/media/", uploadPhoto.single("file"), apiCtrl.media.create);
+
+  /**
+   *  Email api
+   */
+  router.post("/api/email/newsletter", apiCtrl.email.newsletter);
 
   /**
    *  Auth api

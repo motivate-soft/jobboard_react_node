@@ -1,4 +1,6 @@
 import React, { Fragment, useState } from "react";
+import mailApi from "../../service/mailApi";
+import { toast } from "react-toastify";
 
 const navigation = {
   solutions: [
@@ -92,9 +94,44 @@ const navigation = {
 
 export default function SubscriptionForm() {
   const [email, setEmail] = useState("");
+  const [touched, setTouched] = useState(false);
+  const [error, setError] = useState(null);
 
-  function handleSubmit() {
-    console.log("email", email);
+  function handleChange(e) {
+    if (!touched) setTouched(true);
+    if (validateEmail(e.target.value)) {
+      setError(null);
+    }
+    setEmail(e.target.value);
+  }
+
+  function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+
+  async function handleSubmit(e) {
+    try {
+      // e.preventDefault();
+      console.log("email", email);
+      if (email === "") {
+        setError("Please enter your email");
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        setError("Email is not valid");
+        return;
+      }
+
+      const res = await mailApi.newsletter({ email });
+      if (res.sucess) {
+        toast.success(res.message);
+      }
+    } catch (error) {
+      console.log("error", error);
+      toast.warning(error.message);
+    }
   }
 
   return (
@@ -105,29 +142,33 @@ export default function SubscriptionForm() {
       <p className="mt-4 text-base text-gray-300">
         All new Remote Jobs, sent to your inbox weekly.
       </p>
-      <form className="mt-4 sm:flex sm:max-w-md" onSubmit={handleSubmit}>
+      <div className="mt-4 sm:flex sm:max-w-md">
         <label htmlFor="emailAddress" className="sr-only">
           Email address
         </label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          autoComplete="email"
-          required
-          className="appearance-none min-w-0 w-full bg-white border border-transparent rounded-md py-2 px-4 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white focus:border-white focus:placeholder-gray-400"
-          placeholder="Enter your email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="flex flex-col">
+          <input
+            type="email"
+            name="email"
+            id="email"
+            autoComplete="email"
+            className="appearance-none min-w-0 w-full bg-white border border-transparent rounded-md py-2 px-4 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white focus:border-white focus:placeholder-gray-400"
+            placeholder="Enter your email"
+            value={email}
+            onChange={handleChange}
+          />
+          <span className="mt-2 text-pink-500">{error}</span>
+        </div>
+
         <div className="mt-3 rounded-md sm:mt-0 sm:ml-3 sm:flex-shrink-0">
           <button
-            type="submit"
+            onClick={handleSubmit}
             className="w-full bg-indigo-500 border border-transparent rounded-md py-2 px-4 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
           >
             Subscribe
           </button>
         </div>
-      </form>
+      </div>
     </Fragment>
   );
 }
