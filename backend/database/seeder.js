@@ -54,18 +54,23 @@ let options = {
 
 const connectDB = async () => {
   try {
-    mongoose.connect(CONNECTION_URI, options);
-    logger.info("Connected to MongoDB");
+    conn = await mongoose.connect(CONNECTION_URI, options);
+    logger.info(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    logger.error("Something went wrong with DB! - " + error.message);
+    logger.error("Falied to connect to MongoDB! - " + error.message);
   }
 };
 
+function randomDate(start, end) {
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+  );
+}
+
 const importData = async () => {
-  await connectDB();
+  connectDB();
   try {
-    // await User.deleteMany({});
-    await User.collection.drop();
+    await User.deleteMany({});
     await User.insertMany(users);
 
     await Media.deleteMany({});
@@ -77,14 +82,12 @@ const importData = async () => {
       }));
     const mediaData = await Media.insertMany(array);
 
-    // await Company.deleteMany({});
-    await Company.collection.drop;
+    await Company.deleteMany({});
 
     array = Array(COMPANY_COUNT)
       .fill(null)
       .map((a, i) => {
         let ranInt = _.random(0, 9);
-        logger.info(mediaData[ranInt]);
 
         return {
           name: faker.company.companyName(),
@@ -97,13 +100,11 @@ const importData = async () => {
       });
     const companyData = await Company.insertMany(array);
 
-    // await Job.deleteMany({});
-    await Job.collection.drop;
+    await Job.deleteMany({});
 
     array = Array(JOB_COUNT)
       .fill(null)
       .map((a, i) => {
-        console.log("seeder->jobdata");
         let job = {
           company: companyData[i]._id,
           position: faker.name.jobTitle(),
@@ -128,6 +129,7 @@ const importData = async () => {
               : null,
           isStickyDay: _.random(1.0) > 0.5,
           status: STATUS_OPTIONS[_.random(0, 2)],
+          createdAt: randomDate(new Date(2021, 6, 1), new Date()),
         };
         if (_.random(1.0) > 0.5) {
           job.stickyDuration = STICKY_OPTIONS[_.random(0, 3)];
@@ -136,7 +138,7 @@ const importData = async () => {
       });
     const jobData = await Job.insertMany(array);
 
-    logger.info("Seed data imported!");
+    logger.info("Seed data imported successfully!");
     process.exit();
   } catch (error) {
     logger.error(`${error.message}`);

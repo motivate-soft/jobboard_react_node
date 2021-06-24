@@ -26,6 +26,7 @@ export default function JobListTableRow(props) {
     highlightColor,
     isStickyDay,
     stickyDuration,
+    stickyDaysLeft,
     status,
     company,
     createdAt,
@@ -51,16 +52,13 @@ export default function JobListTableRow(props) {
   }
 
   function renderStickyWidget() {
-    if (isStickyDay) {
-      return <span className="mr-3">📌</span>;
-    }
+    // if (!isStickyDay) return;
+    return <span className="mr-3">📌 {stickyDaysLeft}</span>;
 
-    if (stickyDuration && createdAt) {
-      const leftDays = moment(createdAt).add(7, "d").diff(moment.now(), "d");
-      return <span className="mr-3">📌 {leftDays}d</span>;
-    }
-
-    return;
+    // if (stickyDuration && createdAt) {
+    //   const leftDays = moment(createdAt).add(7, "d").diff(moment.now(), "d");
+    //   return <span className="mr-3">📌 {leftDays}d</span>;
+    // }
   }
 
   function renderApplyButton() {

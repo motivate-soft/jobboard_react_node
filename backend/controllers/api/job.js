@@ -14,11 +14,67 @@ exports.listing = async function (req, res) {
   const pageSize = Number(req.query.limit) || 10;
   const pageIndex = Number(req.query.page) || 1;
 
+  const date = new Date();
   let query = [
     { $match: { status: "approved" } },
     {
+      $addFields: {
+        stickyDaysLeft: {
+          $ceil: {
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: ["$stickyDuration", "day"] },
+                  then: {
+                    $divide: [
+                      {
+                        $subtract: [
+                          { $add: ["$createdAt", 3600000 * 24] },
+                          date,
+                        ],
+                      },
+                      3600000 * 24,
+                    ],
+                  },
+                },
+                {
+                  case: { $eq: ["$stickyDuration", "week"] },
+                  then: {
+                    $divide: [
+                      {
+                        $subtract: [
+                          { $add: ["$createdAt", 3600000 * 24 * 7] },
+                          date,
+                        ],
+                      },
+                      3600000 * 24,
+                    ],
+                  },
+                },
+                {
+                  case: { $eq: ["$stickyDuration", "month"] },
+                  then: {
+                    $divide: [
+                      {
+                        $subtract: [
+                          { $add: ["$createdAt", 3600000 * 24 * 30] },
+                          date,
+                        ],
+                      },
+                      3600000 * 24,
+                    ],
+                  },
+                },
+              ],
+              default: 0,
+            },
+          },
+        },
+      },
+    },
+    {
       $sort: {
-        createdAt: -1,
+        stickyDaysLeft: -1,
       },
     },
     { $skip: pageSize * (pageIndex - 1) },
