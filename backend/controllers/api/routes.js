@@ -144,16 +144,18 @@ module.exports = function (middleware, router, controllers) {
   /**
    *  Job api
    */
-  router.get("/api/job/listing", apiCtrl.job.listing); // user api
+  // user api
+  router.get("/api/job/listing", apiCtrl.job.listing);
+  router.get("/api/job/:id", apiCtrl.job.detail);
+  router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
+
+  // admin
   router.get(
     "/api/job/filter/",
     middleware.checkAuth,
     middleware.checkRole("admin"),
     apiCtrl.job.getFilter
   );
-  router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
-
-  // admin
   router.get(
     "/api/job",
     middleware.checkAuth,

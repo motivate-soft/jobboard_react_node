@@ -129,7 +129,7 @@ const importData = async () => {
               : null,
           isStickyDay: _.random(1.0) > 0.5,
           status: STATUS_OPTIONS[_.random(0, 2)],
-          createdAt: randomDate(new Date(2021, 6, 1), new Date()),
+          createdAt: randomDate(new Date(2021, 5, 10), new Date()),
         };
         if (_.random(1.0) > 0.5) {
           job.stickyDuration = STICKY_OPTIONS[_.random(0, 3)];

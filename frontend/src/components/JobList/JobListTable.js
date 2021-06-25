@@ -6,7 +6,8 @@ import jobApi from "../../service/jobApi";
 import Loader from "./../Shared/Loader/Loader";
 
 const PAGE_SIZE = 30;
-export default function JobListTable(props) {
+// const JobListTable = React.memo();
+function JobListTable(props) {
   const { onClickRow } = props;
 
   const [items, setItems] = useState([]);
@@ -118,3 +119,4 @@ export default function JobListTable(props) {
     </div>
   );
 }
+export default JobListTable;

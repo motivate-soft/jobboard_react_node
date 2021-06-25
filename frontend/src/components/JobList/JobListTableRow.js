@@ -34,11 +34,6 @@ export default function JobListTableRow(props) {
   } = job;
 
   function createBackgroundStyle() {
-    console.log(
-      "JobListTableRow->createBackgroundStyle",
-      isHighlight,
-      highlightColor
-    );
     let bgColor = "#ffffff";
     if (isHighlight) {
       bgColor = "#fff9c9";
@@ -52,13 +47,21 @@ export default function JobListTableRow(props) {
   }
 
   function renderStickyWidget() {
-    // if (!isStickyDay) return;
-    return <span className="mr-3">📌 {stickyDaysLeft}</span>;
+    if (stickyDaysLeft < 0) return null;
+    if (stickyDaysLeft < 1) {
+      console.log("stickyDaysLeft < 1", stickyDaysLeft);
+      return (
+        <span className="mr-3">
+          📌 {moment().add(stickyDaysLeft, "d").diff(moment.now(), "t")}
+        </span>
+      );
+    }
 
-    // if (stickyDuration && createdAt) {
-    //   const leftDays = moment(createdAt).add(7, "d").diff(moment.now(), "d");
-    //   return <span className="mr-3">📌 {leftDays}d</span>;
-    // }
+    return (
+      <span className="mr-3">
+        📌 {moment().add(stickyDaysLeft, "d").diff(moment.now(), "d")}
+      </span>
+    );
   }
 
   function renderApplyButton() {

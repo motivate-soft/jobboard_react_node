@@ -20,54 +20,81 @@ exports.listing = async function (req, res) {
     {
       $addFields: {
         stickyDaysLeft: {
-          $ceil: {
-            $switch: {
-              branches: [
-                {
-                  case: { $eq: ["$stickyDuration", "day"] },
-                  then: {
-                    $divide: [
-                      {
-                        $subtract: [
-                          { $add: ["$createdAt", 3600000 * 24] },
-                          date,
-                        ],
-                      },
-                      3600000 * 24,
-                    ],
-                  },
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ["$stickyDuration", "day"] },
+                then: {
+                  $divide: [
+                    {
+                      $subtract: [{ $add: ["$createdAt", 3600000 * 24] }, date],
+                    },
+                    3600000 * 24,
+                  ],
                 },
-                {
-                  case: { $eq: ["$stickyDuration", "week"] },
-                  then: {
-                    $divide: [
-                      {
-                        $subtract: [
-                          { $add: ["$createdAt", 3600000 * 24 * 7] },
-                          date,
-                        ],
-                      },
-                      3600000 * 24,
-                    ],
-                  },
+              },
+              {
+                case: { $eq: ["$stickyDuration", "week"] },
+                then: {
+                  $divide: [
+                    {
+                      $subtract: [
+                        { $add: ["$createdAt", 3600000 * 24 * 7] },
+                        date,
+                      ],
+                    },
+                    3600000 * 24,
+                  ],
                 },
-                {
-                  case: { $eq: ["$stickyDuration", "month"] },
-                  then: {
-                    $divide: [
-                      {
-                        $subtract: [
-                          { $add: ["$createdAt", 3600000 * 24 * 30] },
-                          date,
-                        ],
-                      },
-                      3600000 * 24,
-                    ],
-                  },
+              },
+              {
+                case: { $eq: ["$stickyDuration", "month"] },
+                then: {
+                  $divide: [
+                    {
+                      $subtract: [
+                        { $add: ["$createdAt", 3600000 * 24 * 30] },
+                        date,
+                      ],
+                    },
+                    3600000 * 24,
+                  ],
                 },
-              ],
-              default: 0,
-            },
+              },
+            ],
+            default: 0,
+          },
+        },
+      },
+    },
+    {
+      $set: {
+        stickyDaysLeft: {
+          $switch: {
+            branches: [{ case: { $lt: ["$stickyDaysLeft", 0] }, then: 0 }],
+            default: "$stickyDaysLeft",
+          },
+        },
+      },
+    },
+    {
+      $set: {
+        stickyDaysLeft: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ["$stickyDaysLeft", 0] },
+                then: {
+                  $divide: [
+                    {
+                      $subtract: ["$createdAt", date],
+                    },
+                    3600000 * 24,
+                  ],
+                },
+              },
+            ],
+            default: "$stickyDaysLeft",
           },
         },
       },
@@ -77,6 +104,11 @@ exports.listing = async function (req, res) {
         stickyDaysLeft: -1,
       },
     },
+    // {
+    //   $sort: {
+    //     createdAt: -1,
+    //   },
+    // },
     { $skip: pageSize * (pageIndex - 1) },
     {
       $limit: pageSize,
@@ -147,6 +179,31 @@ exports.listing = async function (req, res) {
     recordsFiltered,
     recordsTotal,
   });
+};
+
+exports.detail = async function (req, res) {
+  const jobId = req.params.id;
+  console.log("jobId", jobId);
+
+  try {
+    // let job = await Job.findById(jobId).populate("company").populate("logo");
+    let job = await Job.findById(jobId).populate({
+      path: "company",
+      model: "company",
+      populate: {
+        path: "logo",
+        model: "media",
+      },
+    });
+    if (!job) {
+      message = `Job with id ${jobId} not found!`;
+      return handleError(res, req, 400, message, "invalidData");
+    }
+    return res.status(200).json(job);
+  } catch (error) {
+    logger.error(error);
+    return handleError(res, req, 500, err);
+  }
 };
 
 // admin

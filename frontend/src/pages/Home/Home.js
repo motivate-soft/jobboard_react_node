@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import JosPostPreview from "../../components/JosPostPreview/JosPostPreview";
 import SideOverlay from "../../components/Shared/SideOverlay/SideOverlay";
 import JobPostForm from "../../components/JobPostForm/JobPostForm";
@@ -9,6 +9,12 @@ export default function Home() {
   const [isJobpostOpened, setIsJobpostOpened] = useState(false);
   const [isJobdetailOpened, setIsJobdetailOpened] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState(null);
+
+  // const handleClick = useCallback((id) => {
+  //   console.log("handleClick", id);
+  //   setIsJobdetailOpened(true);
+  //   setSelectedJobId(id);
+  // }, []);
 
   function handleClick(id) {
     console.log("handleClick", id);

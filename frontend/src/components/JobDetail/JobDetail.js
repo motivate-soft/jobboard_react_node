@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
@@ -20,9 +20,14 @@ export default function JobDetail(props) {
   }, [jobId]);
 
   async function fetchJobDetail() {
-    const { data } = await jobApi.retrieve(jobId);
-    console.log("JobDetail->fetchJobDetail", data);
-    setJob(data);
+    try {
+      console.log("JobDetail->fetchJobDetail->jobId", jobId);
+      const { data } = await jobApi.retrieve(jobId);
+      console.log("JobDetail->fetchJobDetail->success", data);
+      setJob(data);
+    } catch (error) {
+      console.log("JobDetail->fetchJobDetail->error", error);
+    }
   }
 
   function renderApplyButton(job) {
