@@ -9,7 +9,7 @@ const Job = require("../models/job");
 const { users } = require("./data");
 const _ = require("lodash");
 
-nconf.file(`./config/default.json`);
+require("../config");
 const CONNECTION_URI = nconf.get("mongoURI");
 
 const COMPANY_COUNT = 500;

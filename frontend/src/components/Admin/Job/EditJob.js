@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useHistory } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
 import { useForm, Controller } from "react-hook-form";
@@ -12,7 +12,8 @@ import jobApi from "../../../service/jobApi";
 import { toast } from "react-toastify";
 import classNames from "classnames";
 
-const baseUrl = "http://localhost:5000";
+const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 const salaryOptions = Array(20)
   .fill(null)
   .map((u, i) => (i + 1) * 10000);
@@ -37,8 +38,9 @@ const stickyDurationOptions = ["day", "week", "month"];
 const defaultHighlightColor = "#ff4742";
 
 export default function EditJob(props) {
-  const { jobId, setOpen } = props;
+  const { jobId, setOpen, dispatch } = props;
   const [companyId, setCompanyId] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
     fetchJobDetail();
@@ -105,7 +107,6 @@ export default function EditJob(props) {
   const { errors } = formState;
   const watchCompanyLogoUrl = watch("companyLogo.url", null);
 
-  console.log("watchCompanyLogo", watchCompanyLogoUrl);
   useEffect(() => {
     console.log("formState", formState);
     console.log("getValues", getValues());
@@ -221,6 +222,12 @@ export default function EditJob(props) {
       console.log("onSubmit->udpateJob", res);
 
       toast.success("Saved successfully!");
+
+      dispatch({
+        type: "SET_OPTION_VALUE",
+        option: "page",
+        value: 1,
+      });
     } catch (error) {
       console.log("EditJob->onSubmit", error);
       toast.warning("Server error");

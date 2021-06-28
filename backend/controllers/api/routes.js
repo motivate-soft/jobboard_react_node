@@ -56,7 +56,7 @@ module.exports = function (middleware, router, controllers) {
   /**
    *  Payment api
    */
-  router.post("/api/payment/postCharge", apiCtrl.payment.postCharge);
+  // router.post("/api/payment/postCharge", apiCtrl.payment.postCharge);
 
   /**
    *  Auth api
@@ -144,14 +144,15 @@ module.exports = function (middleware, router, controllers) {
   /**
    *  Job api
    */
+
   // user api
   router.get("/api/job/listing", apiCtrl.job.listing);
-  router.get("/api/job/:id", apiCtrl.job.detail);
+  router.get("/api/job/listing/:id", apiCtrl.job.detail);
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
 
   // admin
   router.get(
-    "/api/job/filter/",
+    "/api/job-filters/",
     middleware.checkAuth,
     middleware.checkRole("admin"),
     apiCtrl.job.getFilter

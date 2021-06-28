@@ -202,7 +202,7 @@ exports.detail = async function (req, res) {
     return res.status(200).json(job);
   } catch (error) {
     logger.error(error);
-    return handleError(res, req, 500, err);
+    return handleError(res, req, 500, error);
   }
 };
 
@@ -473,7 +473,7 @@ exports.delete = async function (req, res) {
     }
     await job.remove();
 
-    return res.status(204);
+    return res.status(204).json();
   } catch (error) {
     logger.error(error);
     return handleError(res, req, 500, err);

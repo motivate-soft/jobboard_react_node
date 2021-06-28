@@ -2,6 +2,7 @@ const nconf = require("nconf");
 const mongoose = require("mongoose");
 const logger = require("../helpers/logger");
 
+require("../config");
 let db = {};
 const CONNECTION_URI = nconf.get("mongoURI");
 

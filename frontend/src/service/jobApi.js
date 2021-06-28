@@ -20,7 +20,7 @@ const jobApi = {
 
   getFilter: async () => {
     try {
-      return await axiosInstance.get(`api/job/filter/`);
+      return await axiosInstance.get(`api/job-filters/`);
     } catch (error) {
       return handleError(error);
     }
@@ -34,7 +34,7 @@ const jobApi = {
   },
   retrieve: async (jobId) => {
     try {
-      return await axiosInstance.get(`api/job/${jobId}`);
+      return await axiosInstance.get(`api/job/listing/${jobId}`);
     } catch (error) {
       return handleError(error);
     }

@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const nconf = require("nconf");
 const jwt = require("jsonwebtoken");
+require("../config");
 
 exports.generateJWTToken = function (user) {
   const { id, email, username, fullName } = user;

@@ -7,6 +7,8 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const logger = require("../helpers/logger");
 
+require("../config");
+
 let opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: nconf.get("jwtSecret") || "JWT SECRET STRING",
@@ -15,7 +17,7 @@ let opts = {
 passport.use(
   new JwtStrategy(opts, (payload, done) => {
     logger.info("JwtStrategy");
-    
+
     User.findById(payload.id)
       .then((user) => {
         if (user) {

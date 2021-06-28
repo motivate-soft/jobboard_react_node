@@ -129,7 +129,7 @@ exports.delete = async function (req, res) {
     }
     await company.remove();
 
-    return res.status(204);
+    return res.status(204).json();
   } catch (error) {
     logger.error(error);
     return handleError(res, req, 500, err);

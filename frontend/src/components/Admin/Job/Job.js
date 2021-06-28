@@ -15,6 +15,7 @@ import JobTable from "./JobTable";
 import { useSelector } from "react-redux";
 import jobApi from "../../../service/jobApi";
 import Loader from "../../Shared/Loader/Loader";
+import { toast } from "react-toastify";
 
 function parseQueryOptions(location) {
   const query = qs.parse(location);
@@ -106,6 +107,7 @@ function reducer(state, action) {
         jobsList: action.jobsList,
       };
     case "SET_OPTION_VALUE":
+      console.log("SET_OPTION_VALUE");
       return {
         ...state,
         options: { ...state.options, page: 1, [action.option]: action.value },
@@ -139,8 +141,6 @@ export default function Job() {
   const [state, dispatch] = useReducer(reducer, initialState, init);
 
   const history = useHistory();
-
-  const { token } = useSelector((state) => state.auth);
 
   // Replace current url.
   useEffect(() => {
@@ -204,19 +204,29 @@ export default function Job() {
     const {
       jobsList: { items },
     } = state;
-    console.log("handleEditClick", id);
 
-    console.log(
-      "handleEditClick",
-      items,
-      items.findIndex((obj) => obj._id === id)
-    );
     let selectedJob = items[items.findIndex((obj) => obj._id === id)];
     setSelectedJob(selectedJob);
     setIsOpen(true);
   }
 
-  function handleDeleteClick(id) {}
+  async function handleDeleteClick(id) {
+    if (window.confirm("Are you sure to delete?")) {
+      try {
+        const res = await jobApi.delete(id);
+        dispatch({
+          type: "SET_OPTION_VALUE",
+          option: "page",
+          value: 1,
+        });
+        toast.success("Deleted successfully!");
+      } catch (error) {
+        console.log("error", error);
+        toast.success(error.message);
+      }
+    }
+    return;
+  }
 
   function handleClick(action, id) {
     if (action === "edit") {
@@ -261,7 +271,13 @@ export default function Job() {
         open={isOpen}
         setOpen={setIsOpen}
       >
-        {selectedJob && <EditJob jobId={selectedJob._id} setOpen={setIsOpen} />}
+        {selectedJob && (
+          <EditJob
+            jobId={selectedJob._id}
+            setOpen={setIsOpen}
+            dispatch={dispatch}
+          />
+        )}
       </SideOverlay>
     </div>
   );

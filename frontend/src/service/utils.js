@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 
 export const handleError = (error) => {
+  console.log("axios->handleError", error);
   if (error.response) {
     // Request made and server responded
     console.log("error.response", error.response);
