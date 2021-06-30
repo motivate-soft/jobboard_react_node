@@ -182,4 +182,13 @@ module.exports = function (middleware, router, controllers) {
     middleware.checkRole("admin"),
     apiCtrl.job.delete
   );
+
+  /**
+   *  Stripe api
+   */
+  router.post("/api/stripe/create-customer");
+  router.get(
+    "/api/stripe/getProductsAndPlans",
+    apiCtrl.stripe.getProductsAndPlans
+  );
 };
