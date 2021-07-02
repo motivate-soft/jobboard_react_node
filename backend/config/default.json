@@ -6,7 +6,6 @@
     "key": "",
     "listKey": "",
     "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s"
-
   },
   "mailgun": {
     "key": "",
@@ -14,6 +13,16 @@
     "sender": ""
   },
   "stripe": {
-    "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s"
+    "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s",
+    "products": {
+      "singlePost": "prod_JlWSQiHlx7Aeib",
+      "showLogo": "prod_JlWU8eToQhHTth",
+      "blastEmail": "prod_JlWUDVo7QFMHQ4",
+      "highlight": "prod_JlWUE7WujhcFRZ",
+      "highlightColor": "prod_JlWVZneRyDBh9b",
+      "stickyDay": "prod_JlWVn4vMoRG0Iz",
+      "stickyWeek": "prod_JlWViB3VKP5N10",
+      "stickyMonth": "prod_JlWWJeULo359cK"
+    }
   }
 }

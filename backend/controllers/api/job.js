@@ -1,9 +1,13 @@
 const { validationResult } = require("express-validator");
+const nconf = require("nconf");
 const _ = require("lodash");
 const logger = require("../../helpers/logger");
 const { handleError, responseWithResult } = require("../../helpers/handlers");
 const User = require("../../models/job");
 const Job = require("../../models/job");
+const { getProductsAndPlans } = require("./stripe");
+
+require("../../config/index");
 
 const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
 const STICKY_OPTIONS = ["week", "month"];
@@ -200,6 +204,37 @@ exports.detail = async function (req, res) {
       return handleError(res, req, 400, message, "invalidData");
     }
     return res.status(200).json(job);
+  } catch (error) {
+    logger.error(error);
+    return handleError(res, req, 500, error);
+  }
+};
+
+exports.getPricing = async function (req, res) {
+  try {
+    const productsWithPlansAndPrices = await getProductsAndPlans();
+    const { products } = nconf.get("stripe");
+    let pricing = [];
+    console.log("products", products);
+    for (let [key, value] of Object.entries(products)) {
+      console.log("key, value", key, value);
+      let filteredProducts = productsWithPlansAndPrices.filter(
+        (product) => product.id === value
+      );
+
+      let unitPrice = null;
+      if (filteredProducts) {
+        unitPrice = filteredProducts[0].prices[0].unit_amount_decimal;
+        console.log("unit_amount_decimal", unitPrice);
+      }
+
+      pricing.push({
+        [key]: unitPrice,
+      });
+    }
+    return res
+      .status(200)
+      .json({ products: productsWithPlansAndPrices, pricing });
   } catch (error) {
     logger.error(error);
     return handleError(res, req, 500, error);

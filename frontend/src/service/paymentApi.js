@@ -19,6 +19,7 @@ const paymentApi = {
       return handleError(error);
     }
   },
+  // getProductsPlans:
 };
 
 export default paymentApi;

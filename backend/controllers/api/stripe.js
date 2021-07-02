@@ -7,24 +7,7 @@ const agent = new httpsProxyAgent("http://172.25.1.2:3129");
 
 require("../../config");
 const { secretKey } = nconf.get("stripe");
-const stripe = require("stripe")(secretKey);
-
-async function createCustomer(company) {
-  try {
-    const { name, email, invoiceAddress, invoiceNotes } = company;
-
-    let customer = await stripe.customers.create({
-      name,
-      email,
-      address: invoiceAddress,
-    });
-
-    return customer;
-  } catch (err) {
-    winston.error("Stripe > createCustomer : Error" + err.message);
-    throw err;
-  }
-}
+const stripe = require("stripe")(secretKey, { httpAgent: agent });
 
 function formatProducts(products) {
   products.forEach((product) => {
@@ -53,40 +36,64 @@ function sortAndFormatPlans(plans) {
   return plans;
 }
 
-function attachPlansToProducts(plans, products) {
+function attachPlansToProducts(plans, products, prices) {
   products.forEach((product) => {
     const filteredPlans = plans.filter((plan) => {
       return product.id === plan.product;
     });
 
+    const filteredPrices = prices.filter((price) => {
+      return product.id === price.product;
+    });
+
     product.plans = filteredPlans;
+    product.prices = filteredPrices;
   });
-  logger.info("attachPlansToProducts" + products);
 
   return products.filter((product) => product.plans.length > 0);
 }
 
-function getProductsAndPlans() {
+exports.createCustomer = async (company) => {
+  try {
+    const { name, email, invoiceAddress, invoiceNotes } = company;
+    let customer = await stripe.customers.create({
+      name,
+      email,
+      address: invoiceAddress,
+    });
+    return customer;
+  } catch (err) {
+    winston.error("Stripe > createCustomer : Error" + err.message);
+    throw err;
+  }
+};
+
+exports.getProductsAndPlans = async () => {
   return Promise.all([
     stripe.products.list({}), // Default returns 10 products, sorted by most recent creation date
     stripe.plans.list({}), // Default returns 10 plans, sorted by most recent creation date
+    stripe.prices.list({}), // Default returns 10 plans, sorted by most recent creation date
   ])
     .then((stripeData) => {
       var products = formatProducts(stripeData[0].data);
       var plans = sortAndFormatPlans(stripeData[1].data);
+      var prices = stripeData[2].data;
 
       logger.info("getProductsAndPlans->products" + products);
       logger.info("getProductsAndPlans->plans" + plans);
 
-      return attachPlansToProducts(plans, products);
+      return attachPlansToProducts(plans, products, prices);
     })
     .catch((err) => {
       logger.error("Error fetching Stripe products and plans: ", err);
       return [];
     });
-}
+};
 
-async function createCustomerAndSubscription(paymentMethodId, customerInfo) {
+exports.createCustomerAndSubscription = async (
+  paymentMethodId,
+  customerInfo
+) => {
   /* Create customer and set default payment method */
   const customer = await stripe.customers.create({
     payment_method: paymentMethodId,
@@ -112,13 +119,4 @@ async function createCustomerAndSubscription(paymentMethodId, customerInfo) {
   });
 
   return subscription;
-}
-
-module.exports = {
-  createCustomer,
-  formatProducts,
-  sortAndFormatPlans,
-  attachPlansToProducts,
-  getProductsAndPlans,
-  createCustomerAndSubscription,
 };

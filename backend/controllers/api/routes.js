@@ -54,11 +54,6 @@ module.exports = function (middleware, router, controllers) {
   router.post("/api/email/newsletter", apiCtrl.email.newsletter);
 
   /**
-   *  Payment api
-   */
-  // router.post("/api/payment/postCharge", apiCtrl.payment.postCharge);
-
-  /**
    *  Auth api
    */
   router.post("/api/auth/login", validate("login"), apiCtrl.auth.login);
@@ -151,6 +146,7 @@ module.exports = function (middleware, router, controllers) {
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
 
   // admin
+  router.get("/api/job-pricing/", apiCtrl.job.getPricing);
   router.get(
     "/api/job-filters/",
     middleware.checkAuth,
@@ -187,8 +183,4 @@ module.exports = function (middleware, router, controllers) {
    *  Stripe api
    */
   router.post("/api/stripe/create-customer");
-  router.get(
-    "/api/stripe/getProductsAndPlans",
-    apiCtrl.stripe.getProductsAndPlans
-  );
 };

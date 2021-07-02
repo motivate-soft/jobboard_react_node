@@ -4,6 +4,7 @@ import SideOverlay from "../../components/Shared/SideOverlay/SideOverlay";
 import JobPostForm from "../../components/JobPostForm/JobPostForm";
 import JobListTable from "../../components/JobList/JobListTable";
 import JobDetail from "../../components/JobDetail/JobDetail";
+import PaymentForm from "../../components/PaymentForm/PaymentForm";
 
 export default function Home() {
   const [isJobpostOpened, setIsJobpostOpened] = useState(false);
@@ -54,6 +55,7 @@ export default function Home() {
         <JobPostForm open={isJobpostOpened} setOpen={setIsJobpostOpened} />
       </SideOverlay>
       <JosPostPreview open={isJobpostOpened} />
+      <PaymentForm />
     </div>
   );
 }
