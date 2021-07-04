@@ -6,7 +6,7 @@ const httpsProxyAgent = require("https-proxy-agent");
 const agent = new httpsProxyAgent("http://172.25.1.2:3129");
 
 require("../../config");
-const { secretKey } = nconf.get("stripe");
+const { secretKey, products } = nconf.get("stripe");
 const stripe = require("stripe")(secretKey, { httpAgent: agent });
 
 function formatProducts(products) {
@@ -68,6 +68,11 @@ exports.createCustomer = async (company) => {
   }
 };
 
+exports.retrieveProduct = async (productId) => {
+  const product = await stripe.products.retrieve(productId);
+  return product;
+};
+
 exports.getProductsAndPlans = async () => {
   return Promise.all([
     stripe.products.list({}), // Default returns 10 products, sorted by most recent creation date
@@ -107,16 +112,21 @@ exports.createCustomerAndSubscription = async (
   /* Create subscription and expand the latest invoice's Payment Intent
    * We'll check this Payment Intent's status to determine if this payment needs SCA
    */
+  let items = [];
+  customerInfo.priceItems.map((item) => {
+    items.push({
+      price: item,
+    });
+  });
+
   const subscription = await stripe.subscriptions.create({
     customer: customer.id,
-    items: [
-      {
-        plan: customerInfo.planId,
-      },
-    ],
+    items,
     // trial_from_plan: true,
     expand: ["latest_invoice.payment_intent"],
   });
+
+  console.log("subscription", subscription);
 
   return subscription;
 };

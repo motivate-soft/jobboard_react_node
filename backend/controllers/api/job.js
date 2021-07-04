@@ -5,13 +5,18 @@ const logger = require("../../helpers/logger");
 const { handleError, responseWithResult } = require("../../helpers/handlers");
 const User = require("../../models/job");
 const Job = require("../../models/job");
-const { getProductsAndPlans } = require("./stripe");
+const {
+  getProductsAndPlans,
+  createCustomerAndSubscription,
+} = require("./stripe");
 
 require("../../config/index");
 
 const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
 const STICKY_OPTIONS = ["week", "month"];
 const STATUS_OPTIONS = ["pending", "approved", "declined"];
+
+const { products } = nconf.get("stripe");
 
 // user
 exports.listing = async function (req, res) {
@@ -239,6 +244,29 @@ exports.getPricing = async function (req, res) {
     logger.error(error);
     return handleError(res, req, 500, error);
   }
+};
+
+exports.subscription = async function (req, res) {
+  let { company, job, paymentMethodId } = req.body;
+  console.log("req", company, paymentMethodId);
+
+  // let array = [];
+  // let keys = Object.keys(job);
+  // keys.map((key) => {
+  //   array.push(products[key]);
+  // });
+  company.priceItems = [
+    "price_1J7zQ2HhTqm9kBDPpbdfAn3T",
+    "price_1J7zRIHhTqm9kBDPgnU8pjsm",
+    "price_1J7zRgHhTqm9kBDPrJ0eWdr2",
+    "price_1J7zTPHhTqm9kBDPLRWFZkrM",
+  ];
+
+  const response = await createCustomerAndSubscription(
+    paymentMethodId,
+    company
+  );
+  logger.info("subscription", response);
 };
 
 // admin

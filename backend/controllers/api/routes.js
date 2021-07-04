@@ -153,6 +153,8 @@ module.exports = function (middleware, router, controllers) {
     middleware.checkRole("admin"),
     apiCtrl.job.getFilter
   );
+  router.post("/api/job/subscription", apiCtrl.job.subscription);
+
   router.get(
     "/api/job",
     middleware.checkAuth,
@@ -182,5 +184,4 @@ module.exports = function (middleware, router, controllers) {
   /**
    *  Stripe api
    */
-  router.post("/api/stripe/create-customer");
 };

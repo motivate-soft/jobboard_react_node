@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
 import ReactDOM from "react-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import axiosInstance from "./../../service/axiosInstance";
 import {
   CardElement,
   Elements,
@@ -26,12 +27,29 @@ const CheckoutForm = () => {
       return;
     }
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: "card",
-      card: elements.getElement(CardElement),
-    });
+    try {
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card: elements.getElement(CardElement),
+      });
 
-    
+      await axiosInstance.post("api/job/subscription", {
+        paymentMethodId: paymentMethod.id,
+        company: {
+          name: "amazingCo.ltd",
+          email: "amazing@co.com",
+          invoiceAddress: "boston",
+        },
+        job: {
+          showLogo: true,
+          blastEmail: true,
+          highlightColor: true,
+          stickyMonth: true,
+        },
+      });
+    } catch (error) {
+      console.log("CheckoutForm->error", error);
+    }
   };
 
   return (
