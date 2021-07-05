@@ -78,10 +78,11 @@ export default function EditJob(props) {
       invoiceAddress: Yup.string().required("This field is required"),
       invoiceNotes: Yup.string().required("This field is required"),
 
-      isShowLogo: Yup.bool().required("This field is required"),
-      isBlastEmail: Yup.bool().required("This field is required"),
-      isHighlight: Yup.bool().required("This field is required"),
-      highlightColor: Yup.string(),
+      showLogo: Yup.bool().required("This field is required"),
+      blastEmail: Yup.bool().required("This field is required"),
+      highlight: Yup.bool().required("This field is required"),
+      highlightColor: Yup.bool().required("This field is required"),
+      brandColor: Yup.string(),
       stickyDuration: Yup.string()
         .oneOf(stickyDurationOptions)
         .required("This field is required"),
@@ -133,10 +134,10 @@ export default function EditJob(props) {
         applyEmail,
         status,
 
-        isShowLogo,
-        isBlastEmail,
-        isHighlight,
-        highlightColor,
+        showLogo,
+        blastEmail,
+        highlight,
+        brandColor,
         isStickyDay,
         stickyDuration,
       } = data;
@@ -160,10 +161,10 @@ export default function EditJob(props) {
         invoiceAddress,
         invoiceNotes,
 
-        isShowLogo,
-        isBlastEmail,
-        isHighlight,
-        highlightColor: highlightColor || defaultHighlightColor,
+        showLogo,
+        blastEmail,
+        highlight,
+        brandColor: brandColor || defaultHighlightColor,
         isStickyDay,
         stickyDuration,
         status,
@@ -177,6 +178,16 @@ export default function EditJob(props) {
   function handleUpload(file) {
     console.log("handleUpload", file);
     setValue("companyLogo", file, { shouldValidate: true });
+  }
+
+  function handleChange(e) {
+    if (e.target.name === "highlight" && e.target.checked) {
+      setValue("highlightColor", false);
+      setValue("brandColor", null);
+    }
+    if (e.target.name === "highlightColor" && e.target.checked) {
+      setValue("highlight", false);
+    }
   }
 
   async function onSubmit(formData) {
@@ -209,10 +220,10 @@ export default function EditJob(props) {
         applyEmail: formData.applyEmail,
 
         tags: formData.tags.split(","),
-        isShowLogo: formData.isShowLogo,
-        isBlastEmail: formData.isBlastEmail,
-        isHighlight: formData.isHighlight,
-        highlightColor: formData.highlightColor,
+        showLogo: formData.showLogo,
+        blastEmail: formData.blastEmail,
+        highlight: formData.highlight,
+        brandColor: formData.brandColor,
         isStickyDay: formData.isStickyDay,
         stickyDuration: formData.stickyDuration,
         status: formData.status,
@@ -738,16 +749,16 @@ export default function EditJob(props) {
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
               <input
-                {...register("isShowLogo")}
-                id="isShowLogo"
-                name="isShowLogo"
+                {...register("showLogo")}
+                id="showLogo"
+                name="showLogo"
                 type="checkbox"
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
             <div className="sm:col-span-2">
               <label
-                htmlFor="isShowLogo"
+                htmlFor="showLogo"
                 className="ml-2 block text-sm text-gray-900"
               >
                 Show company logo
@@ -760,16 +771,16 @@ export default function EditJob(props) {
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
               <input
-                {...register("isBlastEmail")}
-                id="isBlastEmail"
-                name="isBlastEmail"
+                {...register("blastEmail")}
+                id="blastEmail"
+                name="blastEmail"
                 type="checkbox"
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
             <div className="sm:col-span-2">
               <label
-                htmlFor="isBlastEmail"
+                htmlFor="blastEmail"
                 className="ml-2 block text-sm text-gray-900"
               >
                 Email blast
@@ -782,16 +793,17 @@ export default function EditJob(props) {
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
               <input
-                {...register("isHighlight")}
-                id="isHighlight"
-                name="isHighlight"
+                {...register("highlight")}
+                id="highlight"
+                name="highlight"
                 type="checkbox"
+                onChange={handleChange}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
             <div className="sm:col-span-2">
               <label
-                htmlFor="isHighlight"
+                htmlFor="highlight"
                 className="ml-2 block text-sm text-gray-900"
               >
                 Highlight
@@ -799,26 +811,28 @@ export default function EditJob(props) {
             </div>
           </div>
 
-          {/* Highlight Company */}
+          {/* Highlight with company brand color*/}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
               <input
-                id="isHighlight"
-                name="isHighlight"
+                {...register("highlightColor")}
+                id="highlightColor"
+                name="highlightColor"
                 type="checkbox"
+                onChange={handleChange}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
             <div className="sm:col-span-2">
               <label
-                htmlFor="isHighlight"
+                htmlFor="highlightColor"
                 className="ml-2 block text-sm text-gray-900"
               >
                 Highlight with the company's brand color
                 <input
-                  {...register("highlightColor")}
-                  id="highlightColor"
-                  name="highlightColor"
+                  {...register("brandColor")}
+                  id="brandColor"
+                  name="brandColor"
                   type="color"
                   className="mx-4 w-8 h-4"
                 />

@@ -10,6 +10,13 @@ const jobApi = {
       return handleError(error);
     }
   },
+  getPricing: async () => {
+    try {
+      return await axiosInstance.get(`api/job/pricing/`);
+    } catch (error) {
+      return handleError(error);
+    }
+  },
   getListing: async (query = {}) => {
     try {
       return await axiosInstance.get(`api/job/listing?${qs.stringify(query)}`);
@@ -20,7 +27,7 @@ const jobApi = {
 
   getFilter: async () => {
     try {
-      return await axiosInstance.get(`api/job-filters/`);
+      return await axiosInstance.get(`api/job/filters/`);
     } catch (error) {
       return handleError(error);
     }

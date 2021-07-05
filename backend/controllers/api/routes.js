@@ -146,9 +146,9 @@ module.exports = function (middleware, router, controllers) {
   router.post("/api/job/", validate("createJob"), apiCtrl.job.create);
 
   // admin
-  router.get("/api/job-pricing/", apiCtrl.job.getPricing);
+  router.get("/api/job/pricing/", apiCtrl.job.getPricing);
   router.get(
-    "/api/job-filters/",
+    "/api/job/filters/",
     middleware.checkAuth,
     middleware.checkRole("admin"),
     apiCtrl.job.getFilter

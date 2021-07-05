@@ -50,24 +50,24 @@ const jobSchema = mongoose.Schema(
       type: String,
     },
 
-    isShowLogo: {
+    showLogo: {
       type: Boolean,
       default: true,
     },
-    isBlastEmail: {
+    blastEmail: {
       type: Boolean,
       default: true,
     },
-    isHighlight: {
+    highlight: {
       type: Boolean,
       default: false,
     },
     highlightColor: {
-      type: String,
-    },
-    isStickyDay: {
       type: Boolean,
       default: false,
+    },
+    brandColor: {
+      type: String,
     },
     stickyDuration: {
       type: String,

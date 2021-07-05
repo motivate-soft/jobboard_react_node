@@ -20,10 +20,11 @@ export default function JobListTableRow(props) {
     howtoApply,
     applyUrl,
     applyEmail,
-    isShowLogo,
-    isBlastEmail,
-    isHighlight,
+    showLogo,
+    blastEmail,
+    highlight,
     highlightColor,
+    brandColor,
     isStickyDay,
     stickyDuration,
     stickyDaysLeft,
@@ -35,11 +36,11 @@ export default function JobListTableRow(props) {
 
   function createBackgroundStyle() {
     let bgColor = "#ffffff";
-    if (isHighlight) {
+    if (highlight) {
       bgColor = "#fff9c9";
     }
-    if (isHighlight && highlightColor) {
-      bgColor = highlightColor;
+    if (highlightColor && brandColor) {
+      bgColor = brandColor;
     }
     return {
       backgroundColor: bgColor,
@@ -106,7 +107,7 @@ export default function JobListTableRow(props) {
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            {isShowLogo ? (
+            {showLogo ? (
               <img
                 src={
                   company.logo

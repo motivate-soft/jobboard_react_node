@@ -120,17 +120,19 @@ const importData = async () => {
           howtoApply: faker.lorem.text(),
           applyUrl: faker.internet.url(),
           applyEmail: faker.internet.email(),
-          isShowLogo: true,
-          isBlastEmail: true,
-          isHighlight: _.random(1.0) > 0.5,
-          highlightColor:
-            _.random(1.0) > 0.5
-              ? COLORS_OPTIONS[_.random(0, COLORS_OPTIONS.length - 1)]
-              : null,
-          isStickyDay: _.random(1.0) > 0.5,
+          showLogo: true,
+          blastEmail: true,
           status: STATUS_OPTIONS[_.random(0, 2)],
           createdAt: randomDate(new Date(2021, 5, 10), new Date()),
         };
+        job.highlight = _.random(1.0) > 0.5;
+        if (!job.highlight) {
+          if (_.random(1.0) > 0.5) {
+            job.highlightColor = true;
+            job.brandColor =
+              COLORS_OPTIONS[_.random(0, COLORS_OPTIONS.length - 1)];
+          }
+        }
         if (_.random(1.0) > 0.5) {
           job.stickyDuration = STICKY_OPTIONS[_.random(0, 3)];
         }

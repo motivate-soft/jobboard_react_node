@@ -13,6 +13,8 @@ import companyApi from "../../service/companyApi";
 import jobApi from "../../service/jobApi";
 import { toast } from "react-toastify";
 import classNames from "classnames";
+import JobPostPreview from "../JobPostPreview/JobPostPreview";
+import PaymentForm from "../PaymentForm/PaymentForm";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -107,12 +109,12 @@ export default function JobPostForm(props) {
   }
 
   function handleUpload(file) {
-    console.log("handleUpload", file);
+    console.log("JobPostForm->handleUpload", file);
     setValue("companyLogo", file._id, { shouldValidate: true });
   }
 
   async function onSubmit(formData) {
-    console.log("onSubmit", formData);
+    console.log("JobPostForm->onSubmit", formData);
 
     try {
       const company = {
@@ -129,25 +131,15 @@ export default function JobPostForm(props) {
 
       const {
         tags,
-        isShowLogo,
-        isBlastEmail,
-        isHighlight,
-        isHighlightColor,
+        showLogo,
+        blastEmail,
+        highlight,
         highlightColor,
-        isStickyDay,
-        isStickyWeek,
-        isStickyMonth,
+        brandColor,
+        stickyDuration,
       } = state;
 
-      let stickyDuration;
-      if (isStickyWeek) {
-        stickyDuration = "week";
-      }
-      if (isStickyMonth) {
-        stickyDuration = "month";
-      }
-
-      const job = {
+      let job = {
         company: companyId,
         position: formData.position,
         primaryTag: formData.primaryTag,
@@ -159,14 +151,24 @@ export default function JobPostForm(props) {
         applyUrl: formData.applyUrl,
         applyEmail: formData.applyEmail,
 
-        tags: tags,
-        isShowLogo,
-        isBlastEmail,
-        isHighlight: isHighlight || isHighlightColor,
-        highlightColor: isHighlightColor ? highlightColor : null,
-        isStickyDay,
-        stickyDuration,
+        tags,
+        showLogo,
+        blastEmail,
+        highlight,
+        highlightColor,
       };
+
+      if (highlightColor) {
+        if (brandColor) {
+          job.brandColor = brandColor;
+        } else {
+          toast.warning("Please select brand color");
+          return;
+        }
+      }
+      if (stickyDuration) {
+        job.stickyDuration = stickyDuration;
+      }
 
       let { data } = await jobApi.create(job);
       console.log("JobPostForm->onSubmit->success", data);
@@ -178,10 +180,10 @@ export default function JobPostForm(props) {
 
   return (
     <form
-      className="h-full flex flex-col bg-white shadow-xl overflow-y-scroll"
+      className="h-full flex flex-col bg-white shadow-xl rounded-md"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="flex-1 px-2">
+      <div className="flex-1 p-2">
         {/* Header */}
         <div className="px-4 py-6 bg-gray-50 sm:px-6">
           <div className="flex items-start justify-between space-x-3">
@@ -421,7 +423,7 @@ export default function JobPostForm(props) {
                 // rules={{
                 //   required: "Description must have some content.",
                 //   validate: (value) => {
-                //     console.log("Controller", value);
+                //     console.log("JobPostForm->Controller", value);
                 //     return (
                 //       value.split(" ").length > 10 ||
                 //       "Enter at least 10 words in the body."
@@ -435,13 +437,12 @@ export default function JobPostForm(props) {
                   <Editor
                     onChange={(description, delta, source, editor) => {
                       console.log(
-                        "onChange:description",
+                        "JobPostForm->onChange(description, delta, source, editor)",
                         description,
                         delta,
                         source,
                         editor
                       );
-                      console.log("onChange:inputRef", ref);
                       onChange(description);
                     }}
                     value={value || ""}
@@ -638,14 +639,23 @@ export default function JobPostForm(props) {
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="absolute left-0 right-0 bottom-0 flex-shrink-0 px-4 border-t border-gray-200 py-5 sm:px-6 bg-white">
-        <div className="space-x-3 flex justify-center">
-          <button type="submit" className="px-12 py-5 text-3xl btn-indigo">
-            Post your job — $<span className="font-bold">{state.price}</span>{" "}
-          </button>
+      {/* Preview form and action button */}
+      <div className="fixed z-50 left-0 right-0 bottom-0 px-10 py-4 bg-white border-t border-gray-200">
+        <div className="grid grid-cols-3">
+          <div className="col-span-2">
+            <JobPostPreview />
+          </div>
+          <div className="col-span-1 flex">
+            <button
+              type="submit"
+              className="ml-auto mb-auto px-12 py-5 text-3xl btn-indigo"
+            >
+              Post your job — $<span className="font-bold">{state.price}</span>{" "}
+            </button>
+          </div>
         </div>
       </div>
+      {/* <PaymentForm/> */}
     </form>
   );
 }

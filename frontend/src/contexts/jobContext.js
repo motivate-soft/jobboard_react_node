@@ -1,4 +1,6 @@
-import React, { useState, createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext, useReducer, useEffect } from "react";
+import jobApi from "../service/jobApi";
+import { toast } from "react-toastify";
 
 export const JobContext = createContext();
 
@@ -15,14 +17,12 @@ const initialJob = {
   location: "Worldwide",
 
   size: 1,
-  isShowLogo: true,
-  isBlastEmail: true,
-  isHighlight: false,
-  isHighlightColor: false,
-  highlightColor: null,
-  isStickyDay: false,
-  isStickyWeek: false,
-  isStickyMonth: false,
+  showLogo: true,
+  blastEmail: true,
+  highlight: false,
+  highlightColor: false,
+  brandColor: null,
+  stickyDuration: null,
 
   price: null,
   discountPercent: 0,
@@ -38,14 +38,12 @@ const initialJobBundle = {
   location: "Worldwide",
 
   size: defaultBundleSize,
-  isShowLogo: true,
-  isBlastEmail: true,
-  isHighlight: false,
-  isHighlightColor: false,
-  highlightColor: null,
-  isStickyDay: false,
-  isStickyWeek: false,
-  isStickyMonth: false,
+  showLogo: true,
+  blastEmail: true,
+  highlight: false,
+  highlightColor: false,
+  brandColor: null,
+  stickyDuration: null,
 
   price: null,
   pricePerPost: defaultPricePerPost,
@@ -53,38 +51,44 @@ const initialJobBundle = {
 };
 
 const upsells = {
-  isShowLogo: 49,
-  isBlastEmail: 49,
-  isHighlight: 49,
-  isHighlightColor: 349,
-  isStickyDay: 199,
-  isStickyWeek: 549,
-  isStickyMonth: 1647,
+  showLogo: 49,
+  blastEmail: 49,
+  highlight: 49,
+  highlightColor: 349,
+  stickyDay: 199,
+  stickyWeek: 549,
+  stickyMonth: 1647,
 };
 
 function calculatePrice(bundleState) {
   let { pricePerPost, size, discountPercent } = bundleState;
   console.log("calculatePrice", bundleState);
-  if (bundleState.isShowLogo) {
-    pricePerPost += upsells.isShowLogo;
+  if (bundleState.showLogo) {
+    pricePerPost += upsells.showLogo;
   }
-  if (bundleState.isBlastEmail) {
-    pricePerPost += upsells.isBlastEmail;
+  if (bundleState.blastEmail) {
+    pricePerPost += upsells.blastEmail;
   }
-  if (bundleState.isHighlight) {
-    pricePerPost += upsells.isHighlight;
+  if (bundleState.highlight) {
+    pricePerPost += upsells.highlight;
   }
-  if (bundleState.isHighlightColor) {
-    pricePerPost += upsells.isHighlightColor;
+  if (bundleState.highlightColor) {
+    pricePerPost += upsells.highlightColor;
   }
-  if (bundleState.isStickyDay) {
-    pricePerPost += upsells.isStickyDay;
-  }
-  if (bundleState.isStickyWeek) {
-    pricePerPost += upsells.isStickyWeek;
-  }
-  if (bundleState.isStickyMonth) {
-    pricePerPost += upsells.isStickyMonth;
+  if (bundleState.stickyDuration) {
+    switch (bundleState.stickyDuration) {
+      case "day":
+        pricePerPost += upsells.stickyDay;
+        break;
+      case "week":
+        pricePerPost += upsells.stickyWeek;
+        break;
+      case "month":
+        pricePerPost += upsells.stickyMonth;
+        break;
+      default:
+        break;
+    }
   }
 
   return (pricePerPost * size * (100 - discountPercent)) / 100;
@@ -103,22 +107,13 @@ function reducer(state, action) {
     case "UPDATE_JOB_UPSELLS":
       let { payload } = action;
 
-      // toggle sticky plan
-      if (payload.isStickyWeek) {
-        console.log("___isStickyWeek");
-        payload.isStickyMonth = false;
-      }
-      if (payload.isStickyMonth) {
-        console.log("___isStickyMonth");
-        payload.isStickyWeek = false;
-      }
-
       // toggle highlight option
-      if (payload.isHighlight) {
-        payload.isHighlightColor = false;
+      if (payload.highlight) {
+        payload.highlightColor = false;
+        payload.brandColor = null;
       }
-      if (payload.isHighlightColor) {
-        payload.isHighlight = false;
+      if (payload.highlightColor) {
+        payload.highlight = false;
       }
 
       const price = calculatePrice({
@@ -135,6 +130,19 @@ function reducer(state, action) {
 
 const JobPostProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialJob);
+
+  useEffect(() => {
+    // fetchPricing();
+  });
+
+  async function fetchPricing() {
+    const { data } = await jobApi.getPricing();
+    if (data.message) {
+      toast.warning(data.message);
+    }
+    console.log("JobPostProvider->fetchPricing", data);
+  }
+
   return (
     <JobContext.Provider value={{ state, dispatch }}>
       {children}
