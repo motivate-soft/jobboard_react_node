@@ -1,24 +1,15 @@
-import React, { useCallback, useState } from "react";
-import JosPostPreview from "../../components/JosPostPreview/JosPostPreview";
+import React, { useState } from "react";
 import SideOverlay from "../../components/Shared/SideOverlay/SideOverlay";
-import JobPostForm from "../../components/JobPostForm/JobPostForm";
 import JobListTable from "../../components/JobList/JobListTable";
 import JobDetail from "../../components/JobDetail/JobDetail";
-import PaymentForm from "../../components/PaymentForm/PaymentForm";
+import { Link } from "react-router-dom";
 
 export default function Home() {
-  const [isJobpostOpened, setIsJobpostOpened] = useState(false);
   const [isJobdetailOpened, setIsJobdetailOpened] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState(null);
 
-  // const handleClick = useCallback((id) => {
-  //   console.log("handleClick", id);
-  //   setIsJobdetailOpened(true);
-  //   setSelectedJobId(id);
-  // }, []);
-
   function handleClick(id) {
-    console.log("handleClick", id);
+    console.log("Home->handleTableRowClick", id);
     setIsJobdetailOpened(true);
     setSelectedJobId(id);
   }
@@ -26,13 +17,9 @@ export default function Home() {
   return (
     <div className="relative flex flex-col min-h-screen pt-20 bg-gray-100">
       <div className="container mx-auto">
-        <button
-          type="submit"
-          className="btn-indigo mr-auto mb-12"
-          onClick={() => setIsJobpostOpened(true)}
-        >
+        <Link to="/buy-single" className="btn-indigo mr-auto mb-12">
           Post a Job
-        </button>
+        </Link>
       </div>
 
       <JobListTable onClickRow={handleClick} />
@@ -47,15 +34,6 @@ export default function Home() {
           setOpen={setIsJobdetailOpened}
         />
       </SideOverlay>
-      <SideOverlay
-        className="w-screen max-w-3xl relative border-l border-gray-200"
-        open={isJobpostOpened}
-        setOpen={setIsJobpostOpened}
-      >
-        <JobPostForm open={isJobpostOpened} setOpen={setIsJobpostOpened} />
-      </SideOverlay>
-      <JosPostPreview open={isJobpostOpened} />
-      <PaymentForm />
     </div>
   );
 }

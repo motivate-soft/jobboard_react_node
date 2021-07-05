@@ -100,7 +100,7 @@ export default function JobListTableRow(props) {
   return (
     <tr
       style={createBackgroundStyle()}
-      className="text-gray-900"
+      className="text-gray-900 cursor-pointer"
       onClick={(e) => onClick(_id)}
     >
       <td className="px-6 py-4 whitespace-nowrap">

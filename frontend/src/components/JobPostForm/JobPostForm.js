@@ -34,7 +34,6 @@ const primaryTagOptions = [
 ];
 
 export default function JobPostForm(props) {
-  const { open, setOpen } = props;
   const { state, dispatch } = useJobPost();
 
   const validationSchema = Yup.object().shape(
@@ -187,23 +186,15 @@ export default function JobPostForm(props) {
         <div className="px-4 py-6 bg-gray-50 sm:px-6">
           <div className="flex items-start justify-between space-x-3">
             <div className="space-y-1">
-              <Dialog.Title className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Post a new job
-              </Dialog.Title>
+              </h1>
             </div>
 
             <div className="h-7 flex items-center">
               <Link to="/buy-bundle" className="mr-4  btn-indigo">
                 Buy a bundle
               </Link>
-              <button
-                type="button"
-                className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                onClick={() => setOpen(false)}
-              >
-                <span className="sr-only">Close panel</span>
-                <XIcon className="h-6 w-6" aria-hidden="true" />
-              </button>
             </div>
           </div>
         </div>
