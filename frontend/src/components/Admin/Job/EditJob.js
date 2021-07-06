@@ -58,7 +58,6 @@ export default function EditJob(props) {
       maxSalary: Yup.string().required("Maximum salary is required"),
       description: Yup.string().required("Job description is required"),
       howtoApply: Yup.string().required("This field is required"),
-
       applyUrl: Yup.string().when("applyEmail", {
         is: (applyEmail) => !applyEmail || applyEmail.length === 0,
         then: Yup.string().required("Apply url is required"),
@@ -83,9 +82,8 @@ export default function EditJob(props) {
       highlight: Yup.bool().required("This field is required"),
       highlightColor: Yup.bool().required("This field is required"),
       brandColor: Yup.string(),
-      stickyDuration: Yup.string()
-        .oneOf(stickyDurationOptions)
-        .required("This field is required"),
+      stickyDuration: Yup.string().oneOf(stickyDurationOptions),
+      // .required("This field is required"),
 
       status: Yup.string()
         .required("This field is required")
@@ -107,17 +105,13 @@ export default function EditJob(props) {
   } = useForm(formOptions);
   const { errors } = formState;
   const watchCompanyLogoUrl = watch("companyLogo.url", null);
-
-  useEffect(() => {
-    console.log("formState", formState);
-    console.log("getValues", getValues());
-  });
+  const watchStickyDuration = watch("stickyDuration", null);
 
   async function fetchJobDetail() {
     try {
       if (!jobId) return;
       let { data } = await jobApi.retrieve(jobId);
-      console.log("Editjob->fetchJobDetail->data", data);
+      console.log("Editjob->fetchJobDetail->success", data);
 
       setCompanyId(data.company._id);
       const {
@@ -137,8 +131,8 @@ export default function EditJob(props) {
         showLogo,
         blastEmail,
         highlight,
+        highlightColor,
         brandColor,
-        isStickyDay,
         stickyDuration,
       } = data;
 
@@ -155,7 +149,7 @@ export default function EditJob(props) {
         applyEmail,
 
         companyName: name,
-        // companyLogo: logo, // media obj id
+        companyLogo: logo, // media obj id
         companyTwitter: twitter,
         companyEmail: email,
         invoiceAddress,
@@ -164,12 +158,14 @@ export default function EditJob(props) {
         showLogo,
         blastEmail,
         highlight,
-        brandColor: brandColor || defaultHighlightColor,
-        isStickyDay,
+        highlightColor,
         stickyDuration,
         status,
       });
-      setValue("companyLogo", logo, { shouldValidate: true });
+      if (highlightColor) {
+        setValue("brandColor", brandColor, { shouldValidate: true });
+      }
+      // setValue("companyLogo", logo, { shouldValidate: true });
     } catch (error) {
       console.log("Editjob->fetchJobDetail->error", error);
     }
@@ -180,7 +176,7 @@ export default function EditJob(props) {
     setValue("companyLogo", file, { shouldValidate: true });
   }
 
-  function handleChange(e) {
+  function handleHighlightChange(e) {
     if (e.target.name === "highlight" && e.target.checked) {
       setValue("highlightColor", false);
       setValue("brandColor", null);
@@ -188,6 +184,16 @@ export default function EditJob(props) {
     if (e.target.name === "highlightColor" && e.target.checked) {
       setValue("highlight", false);
     }
+  }
+
+  function handleStickyDurationChange(e) {
+    let duration;
+    if (e.target.checked) {
+      duration = e.target.name;
+    } else {
+      duration = null;
+    }
+    setValue("stickyDuration", duration, { shouldValidate: true });
   }
 
   async function onSubmit(formData) {
@@ -223,8 +229,8 @@ export default function EditJob(props) {
         showLogo: formData.showLogo,
         blastEmail: formData.blastEmail,
         highlight: formData.highlight,
+        highlightColor: formData.highlightColor,
         brandColor: formData.brandColor,
-        isStickyDay: formData.isStickyDay,
         stickyDuration: formData.stickyDuration,
         status: formData.status,
       };
@@ -250,6 +256,7 @@ export default function EditJob(props) {
     console.log("handleApprove", getValues());
     handleSubmit();
   }
+
   function handleDecline(e) {
     setValue("status", "declined");
     handleSubmit();
@@ -797,7 +804,7 @@ export default function EditJob(props) {
                 id="highlight"
                 name="highlight"
                 type="checkbox"
-                onChange={handleChange}
+                onChange={handleHighlightChange}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
@@ -819,7 +826,7 @@ export default function EditJob(props) {
                 id="highlightColor"
                 name="highlightColor"
                 type="checkbox"
-                onChange={handleChange}
+                onChange={handleHighlightChange}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
             </div>
@@ -840,26 +847,65 @@ export default function EditJob(props) {
             </div>
           </div>
 
-          {/* Sticky 24 hours */}
+          {/* Sticky 1 day */}
           <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
             <div>
-              <select
-                {...register("stickyDuration")}
-                className="block w-full input-indigo "
-              >
-                {stickyDurationOptions.map((option, index) => (
-                  <option key={index} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <input
+                id="day"
+                name="day"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                checked={watchStickyDuration === "day"}
+                onChange={handleStickyDurationChange}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="day" className="ml-2 block text-sm text-gray-900">
+                Sticky for 24 hours
+              </label>
+            </div>
+          </div>
+
+          {/* Sticky 1 week */}
+          <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
+            <div>
+              <input
+                id="week"
+                name="week"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                checked={watchStickyDuration === "week"}
+                onChange={handleStickyDurationChange}
+              />
             </div>
             <div className="sm:col-span-2">
               <label
-                htmlFor="isStickyDay"
+                htmlFor="week"
                 className="ml-2 block text-sm text-gray-900"
               >
-                Sticky post for 24 hours
+                Sticky for 1 entire week
+              </label>
+            </div>
+          </div>
+
+          {/* Sticky 1 month */}
+          <div className="space-y-1 px-4 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 sm:py-5">
+            <div>
+              <input
+                id="month"
+                name="month"
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                checked={watchStickyDuration === "month"}
+                onChange={handleStickyDurationChange}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label
+                htmlFor="month"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                Sticky for 1 entire month
               </label>
             </div>
           </div>

@@ -1,4 +1,5 @@
-const { check, buildCheckFunction } = require("express-validator");
+const { check, body, buildCheckFunction } = require("express-validator");
+const { stickyOptions, statusOptions } = require("../models/job");
 const checkBodyAndParams = buildCheckFunction(["body", "params"]);
 
 module.exports.validate = (method) => {
@@ -96,8 +97,33 @@ module.exports.validate = (method) => {
         check("maxSalary", "maxSalary is required").not().isEmpty(),
         check("description", "description is required").not().isEmpty(),
         check("howtoApply", "howtoApply is required").not().isEmpty(),
-        check("applyUrl", "applyUrl is required").not().isEmpty(),
-        check("applyEmail", "applyEmail is required").not().isEmpty(),
+        check("applyUrl")
+          .isURL()
+          .withMessage("apply Url is not valid")
+          .optional(),
+        check("applyEmail")
+          .isEmail()
+          .withMessage("apply email is not valid")
+          .optional(),
+
+        check("showLogo", "showLogo is required").isBoolean(),
+        check("blastEmail", "blastEmail is required").isBoolean(),
+        check("highlight", "highlight is required").isBoolean(),
+        check("highlightColor", "highlightColor is required").isBoolean(),
+        // check brandColor if highlightColor is true
+        check("brandColor")
+          .if(body("highlightColor").equals("true"))
+          .not()
+          .isEmpty()
+          .withMessage("brandColor is requiered")
+          .isHexColor()
+          .withMessage("brandColor is not valid"),
+        // sticky duration validation
+        check("stickyDuration", "stickyDuration is not valid")
+          .optional()
+          .isIn(stickyOptions),
+        // .optional({nullable: true}),
+        // .optional({checkFalsy: true}),
       ];
     }
   }

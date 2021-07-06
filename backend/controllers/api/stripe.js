@@ -69,8 +69,13 @@ exports.createCustomer = async (company) => {
 };
 
 exports.retrieveProduct = async (productId) => {
-  const product = await stripe.products.retrieve(productId);
-  return product;
+  return await stripe.products.retrieve(productId);
+};
+
+exports.getProductPrices = async (productId) => {
+  return await stripe.prices.list({
+    product: productId,
+  });
 };
 
 exports.getProductsAndPlans = async () => {
@@ -84,8 +89,10 @@ exports.getProductsAndPlans = async () => {
       var plans = sortAndFormatPlans(stripeData[1].data);
       var prices = stripeData[2].data;
 
-      logger.info("getProductsAndPlans->products" + products);
-      logger.info("getProductsAndPlans->plans" + plans);
+      logger.info("getProductsAndPlans->products");
+      logger.info(products);
+      logger.info("getProductsAndPlans->plans");
+      logger.info(plans);
 
       return attachPlansToProducts(plans, products, prices);
     })
@@ -97,13 +104,14 @@ exports.getProductsAndPlans = async () => {
 
 exports.createCustomerAndSubscription = async (
   paymentMethodId,
-  customerInfo
+  customerInfo,
+  pricingItems
 ) => {
-  /* Create customer and set default payment method */
   const customer = await stripe.customers.create({
     payment_method: paymentMethodId,
     email: customerInfo.email,
     name: customerInfo.name,
+    address: customerInfo.invoiceAddress,
     invoice_settings: {
       default_payment_method: paymentMethodId,
     },
@@ -112,21 +120,15 @@ exports.createCustomerAndSubscription = async (
   /* Create subscription and expand the latest invoice's Payment Intent
    * We'll check this Payment Intent's status to determine if this payment needs SCA
    */
-  let items = [];
-  customerInfo.priceItems.map((item) => {
-    items.push({
-      price: item,
-    });
-  });
 
   const subscription = await stripe.subscriptions.create({
     customer: customer.id,
-    items,
+    items: pricingItems.map((item) => ({
+      price: item,
+    })),
     // trial_from_plan: true,
     expand: ["latest_invoice.payment_intent"],
   });
-
-  console.log("subscription", subscription);
 
   return subscription;
 };

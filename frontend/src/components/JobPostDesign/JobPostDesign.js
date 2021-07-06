@@ -69,12 +69,6 @@ export default function JobPostDesign() {
       <h3 className="mb-8 text-xl leading-6 font-bold text-gray-900">
         Design your job posts
       </h3>
-      <div>
-        <h5 className="text-center text-xl font-semibold">
-          Every job post in your bundle will have the features you select below
-          and will be valid for 24 months
-        </h5>
-      </div>
 
       <div className="flex items-center text-base mb-1 py-2">
         {/* Company logo */}

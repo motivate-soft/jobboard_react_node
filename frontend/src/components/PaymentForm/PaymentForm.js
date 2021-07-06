@@ -1,11 +1,12 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon, XIcon } from "@heroicons/react/outline";
-import ReactDOM from "react-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import axiosInstance from "./../../service/axiosInstance";
 import {
   CardElement,
+  CardNumberElement,
+  CardCvcElement,
   Elements,
   useStripe,
   useElements,
@@ -16,54 +17,86 @@ const stripePromise = loadStripe(
     "pk_test_51IZJknHhTqm9kBDPwaxtL2RqAagMTuZXHAOIp7IjRp4BuOqSR1NIETfwwqy5Jbde92AsJATdHDClpXRBct2sUPhi00ShhuWvDX"
 );
 
-const CheckoutForm = () => {
+const CheckoutForm = (props) => {
+  const { onCreatePaymentMethodSuccess, onCreatePaymentMethodFailure } = props;
   const stripe = useStripe();
   const elements = useElements();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const elementsStyles = {
+    base: {
+      color: "#004ABB",
+      iconColor: "#004ABB",
+      fontFamily: "'Mukta', Helvetica, sans-serif",
+      fontWeight: "600",
+      fontSmoothing: "antialiased",
+      fontSize: "16px",
+      "::placeholder": {
+        color: "#6099EE",
+        textTransform: "uppercase",
+      },
+    },
+    invalid: {
+      color: "#ff5252",
+      iconColor: "#ff5252",
+    },
+  };
 
+  async function handleSubmit(event) {
+    event.preventDefault();
     if (elements == null) {
       return;
     }
 
     try {
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
+      const { paymentMethod } = await stripe.createPaymentMethod({
         type: "card",
         card: elements.getElement(CardElement),
       });
 
-      await axiosInstance.post("api/job/subscription", {
-        paymentMethodId: paymentMethod.id,
-        company: {
-          name: "amazingCo.ltd",
-          email: "amazing@co.com",
-          invoiceAddress: "boston",
-        },
-        job: {
-          showLogo: true,
-          blastEmail: true,
-          highlightColor: true,
-          stickyMonth: true,
-        },
-      });
+      onCreatePaymentMethodSuccess(paymentMethod);
+      console.log("CheckoutForm->CreatePaymentMethod->success", paymentMethod);
+
+      // await axiosInstance.post("api/job/subscription", {
+      //   paymentMethodId: paymentMethod.id,
+      //   company: {
+      //     name: "amazingCo.ltd",
+      //     email: "amazing@co.com",
+      //     invoiceAddress: "boston",
+      //   },
+      //   job: {
+      //     showLogo: true,
+      //     blastEmail: true,
+      //     highlightColor: true,
+      //     stickyMonth: true,
+      //   },
+      // });
     } catch (error) {
-      console.log("CheckoutForm->error", error);
+      console.log("CheckoutForm->CreatePaymentMethod->error", error);
+      onCreatePaymentMethodFailure(error);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
-      <button type="submit" disabled={!stripe || !elements}>
+    <form onSubmit={handleSubmit} className="flex flex-col">
+      <CardElement className="mb-4" style={elementsStyles} />
+      <button
+        type="submit"
+        disabled={!stripe || !elements}
+        className="btn-indigo block py-4"
+      >
         Pay
       </button>
     </form>
   );
 };
 
-export default function PaymentForm() {
-  const [open, setOpen] = useState(true);
+export default function PaymentForm(props) {
+  const {
+    open,
+    setOpen,
+    onCreatePaymentMethodSuccess,
+    onCreatePaymentMethodFailure,
+  } = props;
 
   return (
     <Elements stripe={stripePromise}>
@@ -115,7 +148,12 @@ export default function PaymentForm() {
                     <XIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
-                <CheckoutForm />
+                <div className="px-4 pt-8">
+                  <CheckoutForm
+                    onCreatePaymentMethodSuccess={onCreatePaymentMethodSuccess}
+                    onCreatePaymentMethodFailure={onCreatePaymentMethodFailure}
+                  />
+                </div>
               </div>
             </Transition.Child>
           </div>

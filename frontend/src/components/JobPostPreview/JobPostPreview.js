@@ -15,7 +15,7 @@ export default function JobPostPreview(props) {
           <h4 className="font-bold text-2xl col-span-2">{job.position}</h4>
           <div className="flex flex-wrap col-span-4">
             {job.primaryTag && (
-              <div className="mr-1 mb-1 px-1 rounded border-black border-2">
+              <div className="mr-1 mb-auto px-1 rounded border-black border-2">
                 {job.primaryTag}
               </div>
             )}
@@ -23,7 +23,7 @@ export default function JobPostPreview(props) {
             {job.tags.map((tag, index) => (
               <div
                 key={index}
-                className="mr-1 mb-1 px-1 rounded border-black border-2"
+                className="mr-1 mb-auto px-1 rounded border-black border-2"
               >
                 {tag}
               </div>

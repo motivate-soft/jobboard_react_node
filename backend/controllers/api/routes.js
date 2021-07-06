@@ -153,7 +153,7 @@ module.exports = function (middleware, router, controllers) {
     middleware.checkRole("admin"),
     apiCtrl.job.getFilter
   );
-  router.post("/api/job/subscription", apiCtrl.job.subscription);
+  // router.post("/api/job/subscription", apiCtrl.job.subscription);
 
   router.get(
     "/api/job",

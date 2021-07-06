@@ -5,6 +5,7 @@ const logger = require("../../helpers/logger");
 const { handleError, responseWithResult } = require("../../helpers/handlers");
 const User = require("../../models/job");
 const Job = require("../../models/job");
+const Company = require("../../models/company");
 const {
   getProductsAndPlans,
   createCustomerAndSubscription,
@@ -12,11 +13,74 @@ const {
 
 require("../../config/index");
 
-const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
-const STICKY_OPTIONS = ["week", "month"];
-const STATUS_OPTIONS = ["pending", "approved", "declined"];
+const locationOptions = ["worldwide", "europe", "america", "asia", "africa"];
+const stickyOptions = ["week", "month"];
+const statusOptions = ["pending", "approved", "declined"];
 
 const { products } = nconf.get("stripe");
+
+async function getPriceItems(selectedProducts) {
+  let productsWithPrice = await getProductsAndPlans();
+  let pricingItems = [];
+
+  selectedProducts.map((item) => {
+    let productId = products[item];
+    let filteredProducts = productsWithPrice.filter(
+      (product) => product.id === productId
+    );
+    let priceId = filteredProducts[0].prices[0].id;
+    console.log("getPriceItems->filteredProducts->priceId", priceId);
+    pricingItems.push(priceId);
+  });
+  logger.info("getPriceItems->pricingItems");
+  logger.info(pricingItems);
+  console.log("getPriceItems->pricingItems", pricingItems);
+
+  return pricingItems;
+}
+
+async function createSubscription(job, paymentMethodId) {
+  let productsArray = [
+    "showLogo",
+    "blastEmail",
+    "highlight",
+    "highlightColor",
+  ].filter((field) => job[field] === true);
+  productsArray.push("singlePost");
+
+  if (job.stickyDuration) {
+    switch (job.stickyDuration) {
+      case "day":
+        productsArray.push("stickyDay");
+        break;
+      case "week":
+        productsArray.push("stickyWeek");
+        break;
+      case "month":
+        productsArray.push("stickyMonth");
+        break;
+      default:
+        break;
+    }
+  }
+  logger.info("createSubscription->productsArray");
+  logger.info(productsArray);
+
+  let customer = await Company.findById(job.company);
+  let pricingItems = await getPriceItems(productsArray);
+  logger.info("createSubscription->customer");
+  logger.info(customer);
+
+  let response = await createCustomerAndSubscription(
+    paymentMethodId,
+    customer,
+    pricingItems
+  );
+
+  logger.info("createSubscription->createCustomerAndSubscription");
+  logger.info(response);
+  return response;
+}
 
 // user
 exports.listing = async function (req, res) {
@@ -246,29 +310,6 @@ exports.getPricing = async function (req, res) {
   }
 };
 
-exports.subscription = async function (req, res) {
-  let { company, job, paymentMethodId } = req.body;
-  console.log("req", company, paymentMethodId);
-
-  // let array = [];
-  // let keys = Object.keys(job);
-  // keys.map((key) => {
-  //   array.push(products[key]);
-  // });
-  company.priceItems = [
-    "price_1J7zQ2HhTqm9kBDPpbdfAn3T",
-    "price_1J7zRIHhTqm9kBDPgnU8pjsm",
-    "price_1J7zRgHhTqm9kBDPrJ0eWdr2",
-    "price_1J7zTPHhTqm9kBDPLRWFZkrM",
-  ];
-
-  const response = await createCustomerAndSubscription(
-    paymentMethodId,
-    company
-  );
-  logger.info("subscription", response);
-};
-
 // admin
 exports.getFilter = async function (req, res) {
   try {
@@ -277,11 +318,11 @@ exports.getFilter = async function (req, res) {
     return res.status(200).json({
       minSalary: 10000,
       maxSalary: 200000,
-      status: STATUS_OPTIONS,
-      sticky: STICKY_OPTIONS,
+      status: statusOptions,
+      sticky: stickyOptions,
     });
   } catch (error) {
-    logger.error(err);
+    logger.error(error);
     return handleError(res, req, 500, err);
   }
 };
@@ -398,47 +439,10 @@ exports.create = async function (req, res) {
       return handleError(res, req, 400, errors.array(), "invalidData");
     }
 
-    const {
-      company,
-      position,
-      primaryTag,
-      tags,
-      location,
-      minSalary,
-      maxSalary,
-      description,
-      howtoApply,
-      applyUrl,
-      applyEmail,
-      isShowLogo,
-      isBlastEmail,
-      isHighlight,
-      highlightColor,
-      isStickyDay,
-      stickyDuration,
-    } = req.body;
+    const { paymentMethodId, ...jobData } = req.body;
 
-    logger.info(req.body);
+    job = new Job(jobData);
 
-    job = new Job({
-      company,
-      position,
-      primaryTag,
-      tags,
-      location,
-      minSalary,
-      maxSalary,
-      description,
-      howtoApply,
-      applyUrl,
-      applyEmail,
-      isShowLogo,
-      isBlastEmail,
-      isHighlight,
-      highlightColor,
-      isStickyDay,
-      stickyDuration,
-    });
     let newJob = await job.save();
 
     if (!newJob) {
@@ -446,6 +450,8 @@ exports.create = async function (req, res) {
       logger.debug(message);
       return handleError(res, req, 400, message);
     }
+
+    await createSubscription(newJob, paymentMethodId);
 
     return res.status(200).json(newJob);
   } catch (err) {
@@ -480,11 +486,11 @@ exports.update = async function (req, res) {
       howtoApply,
       applyUrl,
       applyEmail,
-      isShowLogo,
-      isBlastEmail,
-      isHighlight,
+      showLogo,
+      blastEmail,
+      highlight,
       highlightColor,
-      isStickyDay,
+      brandColor,
       stickyDuration,
       status,
     } = req.body;
@@ -500,15 +506,15 @@ exports.update = async function (req, res) {
     job.howtoApply = howtoApply;
     job.applyUrl = applyUrl;
     job.applyEmail = applyEmail;
-    job.isShowLogo = isShowLogo;
-    job.isBlastEmail = isBlastEmail;
-    job.isHighlight = isHighlight;
+    job.showLogo = showLogo;
+    job.blastEmail = blastEmail;
+    job.highlight = highlight;
     job.highlightColor = highlightColor;
-    job.isStickyDay = isStickyDay;
+    if (highlightColor) {
+      job.brandColor = brandColor;
+    }
     job.stickyDuration = stickyDuration;
     job.status = status;
-
-    logger.info(req.body);
 
     let newJob = await job.save();
 

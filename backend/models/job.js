@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 var COLLECTION = "job";
 const Schema = mongoose.Schema;
-const STICKY_OPTIONS = ["day", "week", "month"];
-const STATUS_OPTIONS = ["pending", "approved", "declined"];
+const stickyOptions = ["day", "week", "month"];
+const statusOptions = ["pending", "approved", "declined"];
 
 const jobSchema = mongoose.Schema(
   {
@@ -71,11 +71,11 @@ const jobSchema = mongoose.Schema(
     },
     stickyDuration: {
       type: String,
-      enum: STICKY_OPTIONS,
+      enum: stickyOptions,
     },
     status: {
       type: String,
-      enum: STATUS_OPTIONS,
+      enum: statusOptions,
       default: "approved",
     },
     // payLater: {
@@ -89,3 +89,7 @@ const jobSchema = mongoose.Schema(
 
 const Job = mongoose.model(COLLECTION, jobSchema);
 module.exports = Job;
+module.exports = Object.assign(module.exports, {
+  stickyOptions,
+  statusOptions,
+});

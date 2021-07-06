@@ -6,15 +6,16 @@ const User = require("../models/user");
 const Media = require("../models/media");
 const Company = require("../models/company");
 const Job = require("../models/job");
+const { stickyOptions, statusOptions } = require("../models/job");
 const { users } = require("./data");
 const _ = require("lodash");
 
 require("../config");
 const CONNECTION_URI = nconf.get("mongoURI");
 
-const COMPANY_COUNT = 500;
-const JOB_COUNT = 500;
-const PRIMARYTAG_OPTIONS = [
+const companyCount = 500;
+const jobCount = 500;
+const primarytagOptions = [
   "Software Development",
   "Customer Support",
   "Sales",
@@ -28,13 +29,11 @@ const PRIMARYTAG_OPTIONS = [
   "Non-Tech",
   "Other",
 ];
-const LOCATION_OPTIONS = ["worldwide", "europe", "america", "asia", "africa"];
-const STICKY_OPTIONS = ["day", "week", "month"];
-const STATUS_OPTIONS = ["pending", "approved", "declined"];
-const SALARY_OPTIONS = Array(20)
+const locationOptions = ["worldwide", "europe", "america", "asia", "africa"];
+const salaryOptions = Array(20)
   .fill(null)
   .map((u, i) => (i + 1) * 10000);
-const COLORS_OPTIONS = [
+const colorOptions = [
   "#ff4742", // default color
   "#ffed51",
   "#0042aa",
@@ -84,7 +83,7 @@ const importData = async () => {
 
     await Company.deleteMany({});
 
-    array = Array(COMPANY_COUNT)
+    array = Array(companyCount)
       .fill(null)
       .map((a, i) => {
         let ranInt = _.random(0, 9);
@@ -102,39 +101,38 @@ const importData = async () => {
 
     await Job.deleteMany({});
 
-    array = Array(JOB_COUNT)
+    array = Array(jobCount)
       .fill(null)
       .map((a, i) => {
         let job = {
           company: companyData[i]._id,
           position: faker.name.jobTitle(),
           primaryTag:
-            PRIMARYTAG_OPTIONS[_.random(0, PRIMARYTAG_OPTIONS.length - 1)],
+            primarytagOptions[_.random(0, primarytagOptions.length - 1)],
           tags: Array(_.random(3, 5))
             .fill(null)
             .map((a, i) => faker.name.jobArea()),
-          location: LOCATION_OPTIONS[_.random(0, LOCATION_OPTIONS.length - 1)],
-          minSalary: SALARY_OPTIONS[_.random(0, 9)],
-          maxSalary: SALARY_OPTIONS[_.random(10, 19)],
+          location: locationOptions[_.random(0, locationOptions.length - 1)],
+          minSalary: salaryOptions[_.random(0, 9)],
+          maxSalary: salaryOptions[_.random(10, 19)],
           description: faker.lorem.text(),
           howtoApply: faker.lorem.text(),
           applyUrl: faker.internet.url(),
           applyEmail: faker.internet.email(),
           showLogo: true,
           blastEmail: true,
-          status: STATUS_OPTIONS[_.random(0, 2)],
+          status: statusOptions[_.random(0, 2)],
           createdAt: randomDate(new Date(2021, 5, 10), new Date()),
         };
         job.highlight = _.random(1.0) > 0.5;
         if (!job.highlight) {
           if (_.random(1.0) > 0.5) {
             job.highlightColor = true;
-            job.brandColor =
-              COLORS_OPTIONS[_.random(0, COLORS_OPTIONS.length - 1)];
+            job.brandColor = colorOptions[_.random(0, colorOptions.length - 1)];
           }
         }
         if (_.random(1.0) > 0.5) {
-          job.stickyDuration = STICKY_OPTIONS[_.random(0, 3)];
+          job.stickyDuration = stickyOptions[_.random(0, 3)];
         }
         return job;
       });
