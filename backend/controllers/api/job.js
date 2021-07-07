@@ -135,7 +135,7 @@ exports.listing = async function (req, res) {
                 },
               },
             ],
-            default: 0,
+            default: 100, // set larger than month
           },
         },
       },
@@ -144,29 +144,7 @@ exports.listing = async function (req, res) {
       $set: {
         stickyDaysLeft: {
           $switch: {
-            branches: [{ case: { $lt: ["$stickyDaysLeft", 0] }, then: 0 }],
-            default: "$stickyDaysLeft",
-          },
-        },
-      },
-    },
-    {
-      $set: {
-        stickyDaysLeft: {
-          $switch: {
-            branches: [
-              {
-                case: { $eq: ["$stickyDaysLeft", 0] },
-                then: {
-                  $divide: [
-                    {
-                      $subtract: ["$createdAt", date],
-                    },
-                    3600000 * 24,
-                  ],
-                },
-              },
-            ],
+            branches: [{ case: { $lt: ["$stickyDaysLeft", 0] }, then: 100 }], // stickyDaysLeft less than zero
             default: "$stickyDaysLeft",
           },
         },
@@ -174,7 +152,7 @@ exports.listing = async function (req, res) {
     },
     {
       $sort: {
-        stickyDaysLeft: -1,
+        stickyDaysLeft: 1,
       },
     },
     // {

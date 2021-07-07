@@ -21,7 +21,6 @@ export default function Home() {
           Post a Job
         </Link>
       </div>
-
       <JobListTable onClickRow={handleClick} />
       <SideOverlay
         className="w-screen max-w-4xl relative border-l border-gray-200"

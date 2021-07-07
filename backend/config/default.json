@@ -7,10 +7,9 @@
     "listKey": "",
     "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s"
   },
-  "mailgun": {
-    "key": "",
-    "domain": "",
-    "sender": ""
+  "sendgrid": {
+    "apiKey": "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",
+    "listId": "ciojobs"
   },
   "stripe": {
     "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s",

@@ -48,21 +48,15 @@ export default function JobListTableRow(props) {
   }
 
   function renderStickyWidget() {
-    if (stickyDaysLeft < 0) return null;
+    if (stickyDaysLeft < 0 || stickyDaysLeft > 30) return null;
+    // moment().add(stickyDaysLeft, "d").diff(moment.now(), "h")
     if (stickyDaysLeft < 1) {
-      console.log("stickyDaysLeft < 1", stickyDaysLeft);
       return (
-        <span className="mr-3">
-          📌 {moment().add(stickyDaysLeft, "d").diff(moment.now(), "t")}
-        </span>
+        <span className="mr-3">📌 {Math.floor(stickyDaysLeft * 24)} h</span>
       );
     }
 
-    return (
-      <span className="mr-3">
-        📌 {moment().add(stickyDaysLeft, "d").diff(moment.now(), "d")}
-      </span>
-    );
+    return <span className="mr-3">📌 {Math.ceil(stickyDaysLeft)} d</span>;
   }
 
   function renderApplyButton() {

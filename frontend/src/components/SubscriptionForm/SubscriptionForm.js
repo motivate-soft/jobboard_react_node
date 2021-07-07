@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import mailApi from "../../service/mailApi";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const navigation = {
   solutions: [
@@ -124,8 +125,44 @@ export default function SubscriptionForm() {
         return;
       }
 
-      const res = await mailApi.newsletter({ email });
-      console.log("SubscriptionForm", res);
+      //   method: "POST",
+      //   url: "https://api.sendgrid.com/v3/contactdb/lists/ciojobs/recipients",
+      //   headers: {
+      //     "content-type": "application/json",
+      //     authorization:
+      //       "Bearer " +
+      //       "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",
+      //   },
+      //   body: {
+      //     email: email,
+      //     first_name: "asdf",
+      //     last_name: "asdf",
+      //   },
+      
+      let res = await axios.put(
+        "https://api.sendgrid.com/v3/marketing/contacts",
+        {
+          list_ids: ["ciojobs"],
+          contacts: [
+            {
+              first_name: "jhon",
+              last_name: "doe",
+              email: email,
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            authorization:
+              "Bearer " +
+              "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",
+          },
+        }
+      );
+
+      // const res = await mailApi.newsletter({ email });
+      console.log("Footer->SubscriptionForm", res);
       if (res.sucess) {
         toast.success(res.message);
       }

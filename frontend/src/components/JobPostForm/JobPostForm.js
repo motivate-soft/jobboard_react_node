@@ -100,16 +100,7 @@ export default function JobPostForm(props) {
     console.log("JobPostForm->handleChange:useJobpost", state);
 
     if (fieldName === "tags") {
-      let { tags } = state;
-      tags = value.split(",").filter((tag) => tag !== "");
-
-      dispatch({
-        type: "UPDATE_JOB_DETAIL",
-        payload: {
-          tags,
-        },
-      });
-      return;
+      value = value.split(",").filter((tag) => tag !== "");
     }
     dispatch({
       type: "UPDATE_JOB_DETAIL",
