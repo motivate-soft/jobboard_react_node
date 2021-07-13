@@ -6,29 +6,24 @@ require("../config");
 const { apiKey, listId } = nconf.get("sendgrid");
 client.setApiKey(apiKey);
 
-exports.addToContact = async (email) => {
-  try {
-    const request = {
-      method: "PUT",
-      url: "/v3/marketing/contacts",
-      body: {
-        list_ids: [listId],
-        contacts: [
-          {
-            // email: "example@email.com",
-            email,
-          },
-        ],
-      },
-    };
+exports.addEmailToList = async (email) => {
+  const request = {
+    method: "PUT",
+    url: "/v3/marketing/contacts",
+    body: {
+      list_ids: [listId],
+      contacts: [
+        {
+          email,
+        },
+      ],
+    },
+  };
 
-    const res = await client.request(request);
-    logger.info("service->sendgrid->res");
-    logger.info(res);
-  } catch (error) {
-    logger.error(error);
-  }
-
+  const res = await client.request(request);
+  logger.info("service->sendgrid->addEmailToList->res");
+  logger.info(res);
+  
   //   client.request(request).then(([response, body]) => {
   //     console.log(response.statusCode);
   //     console.log(body);

@@ -125,43 +125,62 @@ export default function SubscriptionForm() {
         return;
       }
 
-      //   method: "POST",
-      //   url: "https://api.sendgrid.com/v3/contactdb/lists/ciojobs/recipients",
+      /**
+       *  Get all lists
+       */
+      // let res = await axios.get("https://api.sendgrid.com/v3/marketing/lists", {
       //   headers: {
-      //     "content-type": "application/json",
+      //     "Content-Type": "application/json",
       //     authorization:
       //       "Bearer " +
       //       "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",
       //   },
-      //   body: {
-      //     email: email,
-      //     first_name: "asdf",
-      //     last_name: "asdf",
-      //   },
-      
-      let res = await axios.put(
-        "https://api.sendgrid.com/v3/marketing/contacts",
-        {
-          list_ids: ["ciojobs"],
-          contacts: [
-            {
-              first_name: "jhon",
-              last_name: "doe",
-              email: email,
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            authorization:
-              "Bearer " +
-              "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",
-          },
-        }
-      );
+      // });
 
-      // const res = await mailApi.newsletter({ email });
+      /**
+       *    Get Contacts by Emails
+       */
+      // let res = await axios.post(
+      //   "https://api.sendgrid.com/v3/marketing/contacts/search/emails",
+      //   {
+      //     emails: ["chasemiller5@gmail.com"],
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       authorization:
+      //         "Bearer " +
+      //         "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",
+      //     },
+      //   }
+      // );
+
+      /**
+       * Add contact to list
+       */
+      // let res = await axios.put(
+      //   "https://api.sendgrid.com/v3/marketing/contacts",
+      //   {
+      //     list_ids: ["73140713-7d13-421e-91a4-a8110443c34b"],
+      //     contacts: [
+      //       {
+      //         first_name: "jhon",
+      //         last_name: "doe",
+      //         email: email,
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       authorization:
+      //         "Bearer " +
+      //         "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",
+      //     },
+      //   }
+      // );
+
+      const res = await mailApi.newsletter({ email });
       console.log("Footer->SubscriptionForm", res);
       if (res.sucess) {
         toast.success(res.message);

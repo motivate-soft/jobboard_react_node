@@ -16,6 +16,8 @@ import classNames from "classnames";
 import JobPostPreview from "../JobPostPreview/JobPostPreview";
 import PaymentForm from "../PaymentForm/PaymentForm";
 import { Fragment } from "react";
+import Modal from "../Shared/Modal/Modal";
+import StripePaymentForm from "../PaymentForm/StripePaymentForm";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -110,6 +112,15 @@ export default function JobPostForm(props) {
     });
   }
 
+  function handleApplyDataChange(e) {
+    if (e.target.name === "applyUrl") {
+      setValue("applyEmail", "");
+    }
+    if (e.target.name === "applyEmail") {
+      setValue("applyUrl", "");
+    }
+  }
+
   function handleUpload(file) {
     console.log("JobPostForm->handleUpload", file);
     setValue("companyLogo", file._id, { shouldValidate: true });
@@ -119,10 +130,6 @@ export default function JobPostForm(props) {
     trigger();
     console.log("JobPostForm->handlePostClick->formstate", isValid, errors);
     if (!isValid) return;
-    // setValue("paymentMethodId", "pm_1JA8isHhTqm9kBDPk2J9gW3l", {
-    //   shouldValidate: true,
-    // });
-    // handleSubmit(onSubmit)();
 
     setCheckoutFormOpen(true);
   }
@@ -178,8 +185,6 @@ export default function JobPostForm(props) {
         maxSalary: formData.maxSalary,
         description: formData.description,
         howtoApply: formData.howtoApply,
-        applyUrl: formData.applyUrl,
-        applyEmail: formData.applyEmail,
         payLater: formData.payLater,
         paymentMethodId: formData.paymentMethodId,
 
@@ -189,7 +194,12 @@ export default function JobPostForm(props) {
         highlight,
         highlightColor,
       };
-
+      if (formData.applyUrl && formData.applyUrl.length > 0) {
+        job.applyUrl = formData.applyUrl;
+      }
+      if (formData.applyEmail && formData.applyEmail.length > 0) {
+        job.applyEmail = formData.applyEmail;
+      }
       if (highlightColor && brandColor) {
         job.brandColor = brandColor;
       }
@@ -526,6 +536,7 @@ export default function JobPostForm(props) {
                   className={classNames("block", "w-full", "input-indigo", {
                     "bg-pink-200": errors.applyUrl,
                   })}
+                  onChange={handleApplyDataChange}
                   placeholder="https://"
                 />
                 <span className="span-error">{errors.applyUrl?.message}</span>
@@ -549,6 +560,7 @@ export default function JobPostForm(props) {
                     "bg-pink-200": errors.applyEmail,
                   })}
                   placeholder="Apply email"
+                  onChange={handleApplyDataChange}
                 />
                 <span className="span-error">{errors.applyEmail?.message}</span>
               </div>
@@ -693,12 +705,23 @@ export default function JobPostForm(props) {
           </div>
         </div>
       </div>
-      <PaymentForm
-        open={checkoutFormOpen}
-        setOpen={setCheckoutFormOpen}
-        onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
-        onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
-      />
+      <Modal open={checkoutFormOpen} setOpen={setCheckoutFormOpen}>
+        <StripePaymentForm
+          open={checkoutFormOpen}
+          setOpen={setCheckoutFormOpen}
+          amount={state.price}
+          onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
+          onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
+        />
+      </Modal>
+      {/* <Modal open={checkoutFormOpen} setOpen={setCheckoutFormOpen}>
+        <PaymentForm
+          open={checkoutFormOpen}
+          setOpen={setCheckoutFormOpen}
+          onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
+          onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
+        />
+      </Modal> */}
     </Fragment>
   );
 }

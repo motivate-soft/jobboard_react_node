@@ -128,7 +128,58 @@ exports.createCustomerAndSubscription = async (
     })),
     // trial_from_plan: true,
     expand: ["latest_invoice.payment_intent"],
+    // promotion_code: 'promo_1JCbmpHhTqm9kBDPRFFhPoZV',
   });
 
   return subscription;
+};
+
+exports.createSubscription = async (
+  customerInfo,
+  pricingItems,
+  promoCode
+) => {};
+
+exports.createCustomer = async () => {};
+
+exports.createCoupon = async (discountPercent, maxRedemptions) => {
+  console.log("createCoupon->params", discountPercent, maxRedemptions);
+  const coupon = await stripe.coupons.create({
+    id: "post-discount",
+    duration: "forever",
+    // duration: "repeating",
+    percent_off: discountPercent,
+    max_redemptions: maxRedemptions,
+    applies_to: {
+      products: [
+        "prod_JlWSQiHlx7Aeib",
+        "prod_JlWU8eToQhHTth",
+        "prod_JlWUDVo7QFMHQ4",
+        "prod_JlWUE7WujhcFRZ",
+        "prod_JlWVZneRyDBh9b",
+        "prod_JlWVn4vMoRG0Iz",
+        "prod_JlWViB3VKP5N10",
+        "prod_JlWWJeULo359cK",
+      ],
+    },
+  });
+  return coupon;
+};
+
+exports.createPromoCode = async (couponId) => {
+  const promotion_code = await stripe.promotionCodes.create({
+    coupon: couponId,
+    // customer: 'cus_4fdAW5ftNQow1a',
+    max_redemptions: 10,
+  });
+  return promotion_code;
+};
+
+exports.retrievePromoCode = async (code) => {
+  console.log("retrievePromoCode", code);
+  const promotionCodes = await stripe.promotionCodes.list({
+    code,
+    active: true,
+  });
+  return promotionCodes;
 };
