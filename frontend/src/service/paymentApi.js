@@ -20,6 +20,8 @@ const paymentApi = {
     }
   },
   // getProductsPlans:
+  // buySinglePost: async ()=>{}
+  // buyBundlePost: async ()=>{}
 };
 
 export default paymentApi;

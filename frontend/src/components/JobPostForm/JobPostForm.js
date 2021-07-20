@@ -700,7 +700,8 @@ export default function JobPostForm(props) {
               className="ml-auto my-auto px-12 py-5 text-3xl btn-indigo"
               onClick={handlePostClick}
             >
-              Post your job — $<span className="font-bold">{state.price}</span>{" "}
+              Post your job — $
+              <span className="font-bold">{state.pricePerPost}</span>{" "}
             </button>
           </div>
         </div>

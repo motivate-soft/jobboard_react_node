@@ -6,7 +6,7 @@ export const JobContext = createContext();
 
 const defaultPricePerPost = 299;
 const defaultDiscountPercent = 5;
-const defaultBundleSize = 25;
+const defaultBundleSize = 10;
 
 const initialJob = {
   logo: "/images/sample_logo.png",
@@ -24,9 +24,8 @@ const initialJob = {
   brandColor: null,
   stickyDuration: null,
 
-  price: null,
-  discountPercent: 0,
-  pricePerPost: defaultPricePerPost,
+  discountPercent: null,
+  pricePerPost: null,
 };
 
 const initialJobBundle = {
@@ -45,9 +44,8 @@ const initialJobBundle = {
   brandColor: null,
   stickyDuration: null,
 
-  price: null,
-  pricePerPost: defaultPricePerPost,
-  discountPercent: defaultDiscountPercent,
+  pricePerPost: null,
+  discountPercent: null,
 };
 
 const upsells = {
@@ -60,9 +58,36 @@ const upsells = {
   stickyMonth: 1647,
 };
 
-function calculatePrice(bundleState) {
-  let { pricePerPost, size, discountPercent } = bundleState;
-  console.log("calculatePrice", bundleState);
+function getDiscountRate(size) {
+  if (size === 1) {
+    return 0;
+  } else if (size <= 5) {
+    return 5;
+  } else if (size <= 10) {
+    return 10;
+  } else if (size <= 15) {
+    return 15;
+  } else if (size <= 30) {
+    return 20;
+  } else if (size <= 40) {
+    return 25;
+  } else if (size <= 50) {
+    return 30;
+  } else if (size <= 60) {
+    return 35;
+  } else if (size <= 75) {
+    return 40;
+  } else if (size <= 99) {
+    return 45;
+  } else {
+    return 50;
+  }
+}
+
+function calculatePricePerPost(bundleState) {
+  let pricePerPost = defaultPricePerPost;
+  let { size, discountPercent } = bundleState;
+  console.log("jobContext->calculatePrice", bundleState);
   if (bundleState.showLogo) {
     pricePerPost += upsells.showLogo;
   }
@@ -91,22 +116,37 @@ function calculatePrice(bundleState) {
     }
   }
 
-  return (pricePerPost * size * (100 - discountPercent)) / 100;
+  // return (pricePerPost * (1 - getDiscountRate(size) / 100)).toFixed(2);
+  return pricePerPost;
 }
 
 function reducer(state, action) {
+  let { payload } = action;
   switch (action.type) {
     case "RESET_JOB_BUNDLE":
-      return { ...initialJobBundle, price: calculatePrice(initialJobBundle) };
+      return {
+        ...initialJobBundle,
+        discountPercent: getDiscountRate(initialJobBundle.size),
+        pricePerPost: calculatePricePerPost(initialJobBundle),
+      };
     case "RESET_JOB":
-      return { ...initialJob, price: calculatePrice(initialJob) };
+      return {
+        ...initialJob,
+        discountPercent: getDiscountRate(initialJob.size),
+        pricePerPost: calculatePricePerPost(initialJob),
+      };
 
     case "UPDATE_JOB_DETAIL":
-      return { ...state, ...action.payload };
+      payload.discountPercent = getDiscountRate(payload.size);
+      payload.pricePerPost = calculatePricePerPost({
+        ...state,
+        ...action.payload,
+      });
+      console.log("jobContext->UPDATE_JOB_DETAIL", payload);
+
+      return { ...state, ...payload };
 
     case "UPDATE_JOB_UPSELLS":
-      let { payload } = action;
-
       // toggle highlight option
       if (payload.highlight) {
         payload.highlightColor = false;
@@ -116,12 +156,14 @@ function reducer(state, action) {
         payload.highlight = false;
       }
 
-      const price = calculatePrice({
+      payload.discountPercent = getDiscountRate(payload.size);
+      payload.pricePerPost = calculatePricePerPost({
         ...state,
-        ...payload,
+        ...action.payload,
       });
+      console.log("jobContext->UPDATE_JOB_UPSELLS", payload);
 
-      return { ...state, ...payload, price };
+      return { ...state, ...payload };
 
     default:
       return state;
