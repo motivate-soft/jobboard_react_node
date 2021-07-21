@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DragSlider from "../../components/JobPostDesign/DragSlider";
 import JobPostDesign from "../../components/JobPostDesign/JobPostDesign";
@@ -6,12 +6,19 @@ import JobPostPreview from "../../components/JobPostPreview/JobPostPreview";
 import { useJobPost } from "../../contexts/jobContext";
 import { toast } from "react-toastify";
 import Modal from "../../components/Shared/Modal/Modal";
-import StripePaymentForm from "../../components/PaymentForm/StripePaymentForm";
+import paymentApi from "../../service/paymentApi";
+import { useStripe } from "@stripe/react-stripe-js";
+import StripeCardForm from "../../components/PaymentForm/StripeCardForm";
+import PaymentSucess from "../../components/PaymentForm/PaymentSucess";
 
 export default function Buybundle() {
   const { state, dispatch } = useJobPost();
-  const { size, price } = state;
+  const [loading, setLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
+  const [promoCode, setPromoCode] = useState(null);
+  const { size, pricePerPost, discountPercent } = state;
   const [checkoutFormOpen, setCheckoutFormOpen] = useState(false);
+  const stripe = useStripe();
 
   useEffect(() => {
     dispatch({
@@ -19,51 +26,72 @@ export default function Buybundle() {
     });
   }, []);
 
-  function handleSubmit() {
-    setCheckoutFormOpen(true);
+  async function handleBuybundleClick() {
+    try {
+      let bundle = {
+        size: state.size,
+      };
+      if (state.showLogo) {
+        bundle.showLogo = state.showLogo;
+      }
+      if (state.blastEmail) {
+        bundle.blastEmail = state.blastEmail;
+      }
+      if (state.highlight) {
+        bundle.highlight = state.highlight;
+      }
+      if (state.highlightColor) {
+        bundle.highlightColor = state.highlightColor;
+      }
+      if (state.stickyDuration) {
+        bundle.stickyDuration = state.stickyDuration;
+      }
+      const { data } = await paymentApi.createPaymentIntent(bundle);
+      setClientSecret(data.clientSecret);
+      setCheckoutFormOpen(true);
+    } catch (error) {
+      console.log("Buybundle->createPaymentIntent->error", error);
+    }
   }
 
-  function handleBuybundle(paymentMethodId) {
-    console.log("handleBuybundle", paymentMethodId, state);
-    const {
-      tags,
-      showLogo,
-      blastEmail,
-      highlight,
-      highlightColor,
-      brandColor,
-      stickyDuration,
-    } = state;
-    let upsells = {
-      tags,
-      showLogo,
-      blastEmail,
-      highlight,
-    };
+  async function handleSubmit(card) {
+    setLoading(true);
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card,
+      },
+    });
 
-    if (highlightColor && !brandColor) {
-      toast.warning("Please select brand color");
+    if (result.error) {
+      console.log("Buybundle->handleSubmit->error", result.error);
+      toast.warning(result.error.message || "stripe error");
+      setLoading(false);
       return;
+    } else {
+      if (result.paymentIntent.status === "succeeded") {
+        let bundle = {
+          size: state.size,
+        };
+        if (state.showLogo) {
+          bundle.showLogo = state.showLogo;
+        }
+        if (state.blastEmail) {
+          bundle.blastEmail = state.blastEmail;
+        }
+        if (state.highlight) {
+          bundle.highlight = state.highlight;
+        }
+        if (state.highlightColor) {
+          bundle.highlightColor = state.highlightColor;
+        }
+        if (state.stickyDuration) {
+          bundle.stickyDuration = state.stickyDuration;
+        }
+        const { data } = await paymentApi.createPromoCode(bundle);
+        setPromoCode(data.promoCode);
+      }
+      setLoading(false);
     }
-    if (highlightColor && brandColor) {
-      upsells.brandColor = brandColor;
-    }
-    if (stickyDuration) {
-      upsells.stickyDuration = stickyDuration;
-    }
-    
-
-    setCheckoutFormOpen(false);
-  }
-
-  function handleCreatePaymentMethodSuccess(paymentMethod) {
-    console.log("Buybundle->handleCreatePaymentMethodSuccess", paymentMethod);
-    handleBuybundle(paymentMethod.id);
-  }
-
-  function handleCreatePaymentMethodFailure(error) {
-    console.log("Buybundle->handleCreatePaymentMethodFailure", error);
-    toast.warning(error.message || "stripe error");
   }
 
   return (
@@ -80,19 +108,29 @@ export default function Buybundle() {
       </div>
       <button
         className="mx-auto mb-20 px-4 py-4 max-w-lg inline-flex font-sans text-3xl justify-center  border border-transparent shadow-sm font-medium rounded-xl text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        onClick={handleSubmit}
+        onClick={handleBuybundleClick}
       >
-        Buy <span>{size}</span>-jobs bundle — $<span>{price}</span>
+        Buy <span>{size}</span> -jobs bundle-$
+        <span>{pricePerPost * (1 - discountPercent / 100) * size}</span>
       </button>
-      <JobPostPreview />
+      {/* <JobPostPreview /> */}
+
       <Modal open={checkoutFormOpen} setOpen={setCheckoutFormOpen}>
-        <StripePaymentForm
-          open={checkoutFormOpen}
-          setOpen={setCheckoutFormOpen}
-          amount={state.price}
-          onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
-          onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
-        />
+        {promoCode ? (
+          <PaymentSucess
+            promoCode={promoCode}
+            open={checkoutFormOpen}
+            setOpen={setCheckoutFormOpen}
+          />
+        ) : (
+          <StripeCardForm
+            loading={loading}
+            open={checkoutFormOpen}
+            setOpen={setCheckoutFormOpen}
+            amount={pricePerPost * (1 - discountPercent / 100) * size}
+            onSubmit={handleSubmit}
+          />
+        )}
       </Modal>
     </div>
   );

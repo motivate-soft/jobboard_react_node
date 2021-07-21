@@ -1,0 +1,42 @@
+[
+  {
+    "id": "jobPosting",
+    "name": "jobPosting",
+    "price": 30000
+  },
+  {
+    "id": "showLogo",
+    "name": "ShowLogo",
+    "price": 5000
+  },
+  {
+    "id": "blastEmail",
+    "name": "blastEmail",
+    "price": 5000
+  },
+  {
+    "id": "highlight",
+    "name": "highlight",
+    "price": 5000
+  },
+  {
+    "id": "highlightColor",
+    "name": "highlightColor",
+    "price": 10000
+  },
+  {
+    "id": "stickyDay",
+    "name": "stickyDay",
+    "price": 20000
+  },
+  {
+    "id": "stickyWeek",
+    "name": "stickyWeek",
+    "price": 50000
+  },
+  {
+    "id": "stickyMonth",
+    "name": "stickyMonth",
+    "price": 150000
+  }
+]

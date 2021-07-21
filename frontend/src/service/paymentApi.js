@@ -1,27 +1,31 @@
 import { handleError } from "./utils";
 import axiosInstance from "./axiosInstance";
-import axios from "axios";
 
 const paymentApi = {
-  onetimeCharge: async (amount, stripe) => {
-    const { token } = await stripe.createToken({
-      name: "customer name",
-    });
-
+  createPaymentIntent: async (bundle) => {
     try {
-      const order = await axiosInstance.post("api/payment/postCharge", {
-        amount,
-        source: token.id,
-        receipt_email: "customer@example.com",
-      });
-      return await axiosInstance.post(`api/media/`, media);
+      return await axiosInstance.post(
+        "api/stripe/create-payment-intent",
+        bundle
+      );
     } catch (error) {
       return handleError(error);
     }
   },
-  // getProductsPlans:
-  // buySinglePost: async ()=>{}
-  // buyBundlePost: async ()=>{}
+  createPromoCode: async (bundle) => {
+    try {
+      return await axiosInstance.post("api/stripe/create-promocode", bundle);
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+  createSubscription: async (data) => {
+    try {
+      return await axiosInstance.post("api/stripe/create-subscription", data);
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 };
 
 export default paymentApi;

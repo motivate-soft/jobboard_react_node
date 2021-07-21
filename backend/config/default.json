@@ -12,16 +12,6 @@
     "listId": "73140713-7d13-421e-91a4-a8110443c34b"
   },
   "stripe": {
-    "secretKey": "sk_test_51IZJknHhTqm9kBDPQKt4ULqp1DT07L5HgO3BlkrEfoMiacDPOsyU5cu1WkqmteJjW6D0jiOravuCRpOwSfUkTQck00MnPRrk4s",
-    "products": {
-      "singlePost": "prod_JlWSQiHlx7Aeib",
-      "showLogo": "prod_JlWU8eToQhHTth",
-      "blastEmail": "prod_JlWUDVo7QFMHQ4",
-      "highlight": "prod_JlWUE7WujhcFRZ",
-      "highlightColor": "prod_JlWVZneRyDBh9b",
-      "stickyDay": "prod_JlWVn4vMoRG0Iz",
-      "stickyWeek": "prod_JlWViB3VKP5N10",
-      "stickyMonth": "prod_JlWWJeULo359cK"
-    }
+    "secretKey": "sk_test_51JFgV1FWtCTRj7rq5UszFOTqZW0XIdo7pyIJZJfK4FAaVh7C6LMh3UPkJEQpdbkPn7ogYE1gukMhoLVlN9yRTGFy00ZGwwIpYg"
   }
 }

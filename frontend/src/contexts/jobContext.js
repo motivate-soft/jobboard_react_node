@@ -4,8 +4,7 @@ import { toast } from "react-toastify";
 
 export const JobContext = createContext();
 
-const defaultPricePerPost = 299;
-const defaultDiscountPercent = 5;
+const defaultPricePerPost = 300;
 const defaultBundleSize = 10;
 
 const initialJob = {
@@ -49,13 +48,13 @@ const initialJobBundle = {
 };
 
 const upsells = {
-  showLogo: 49,
-  blastEmail: 49,
-  highlight: 49,
-  highlightColor: 349,
-  stickyDay: 199,
-  stickyWeek: 549,
-  stickyMonth: 1647,
+  showLogo: 50,
+  blastEmail: 50,
+  highlight: 50,
+  highlightColor: 300,
+  stickyDay: 200,
+  stickyWeek: 500,
+  stickyMonth: 1500,
 };
 
 function getDiscountRate(size) {
@@ -86,8 +85,6 @@ function getDiscountRate(size) {
 
 function calculatePricePerPost(bundleState) {
   let pricePerPost = defaultPricePerPost;
-  let { size, discountPercent } = bundleState;
-  console.log("jobContext->calculatePrice", bundleState);
   if (bundleState.showLogo) {
     pricePerPost += upsells.showLogo;
   }
@@ -116,7 +113,6 @@ function calculatePricePerPost(bundleState) {
     }
   }
 
-  // return (pricePerPost * (1 - getDiscountRate(size) / 100)).toFixed(2);
   return pricePerPost;
 }
 

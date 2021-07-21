@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Dialog } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
@@ -14,10 +14,12 @@ import jobApi from "../../service/jobApi";
 import { toast } from "react-toastify";
 import classNames from "classnames";
 import JobPostPreview from "../JobPostPreview/JobPostPreview";
-import PaymentForm from "../PaymentForm/PaymentForm";
 import { Fragment } from "react";
 import Modal from "../Shared/Modal/Modal";
-import StripePaymentForm from "../PaymentForm/StripePaymentForm";
+import StripeCardForm from "../PaymentForm/StripeCardForm";
+import { useStripe } from "@stripe/react-stripe-js";
+import paymentApi from "../../service/paymentApi";
+import Spinner from "../Shared/Loader/Spinner";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -39,8 +41,14 @@ const primaryTagOptions = [
 ];
 
 export default function JobPostForm(props) {
+  const [loading, setLoading] = useState(false);
   const [checkoutFormOpen, setCheckoutFormOpen] = useState(false);
+  const [paymentMethodId, setPaymentMethodId] = useState(null);
+  const [promoCode, setPromoCode] = useState(null);
+  const [company, setCompany] = useState(null);
+  const [job, setJob] = useState(null);
   const { state, dispatch } = useJobPost();
+  const stripe = useStripe();
 
   const validationSchema = Yup.object().shape(
     {
@@ -80,7 +88,6 @@ export default function JobPostForm(props) {
     },
     ["applyEmail", "applyUrl"]
   );
-
   const formOptions = { resolver: yupResolver(validationSchema) };
   const {
     register,
@@ -97,6 +104,12 @@ export default function JobPostForm(props) {
       type: "RESET_JOB",
     });
   }, []);
+
+  useEffect(() => {
+    if (paymentMethodId && company && job) {
+      createSubscription();
+    }
+  }, [paymentMethodId, promoCode, company, job]);
 
   function handleChange(fieldName, value) {
     console.log("JobPostForm->handleChange:useJobpost", state);
@@ -127,27 +140,53 @@ export default function JobPostForm(props) {
   }
 
   async function handlePostClick() {
-    trigger();
-    console.log("JobPostForm->handlePostClick->formstate", isValid, errors);
-    if (!isValid) return;
-
+    const result = await trigger();
+    if (!result) return;
     setCheckoutFormOpen(true);
   }
 
-  function handleCreatePaymentMethodSuccess(paymentMethod) {
-    console.log("JobPostForm->handleCreatePaymentMethodSuccess", paymentMethod);
-    setValue("paymentMethodId", paymentMethod.id, { shouldValidate: true });
-    handleSubmit(onSubmit)();
+  async function handlePaymentFormSubmit(card, promoCode) {
+    setLoading(true);
+    try {
+      const { paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card,
+      });
+      setPaymentMethodId(paymentMethod.id);
+      setPromoCode(promoCode);
+      handleSubmit(onSubmit)();
+      setLoading(false);
+    } catch (error) {
+      toast.warning(error.message || "error while creating payment method!");
+    }
+    setLoading(false);
   }
 
-  function handleCreatePaymentMethodFailure(error) {
-    console.log("JobPostForm->handleCreatePaymentMethodFailure", error);
-    toast.warning(error.message || "stripe error");
+  async function createSubscription() {
+    setLoading(true);
+    try {
+      const res = await paymentApi.createSubscription({
+        company,
+        job,
+        promoCode,
+        paymentMethodId,
+      });
+
+      toast.success("subscription success");
+    } catch (error) {
+      console.log("JobPostForm->createSubscription->error", error);
+      toast.warning(error.message || "error while creating subscription!");
+    }
+    setPaymentMethodId(null);
+    setPromoCode(null);
+    setCompany(null);
+    setJob(null);
+
+    setCheckoutFormOpen(false);
+    setLoading(false);
   }
 
   async function onSubmit(formData) {
-    console.log("JobPostForm->onSubmit", formData);
-
     const {
       tags,
       showLogo,
@@ -164,7 +203,8 @@ export default function JobPostForm(props) {
     }
 
     try {
-      const company = {
+      let company, job, response;
+      company = {
         name: formData.companyName,
         logo: formData.companyLogo,
         twitter: formData.companyTwitter,
@@ -172,12 +212,11 @@ export default function JobPostForm(props) {
         invoiceAddress: formData.invoiceAddress,
         invoiceNotes: formData.invoiceNotes,
       };
-      let {
-        data: { _id: companyId },
-      } = await companyApi.create(company);
+      response = await companyApi.create(company);
+      setCompany(response.data);
 
-      let job = {
-        company: companyId,
+      job = {
+        company: response.data._id,
         position: formData.position,
         primaryTag: formData.primaryTag,
         location: formData.location,
@@ -206,12 +245,10 @@ export default function JobPostForm(props) {
       if (stickyDuration) {
         job.stickyDuration = stickyDuration;
       }
-
-      let { data } = await jobApi.create(job);
-      console.log("JobPostForm->onSubmit->success", data);
-      toast.success("Job posted successfully");
-      setCheckoutFormOpen(false);
+      response = await jobApi.create(job);
+      setJob(response.data);
     } catch (error) {
+      toast.warning("Failed to process your request");
       console.log("JobPostForm->onSubmit->error", error);
     }
   }
@@ -670,7 +707,7 @@ export default function JobPostForm(props) {
             </div>
 
             {/* Pay option */}
-            <div className="space-y-1 px-4 pt-5 py-40 sm:space-y-0 flex justify-items-center sm:gap-4 sm:px-6">
+            {/* <div className="space-y-1 px-4 pt-5 py-40 sm:space-y-0 flex justify-items-center sm:gap-4 sm:px-6">
               <input
                 {...register("payLater")}
                 id="payLater"
@@ -684,7 +721,7 @@ export default function JobPostForm(props) {
                 PAY LATER
               </label>
               <span className="span-error">{errors.payLater?.message}</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </form>
@@ -700,6 +737,7 @@ export default function JobPostForm(props) {
               className="ml-auto my-auto px-12 py-5 text-3xl btn-indigo"
               onClick={handlePostClick}
             >
+              <Spinner />
               Post your job — $
               <span className="font-bold">{state.pricePerPost}</span>{" "}
             </button>
@@ -707,22 +745,17 @@ export default function JobPostForm(props) {
         </div>
       </div>
       <Modal open={checkoutFormOpen} setOpen={setCheckoutFormOpen}>
-        <StripePaymentForm
+        <StripeCardForm
+          showPromo
+          loading={loading}
           open={checkoutFormOpen}
           setOpen={setCheckoutFormOpen}
-          amount={state.price}
-          onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
-          onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
+          amount={
+            state.pricePerPost * (1 - state.discountPercent / 100) * state.size
+          }
+          onSubmit={handlePaymentFormSubmit}
         />
       </Modal>
-      {/* <Modal open={checkoutFormOpen} setOpen={setCheckoutFormOpen}>
-        <PaymentForm
-          open={checkoutFormOpen}
-          setOpen={setCheckoutFormOpen}
-          onCreatePaymentMethodSuccess={handleCreatePaymentMethodSuccess}
-          onCreatePaymentMethodFailure={handleCreatePaymentMethodFailure}
-        />
-      </Modal> */}
     </Fragment>
   );
 }

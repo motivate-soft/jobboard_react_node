@@ -6,7 +6,8 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "data:import": "node ./database/seeder",
-    "data:destroy": "node ./database/seeder -d"
+    "data:destroy": "node ./database/seeder -d",
+    "setup": "node setup.js"
   },
   "dependencies": {
     "@sendgrid/client": "^7.4.3",

@@ -1,23 +1,19 @@
+const httpsProxyAgent = require("https-proxy-agent");
 const { handleError } = require("../../helpers/handlers");
 const logger = require("../../helpers/logger");
 const nconf = require("nconf");
-
-const httpsProxyAgent = require("https-proxy-agent");
-const agent = new httpsProxyAgent("http://172.25.1.2:3129");
+const products = require("../../config/products.json");
 
 require("../../config");
-const { secretKey, products } = nconf.get("stripe");
-const stripe = require("stripe")(secretKey, { httpAgent: agent });
+const { secretKey } = nconf.get("stripe");
 
-const upsells = {
-  showLogo: 49,
-  blastEmail: 49,
-  highlight: 49,
-  highlightColor: 349,
-  stickyDay: 199,
-  stickyWeek: 549,
-  stickyMonth: 1647,
-};
+let stripeConfig = {};
+
+if (process.env.HTTPS_PROXY) {
+  const agent = new httpsProxyAgent(`http://${process.env.HTTPS_PROXY}`);
+  stripeConfig = { httpAgent: agent };
+}
+const stripe = require("stripe")(secretKey, stripeConfig);
 
 function getDiscountRate(size) {
   if (size === 1) {
@@ -46,29 +42,29 @@ function getDiscountRate(size) {
 }
 
 function calculatePricePerPost(bundleState) {
-  let pricePerPost = defaultPricePerPost;
+  let pricePerPost = products[0].price;
   if (bundleState.showLogo) {
-    pricePerPost += upsells.showLogo;
+    pricePerPost += products[1].price;
   }
   if (bundleState.blastEmail) {
-    pricePerPost += upsells.blastEmail;
+    pricePerPost += products[2].price;
   }
   if (bundleState.highlight) {
-    pricePerPost += upsells.highlight;
+    pricePerPost += products[3].price;
   }
   if (bundleState.highlightColor) {
-    pricePerPost += upsells.highlightColor;
+    pricePerPost += products[4].price;
   }
   if (bundleState.stickyDuration) {
     switch (bundleState.stickyDuration) {
       case "day":
-        pricePerPost += upsells.stickyDay;
+        pricePerPost += products[5].price;
         break;
       case "week":
-        pricePerPost += upsells.stickyWeek;
+        pricePerPost += products[6].price;
         break;
       case "month":
-        pricePerPost += upsells.stickyMonth;
+        pricePerPost += products[7].price;
         break;
       default:
         break;
@@ -78,15 +74,23 @@ function calculatePricePerPost(bundleState) {
   return pricePerPost;
 }
 
-function calculatePrice(bundleState, size) {
-  let pricePerPost = calculatePricePerPost(calculatePricePerPost);
-  // for (let [key, value] of Object.entries(upsells)) {
-  //   if (bundleState[key]) {
-  //     priceSinglePost += upsells[key];
-  //   }
-  // }
+function calculateBundlePrice(bundleState, size) {
+  let pricePerPost = calculatePricePerPost(bundleState);
+  return pricePerPost * size * (1 - getDiscountRate(size) / 100);
+}
 
-  return pricePerPost * size * (1 - getDiscountRate(size));
+async function getPriceItems(productIds) {
+  let productsWithPrice = await getProductsAndPlans();
+  let pricingItems = [];
+
+  productIds.map((productId) => {
+    let filteredProducts = productsWithPrice.filter(
+      (product) => product.id === productId
+    );
+    let priceId = filteredProducts[0].prices[0].id;
+    pricingItems.push(priceId);
+  });
+  return pricingItems;
 }
 
 function formatProducts(products) {
@@ -133,16 +137,6 @@ function attachPlansToProducts(plans, products, prices) {
   return products.filter((product) => product.plans.length > 0);
 }
 
-async function retrieveProduct(productId) {
-  return await stripe.products.retrieve(productId);
-}
-
-async function getProductPrices(productId) {
-  return await stripe.prices.list({
-    product: productId,
-  });
-}
-
 async function getProductsAndPlans() {
   try {
     const stripeData = await Promise.all([
@@ -169,107 +163,156 @@ async function getProductsAndPlans() {
 async function createCoupon(discountPercent, maxRedemptions) {
   console.log("createCoupon->params", discountPercent, maxRedemptions);
   const coupon = await stripe.coupons.create({
-    id: "post-discount",
     duration: "forever",
     // duration: "repeating",
     percent_off: discountPercent,
     max_redemptions: maxRedemptions,
     applies_to: {
-      products: [
-        "prod_JlWSQiHlx7Aeib",
-        "prod_JlWU8eToQhHTth",
-        "prod_JlWUDVo7QFMHQ4",
-        "prod_JlWUE7WujhcFRZ",
-        "prod_JlWVZneRyDBh9b",
-        "prod_JlWVn4vMoRG0Iz",
-        "prod_JlWViB3VKP5N10",
-        "prod_JlWWJeULo359cK",
-      ],
+      products: products.map((product) => product.id),
     },
   });
   return coupon;
 }
 
-async function createPromoCode(couponId) {
-  const promotion_code = await stripe.promotionCodes.create({
-    coupon: couponId,
-    // customer: 'cus_4fdAW5ftNQow1a',
-    max_redemptions: 10,
-  });
-  return promotion_code;
-}
-
-async function retrievePromoCode(code) {
-  const promotionCodes = await stripe.promotionCodes.list({
-    code,
-    active: true,
-  });
-  return promotionCodes;
-}
-
-async function createSubscription(customerInfo, pricingItems, promoCode) {}
-
-async function createCustomer(company) {
+async function createPromoCode(req, res) {
   try {
-    const { name, email, invoiceAddress, invoiceNotes } = company;
-    let customer = await stripe.customers.create({
-      name,
-      email,
-      address: invoiceAddress,
+    const { size } = req.body;
+    let coupon = await createCoupon(getDiscountRate(size), size);
+    logger.info("createPromoCode->coupon", coupon);
+    const promotion_code = await stripe.promotionCodes.create({
+      coupon: coupon.id,
+      // customer: 'cus_4fdAW5ftNQow1a',
+      max_redemptions: size,
     });
-    return customer;
-  } catch (err) {
-    winston.error("Stripe > createCustomer : Error" + err.message);
-    throw err;
-  }
-}
+    logger.info("createPromoCode->promotion_code", promotion_code);
 
-async function createPaymentIntent(amount) {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
-      payment_method_types: ["card"],
+    return res.status(200).send({
+      promoCode: promotion_code.code,
     });
-  } catch (error) {}
-}
-
-exports.createCustomerAndSubscription = async (
-  paymentMethodId,
-  customerInfo,
-  pricingItems
-) => {
-  const customer = await stripe.customers.create({
-    payment_method: paymentMethodId,
-    email: customerInfo.email,
-    name: customerInfo.name,
-    address: customerInfo.invoiceAddress,
-    invoice_settings: {
-      default_payment_method: paymentMethodId,
-    },
-  });
-
-  /* Create subscription and expand the latest invoice's Payment Intent
-   * We'll check this Payment Intent's status to determine if this payment needs SCA
-   */
-
-  const subscription = await stripe.subscriptions.create({
-    customer: customer.id,
-    items: pricingItems.map((item) => ({
-      price: item,
-    })),
-    // trial_from_plan: true,
-    expand: ["latest_invoice.payment_intent"],
-    // promotion_code: 'promo_1JCbmpHhTqm9kBDPRFFhPoZV',
-  });
-
-  return subscription;
-};
-
-exports.buybundle = async function (req, res) {
-  try {
-    return res.status(204).json();
   } catch (error) {
     logger.error(error);
-    return handleError(res, req, 500, err);
+    return handleError(
+      res,
+      req,
+      500,
+      error.raw.message || "failed to create promotion code",
+      error.raw.type || "serverError"
+    );
   }
+}
+
+async function createPaymentIntent(req, res) {
+  try {
+    const { size, ...upsells } = req.body;
+    let amount = calculateBundlePrice(upsells, size);
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+    });
+    return res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    logger.error(error);
+    return handleError(
+      res,
+      req,
+      500,
+      error.raw.message || "failed to create payment intent",
+      error.raw.type || "serverError"
+    );
+  }
+}
+
+async function createCustomerAndSubscription(req, res) {
+  try {
+    console.log("createCustomerAndSubscription", req.body);
+    const { company, job, promoCode, paymentMethodId } = req.body;
+    const customer = await stripe.customers.create({
+      payment_method: paymentMethodId,
+      email: company.email,
+      // name: company.name,
+      // address: company.invoiceAddress,
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+    console.log("createCustomerAndSubscription->customer", customer);
+
+    let productIds = [
+      "showLogo",
+      "blastEmail",
+      "highlight",
+      "highlightColor",
+    ].filter((field) => job[field] === true);
+    productIds.push("jobPosting");
+    if (job.stickyDuration) {
+      switch (job.stickyDuration) {
+        case "day":
+          productIds.push("stickyDay");
+          break;
+        case "week":
+          productIds.push("stickyWeek");
+          break;
+        case "month":
+          productIds.push("stickyMonth");
+          break;
+        default:
+          break;
+      }
+    }
+
+    let pricingItems = await getPriceItems(productIds);
+    console.log("createCustomerAndSubscription->pricingItems", pricingItems);
+
+    // get promotion_code
+    const { data } = await stripe.promotionCodes.list({
+      code: promoCode,
+    });
+
+    if (data.length === 0) {
+      let error = new Error();
+      error = {
+        code: 400,
+        message: "invalid promotion code",
+      };
+      throw error;
+    }
+    let promotion_code = data[0].id;
+    console.log("createCustomerAndSubscription->promotionCodes", data);
+
+    /* Create subscription and expand the latest invoice's Payment Intent
+     * We'll check this Payment Intent's status to determine if this payment needs SCA
+     */
+
+    const subscription = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: pricingItems.map((item) => ({
+        price: item,
+      })),
+      trial_from_plan: true,
+      expand: ["latest_invoice.payment_intent"],
+      promotion_code,
+    });
+    console.log("createCustomerAndSubscription->subscription", subscription);
+
+    return res.status(200).send({
+      subscription,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return handleError(
+      res,
+      req,
+      error.code || 500,
+      error.message || "failed to create subscription",
+      error.type || "serverError"
+    );
+  }
+}
+
+module.exports = {
+  createPaymentIntent,
+  createPromoCode,
+  createCustomerAndSubscription,
 };

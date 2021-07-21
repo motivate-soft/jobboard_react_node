@@ -1,6 +1,16 @@
 import React from "react";
 import { useJobPost } from "../../contexts/jobContext";
 
+const upsells = {
+  showLogo: 50,
+  blastEmail: 50,
+  highlight: 50,
+  highlightColor: 300,
+  stickyDay: 200,
+  stickyWeek: 500,
+  stickyMonth: 1500,
+};
+
 export default function JobPostDesign() {
   const { state, dispatch } = useJobPost();
 
@@ -81,7 +91,8 @@ export default function JobPostDesign() {
           onChange={handleChange}
         />
         <label htmlFor="showLogo" className="ml-2 block text-sm text-gray-900">
-          Show my ⭐️ company logo besides my posts (+$<span>49</span>)
+          Show my ⭐️ company logo besides my posts (+$
+          <span>{upsells.showLogo}</span>)
           <span>(you can change the logo later when posting each job)</span>
           {"     "}
           {renderOutlinedBadge("2X MORE VIEWS")}
@@ -104,7 +115,7 @@ export default function JobPostDesign() {
           className="ml-2 block text-sm text-gray-900"
         >
           Email blast my job post to <span>📮95,131</span> remote candidates (+$
-          <span>49</span>){"     "}
+          <span>{upsells.blastEmail}</span>){"     "}
           {renderOutlinedBadge("3X MORE VIEWS")}
           {renderBadge("Highly recommended")}
         </label>
@@ -121,7 +132,8 @@ export default function JobPostDesign() {
           onChange={handleChange}
         />
         <label htmlFor="highlight" className="ml-2 block text-sm text-gray-900">
-          Highlight your posts in ⚠️ yellow (+$<span>49</span>){"     "}
+          Highlight your posts in ⚠️ yellow (+$<span>{upsells.highlight}</span>)
+          {"     "}
           {renderOutlinedBadge("3X MORE VIEWS")}
         </label>
       </div>
@@ -143,7 +155,7 @@ export default function JobPostDesign() {
         >
           <span className="flex items-center">
             Highlight with your company's 🌈 brand color (+$
-            <span>349</span>)
+            <span>{upsells.highlightColor}</span>)
             <input
               id="brandColor"
               name="brandColor"
@@ -169,7 +181,8 @@ export default function JobPostDesign() {
         />
         <label htmlFor="day" className="ml-2 block text-sm text-gray-900">
           Sticky your posts so they stay on 📌 top of the frontpage for ⏰ 24
-          hours (+$<span>199</span>) {renderOutlinedBadge("2X MORE VIEWS")}
+          hours (+$<span>{upsells.stickDay}</span>){" "}
+          {renderOutlinedBadge("2X MORE VIEWS")}
         </label>
       </div>
 
@@ -185,7 +198,7 @@ export default function JobPostDesign() {
         />
         <label htmlFor="week" className="ml-2 block text-sm text-gray-900">
           Sticky your posts so they stay on 📌 top of the frontpage for 🗓 1
-          entire week (+$<span>549</span>){" "}
+          entire week (+$<span>{upsells.stickyWeek}</span>){" "}
           {renderOutlinedBadge("2X MORE VIEWS")}
         </label>
       </div>
@@ -202,7 +215,7 @@ export default function JobPostDesign() {
         />
         <label htmlFor="month" className="ml-2 block text-sm text-gray-900">
           Sticky your posts so they stay on 📌 top of the frontpage for 🗓 1
-          entire month (+$<spacing>1647</spacing>){" "}
+          entire month (+$<spacing>{upsells.stickyMonth}</spacing>){" "}
           {renderOutlinedBadge("8X MORE VIEWS")}
         </label>
       </div>
