@@ -7,30 +7,41 @@ export default function DropzoneUploader(props) {
   const { onUpload } = props;
   const componentConfig = {
     iconFiletypes: [".jpg", ".png"],
-    method: true,
     showFiletypeIcon: true,
+    postUrl: "no-url",
+    // dropzoneSelector: "#dropzone",
+  };
+
+  const djsConfig = {
+    autoProcessQueue: false,
     uploadMultiple: false,
     maxFilesize: 2, // MB
     maxFiles: 1,
     dictMaxFilesExceeded: "You can only upload upto 1 image",
     dictRemoveFile: "Delete",
     dictCancelUploadConfirmation: "Are you sure to cancel upload?",
-    postUrl: "no-url",
-    // dropzoneSelector: "#dropzone",
   };
-  const djsConfig = { autoProcessQueue: false };
+
   const eventHandlers = {
     addedfile: (file) => onAddedFile(file),
+    addedfiles: (files) => {
+      console.log(`DropzoneUploader->addedfiles`, files);
+    },
     success: (file) => console.log(`${file.name} successfully uploaded`),
     error: (error) => console.log("Server is not set in the demo"),
+    maxfilesexceeded: (file) => {
+      console.log(`maxfilesexceeded`, file);
+    },
   };
 
   async function onAddedFile(file) {
+    console.log(`DropzoneUploader->addedfile`, file);
+
     const body = new FormData();
     body.append("file", file);
     try {
       const { data } = await mediaApi.create(body);
-      console.log("onAddedFile->mediaApi->create:res", data);
+      console.log("DropzoneUploader->onAddedFile->mediaApi->create:res", data);
       onUpload(data);
     } catch (error) {
       console.log(error);

@@ -6,8 +6,12 @@ export default function JobPostPreview(props) {
 
   return (
     <div className="grid grid-cols-6">
-      <div className="col-span-1">
-        <img src={job.logo} alt="company log" />
+      <div className="col-span-1 mr-4 flex content-center items-center">
+        {job.logo ? (
+          <img src={job.logo} alt="company log" />
+        ) : (
+          <h4>Company Logo</h4>
+        )}
       </div>
       <div className="col-span-3 flex flex-col">
         <h4>{job.companyName}</h4>

@@ -18,6 +18,7 @@ import PaymentForm from "../PaymentForm/PaymentForm";
 import { Fragment } from "react";
 import Modal from "../Shared/Modal/Modal";
 import StripePaymentForm from "../PaymentForm/StripePaymentForm";
+import { API_URL } from "../../env-config";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -68,10 +69,10 @@ export default function JobPostForm(props) {
       }),
 
       companyLogo: Yup.string().required("This field is required"),
-      companyTwitter: Yup.string().required("This field is required"),
+      companyTwitter: Yup.string(),
       companyEmail: Yup.string().email().required("This field is required"),
-      invoiceAddress: Yup.string().required("This field is required"),
-      invoiceNotes: Yup.string().required("This field is required"),
+      invoiceAddress: Yup.string(),
+      invoiceNotes: Yup.string(),
       payLater: Yup.bool(),
       paymentMethodId: Yup.string()
         // .required("This field is required")
@@ -124,6 +125,7 @@ export default function JobPostForm(props) {
   function handleUpload(file) {
     console.log("JobPostForm->handleUpload", file);
     setValue("companyLogo", file._id, { shouldValidate: true });
+    handleChange("logo", `${API_URL}/uploads/${file.url}`);
   }
 
   async function handlePostClick() {

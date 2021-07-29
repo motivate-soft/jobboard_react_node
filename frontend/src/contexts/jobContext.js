@@ -9,7 +9,7 @@ const defaultDiscountPercent = 5;
 const defaultBundleSize = 25;
 
 const initialJob = {
-  logo: "/images/sample_logo.png",
+  logo: null,
   companyName: "Company",
   position: "Position",
   primaryTag: null,
@@ -30,7 +30,7 @@ const initialJob = {
 };
 
 const initialJobBundle = {
-  logo: "/images/sample_logo.png",
+  logo: null,
   companyName: "Example Company",
   position: "Example Position",
   primaryTag: null,
@@ -102,6 +102,7 @@ function reducer(state, action) {
       return { ...initialJob, price: calculatePrice(initialJob) };
 
     case "UPDATE_JOB_DETAIL":
+      console.log(`UPDATE_JOB_DETAIL`, action.payload);
       return { ...state, ...action.payload };
 
     case "UPDATE_JOB_UPSELLS":
