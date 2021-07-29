@@ -77,10 +77,10 @@ module.exports.validate = (method) => {
       return [
         check("name", "company logo is required").not().isEmpty(),
         check("logo", "company logo is required").not().isEmpty(),
-        check("twitter", "company twitter is required").not().isEmpty().optional(),
+        check("twitter", "company twitter is required").optional(),
         check("email", "company email is required").not().isEmpty(),
-        check("invoiceAddress", "invoice address is required").not().isEmpty().optional(),
-        check("invoiceNotes", "invoice notes is required").not().isEmpty().optional(),
+        check("invoiceAddress", "invoice address is required").optional(),
+        check("invoiceNotes", "invoice notes is required").optional(),
       ];
     }
 

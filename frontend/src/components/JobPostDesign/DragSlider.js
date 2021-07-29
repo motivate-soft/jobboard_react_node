@@ -4,10 +4,11 @@ import { useJobPost } from "../../contexts/jobContext";
 const minBundleSize = 0;
 const maxBundleSize = 100;
 const step = 5;
+const defaultPricePerPost = 299;
 
 export default function DragSlider(props) {
   const { state, dispatch } = useJobPost();
-  const { pricePerPost, size, price, discountPercent } = state;
+  const { pricePerPost, size, discountPercent } = state;
 
   function handleChange(e) {
     dispatch({
@@ -33,16 +34,19 @@ export default function DragSlider(props) {
       />
       <h2 className="text-center text-2xl">
         <span className="line-through">
-          ${pricePerPost * size} for {size}
+          ${pricePerPost} for {size}
         </span>{" "}
         <span>
-          ${price} for {size} =
+          ${pricePerPost * (1 - discountPercent / 100)} for {size} =
         </span>{" "}
-        <span className="line-through">${price}</span>{" "}
-        <span>${price} per post</span>
+        <span className="line-through">${pricePerPost * size}</span>{" "}
+        <span>
+          ${pricePerPost * (1 - discountPercent / 100) * size} per post
+        </span>
       </h2>
       <h2 className="text-center text-3xl">
-        You save ${pricePerPost * size - price} ({discountPercent}% discount){" "}
+        You save ${pricePerPost * (discountPercent / 100) * size} (
+        {discountPercent}% discount){" "}
       </h2>
     </div>
   );

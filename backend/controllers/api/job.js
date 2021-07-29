@@ -19,69 +19,6 @@ const statusOptions = ["pending", "approved", "declined"];
 
 const { products } = nconf.get("stripe");
 
-async function getPriceItems(selectedProducts) {
-  let productsWithPrice = await getProductsAndPlans();
-  let pricingItems = [];
-
-  selectedProducts.map((item) => {
-    let productId = products[item];
-    let filteredProducts = productsWithPrice.filter(
-      (product) => product.id === productId
-    );
-    let priceId = filteredProducts[0].prices[0].id;
-    console.log("getPriceItems->filteredProducts->priceId", priceId);
-    pricingItems.push(priceId);
-  });
-  logger.info("getPriceItems->pricingItems");
-  logger.info(pricingItems);
-  console.log("getPriceItems->pricingItems", pricingItems);
-
-  return pricingItems;
-}
-
-async function createSubscription(job, paymentMethodId) {
-  let productsArray = [
-    "showLogo",
-    "blastEmail",
-    "highlight",
-    "highlightColor",
-  ].filter((field) => job[field] === true);
-  productsArray.push("singlePost");
-
-  if (job.stickyDuration) {
-    switch (job.stickyDuration) {
-      case "day":
-        productsArray.push("stickyDay");
-        break;
-      case "week":
-        productsArray.push("stickyWeek");
-        break;
-      case "month":
-        productsArray.push("stickyMonth");
-        break;
-      default:
-        break;
-    }
-  }
-  logger.info("createSubscription->productsArray");
-  logger.info(productsArray);
-
-  let customer = await Company.findById(job.company);
-  let pricingItems = await getPriceItems(productsArray);
-  logger.info("createSubscription->customer");
-  logger.info(customer);
-
-  let response = await createCustomerAndSubscription(
-    paymentMethodId,
-    customer,
-    pricingItems
-  );
-
-  logger.info("createSubscription->createCustomerAndSubscription");
-  logger.info(response);
-  return response;
-}
-
 // user
 exports.listing = async function (req, res) {
   const pageSize = Number(req.query.limit) || 10;
@@ -417,9 +354,7 @@ exports.create = async function (req, res) {
       return handleError(res, req, 400, errors.array(), "invalidData");
     }
 
-    const { paymentMethodId, ...jobData } = req.body;
-
-    job = new Job(jobData);
+    job = new Job(req.body);
 
     let newJob = await job.save();
 
@@ -428,8 +363,6 @@ exports.create = async function (req, res) {
       logger.debug(message);
       return handleError(res, req, 400, message);
     }
-
-    await createSubscription(newJob, paymentMethodId);
 
     return res.status(200).json(newJob);
   } catch (err) {

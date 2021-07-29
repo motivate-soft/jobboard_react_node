@@ -4,7 +4,11 @@ const { validate } = require("../../middleware/validator");
 const path = require("path");
 const logger = require("../../helpers/logger");
 const { v4: uuidv4 } = require("uuid");
-const { createCoupon, createPromoCode, retrievePromoCode } = require("./stripe");
+const {
+  createCoupon,
+  createPromoCode,
+  retrievePromoCode,
+} = require("./stripe");
 const { handleError } = require("../../helpers/handlers");
 
 const storage = multer.diskStorage({
@@ -185,36 +189,46 @@ module.exports = function (middleware, router, controllers) {
   /**
    *  Stripe api
    */
-  router.get("/api/stripe/coupon", async function (req, res) {
-    try {
-      const response = await createCoupon(5, 10);
-      console.log("route->createCoupon->res", response);
-      return res.json(response);
-    } catch (error) {
-      console.log("route->createCoupon->error", error);
-      handleError(res, req, 500, error);
-    }
-  });
+  router.post(
+    "/api/stripe/create-payment-intent",
+    apiCtrl.stripe.createPaymentIntent
+  );
+  router.post("/api/stripe/create-promocode", apiCtrl.stripe.createPromoCode);
+  router.post(
+    "/api/stripe/create-subscription",
+    apiCtrl.stripe.createCustomerAndSubscription
+  );
 
-  router.get("/api/stripe/promo", async function (req, res) {
-    try {
-      const response = await createPromoCode("post-discount");
-      console.log("route->createPromoCode->res", response);
-      return res.json(response);
-    } catch (error) {
-      console.log("route->createPromoCode->error", error);
-      handleError(res, req, 500, error);
-    }
-  });
+  // router.get("/api/stripe/coupon", async function (req, res) {
+  //   try {
+  //     const response = await createCoupon(5, 10);
+  //     console.log("route->createCoupon->res", response);
+  //     return res.json(response);
+  //   } catch (error) {
+  //     console.log("route->createCoupon->error", error);
+  //     handleError(res, req, 500, error);
+  //   }
+  // });
 
-  router.get("/api/stripe/promo/:code", async function (req, res) {
-    try {
-      const response = await retrievePromoCode(req.params.code);
-      console.log("route->retrievePromoCode->res", response);
-      return res.json(response);
-    } catch (error) {
-      console.log("route->retrievePromoCode->error", error);
-      handleError(res, req, 500, error);
-    }
-  });
+  // router.get("/api/stripe/promo", async function (req, res) {
+  //   try {
+  //     const response = await createPromoCode("post-discount");
+  //     console.log("route->createPromoCode->res", response);
+  //     return res.json(response);
+  //   } catch (error) {
+  //     console.log("route->createPromoCode->error", error);
+  //     handleError(res, req, 500, error);
+  //   }
+  // });
+
+  // router.get("/api/stripe/promo/:code", async function (req, res) {
+  //   try {
+  //     const response = await retrievePromoCode(req.params.code);
+  //     console.log("route->retrievePromoCode->res", response);
+  //     return res.json(response);
+  //   } catch (error) {
+  //     console.log("route->retrievePromoCode->error", error);
+  //     handleError(res, req, 500, error);
+  //   }
+  // });
 };

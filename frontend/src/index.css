@@ -109,18 +109,18 @@
     @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
   }
   .btn-indigo {
-    @apply inline-flex px-4 py-2 font-sans justify-center border  border-none shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none;
+    @apply inline-flex px-4 py-2 font-sans justify-center border  border-none shadow-sm text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none disabled:opacity-50;
     /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
   }
   .btn-indigo-outlined {
-    @apply inline-flex px-4 py-2 font-sans justify-center border  border-indigo-500 shadow-sm text-lg font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none;
+    @apply inline-flex px-4 py-2 font-sans justify-center border  border-indigo-500 shadow-sm text-lg font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none disabled:opacity-50;
     /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
   }
   .btn-indigo-sm {
-    @apply inline-flex px-2 py-1 font-sans justify-center border  border-none shadow-sm text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none;
+    @apply inline-flex px-2 py-1 font-sans justify-center border  border-none shadow-sm text-base font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none disabled:opacity-50;
   }
   .btn-indigo-outlined-sm {
-    @apply inline-flex px-2 py-1 font-sans justify-center border border-indigo-500 shadow-sm text-base font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none;
+    @apply inline-flex px-2 py-1 font-sans justify-center border border-indigo-500 shadow-sm text-base font-medium rounded-md text-indigo-500 bg-white hover:text-indigo-700 hover:bg-gray-200 focus:outline-none disabled:opacity-50;
     /* focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 */
   }
 
@@ -169,7 +169,7 @@ input[type="range"]::-webkit-slider-thumb {
   margin-top: -14px;
 }
 input[type="range"]:focus::-webkit-slider-runnable-track {
-  background: #6366f1;
+  /* background: #6366f1; */
 }
 input[type="range"]::-moz-range-track {
   width: 100%;
