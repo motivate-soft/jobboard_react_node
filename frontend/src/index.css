@@ -234,11 +234,18 @@ input[type="range"]:focus::-ms-fill-upper {
   min-height: 200px;
 }
 
-/* dropzone */
+/* react-dropzone-component */
 .filepicker.dropzone {
   border-style: dashed;
   border-color: #e5e7eb;
   border-width: 2px;
   border-radius: 8px;
   /* border-2 border-gray-300 border-dashed rounded-md */
+}
+/* react-dropzone */
+.dz-message{
+  border-style: dashed;
+  border-color: #e5e7eb;
+  border-width: 2px;
+  border-radius: 8px;
 }

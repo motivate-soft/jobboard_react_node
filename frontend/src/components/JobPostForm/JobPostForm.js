@@ -5,7 +5,7 @@ import { XIcon } from "@heroicons/react/outline";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import DropzoneUploader from "../Shared/DropzoneUploader/DropzoneUploader";
+import Uploader from "../Shared/DropzoneUploader/Uploader";
 import Editor from "../Shared/MDEditor/Editor";
 import JobPostDesign from "../JobPostDesign/JobPostDesign";
 import { useJobPost } from "../../contexts/jobContext";
@@ -21,6 +21,7 @@ import { useStripe } from "@stripe/react-stripe-js";
 import paymentApi from "../../service/paymentApi";
 import Spinner from "../Shared/Loader/Spinner";
 import { API_URL } from "../../env-config";
+import mediaApi from "../../service/mediaApi";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -76,7 +77,7 @@ export default function JobPostForm(props) {
         otherwise: Yup.string().notRequired(),
       }),
 
-      companyLogo: Yup.string().required("This field is required"),
+      companyLogo: Yup.object().required("This field is required"), // media obj
       companyTwitter: Yup.string(),
       companyEmail: Yup.string().email().required("This field is required"),
       invoiceAddress: Yup.string(),
@@ -95,10 +96,12 @@ export default function JobPostForm(props) {
     handleSubmit,
     trigger,
     setValue,
+    watch,
     control,
     formState,
   } = useForm(formOptions);
   const { errors, isValid } = formState;
+  const watchCompanyLogoUrl = watch("companyLogo.url", null);
 
   useEffect(() => {
     dispatch({
@@ -135,10 +138,28 @@ export default function JobPostForm(props) {
     }
   }
 
-  function handleUpload(file) {
-    console.log("JobPostForm->handleUpload", file);
-    setValue("companyLogo", file._id, { shouldValidate: true });
-    handleChange("logo", `${API_URL}/uploads/${file.url}`);
+  async function handleUpload(selectedFiles) {
+    console.log(`handleUpload->files`, selectedFiles);
+    if (selectedFiles[0].size > 1024 * 1024 * 10) {
+      alert("You can only upload files smaller than 10MB.");
+      return;
+    }
+
+    if (selectedFiles[0].type.indexOf("image") === -1) {
+      alert("You can only upload image files.");
+      return;
+    }
+
+    const body = new FormData();
+    body.append("file", selectedFiles[0]);
+    try {
+      const { data } = await mediaApi.create(body);
+      console.log("handleUpload->mediaApi->create:res", data);
+      setValue("companyLogo", data, { shouldValidate: true });
+      handleChange("logo", `${API_URL}/uploads/${data.url}`);
+    } catch (error) {
+      console.log("handleUpload->mediaApi->create:error", error);
+    }
   }
 
   async function handlePostClick() {
@@ -208,7 +229,7 @@ export default function JobPostForm(props) {
       let company, job, response;
       company = {
         name: formData.companyName,
-        logo: formData.companyLogo,
+        logo: formData.companyLogo._id,
         twitter: formData.companyTwitter,
         email: formData.companyEmail,
         invoiceAddress: formData.invoiceAddress,
@@ -414,19 +435,24 @@ export default function JobPostForm(props) {
                   Company logo <br /> (.jpg or .png)
                 </label>
               </div>
-              <input
-                {...register("companyLogo")}
-                id="companyLogo"
-                name="companyLogo"
-                type="text"
-                className="sr-only"
-              />
+
               <div className="col-span-2">
-                <div className="flex flex-col">
-                  <DropzoneUploader onUpload={handleUpload} />
-                  <span className="span-error">
-                    {errors.companyLogo?.message}
-                  </span>
+                <div className="grid grid-cols-4 gap-4">
+                  {watchCompanyLogoUrl && (
+                    <div>
+                      <img
+                        src={`${API_URL}/uploads/${watchCompanyLogoUrl}`}
+                        alt="company logo"
+                        className="w-full border-2 border-gray-200 rounded-lg"
+                      />
+                    </div>
+                  )}
+                  <div className="col-span-3">
+                    <Uploader onAddFiles={handleUpload} />
+                    <span className="span-error">
+                      {errors.companyLogo?.message}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

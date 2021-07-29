@@ -5,14 +5,14 @@ import { XIcon } from "@heroicons/react/outline";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import DropzoneUploader from "../../Shared/DropzoneUploader/DropzoneUploader";
+import Uploader from "../../Shared/DropzoneUploader/Uploader";
 import Editor from "../../Shared/MDEditor/Editor";
 import companyApi from "../../../service/companyApi";
 import jobApi from "../../../service/jobApi";
 import { toast } from "react-toastify";
 import classNames from "classnames";
-
-const baseUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+import mediaApi from "../../../service/mediaApi";
+import { API_URL } from "../../../env-config";
 
 const salaryOptions = Array(20)
   .fill(null)
@@ -72,10 +72,10 @@ export default function EditJob(props) {
       }),
 
       companyLogo: Yup.object().required("This field is required"), // media obj
-      companyTwitter: Yup.string().required("This field is required"),
+      companyTwitter: Yup.string().optional(),
       companyEmail: Yup.string().required("This field is required"),
-      invoiceAddress: Yup.string().required("This field is required"),
-      invoiceNotes: Yup.string().required("This field is required"),
+      invoiceAddress: Yup.string().optional(),
+      invoiceNotes: Yup.string().optional(),
 
       showLogo: Yup.bool().required("This field is required"),
       blastEmail: Yup.bool().required("This field is required"),
@@ -174,6 +174,29 @@ export default function EditJob(props) {
   function handleUpload(file) {
     console.log("handleUpload", file);
     setValue("companyLogo", file, { shouldValidate: true });
+  }
+
+  async function handleUpload(selectedFiles) {
+    console.log(`handleUpload->files`, selectedFiles);
+    if (selectedFiles[0].size > 1024 * 1024 * 10) {
+      alert("You can only upload files smaller than 10MB.");
+      return;
+    }
+
+    if (selectedFiles[0].type.indexOf("image") === -1) {
+      alert("You can only upload image files.");
+      return;
+    }
+
+    const body = new FormData();
+    body.append("file", selectedFiles[0]);
+    try {
+      const { data } = await mediaApi.create(body);
+      console.log("handleUpload->mediaApi->create:res", data);
+      setValue("companyLogo", data, { shouldValidate: true });
+    } catch (error) {
+      console.log("handleUpload->mediaApi->create:error", error);
+    }
   }
 
   function handleHighlightChange(e) {
@@ -362,26 +385,19 @@ export default function EditJob(props) {
                 Company logo <br /> (.jpg or .png)
               </label>
             </div>
-            <input
-              {...register("companyLogo")}
-              id="companyLogo"
-              name="companyLogo"
-              type="text"
-              className="sr-only"
-            />
             <div className="col-span-2">
               <div className="flex flex-col">
                 <div className="p-4">
                   {watchCompanyLogoUrl && (
                     <img
-                      src={`${baseUrl}/uploads/${watchCompanyLogoUrl}`}
+                      src={`${API_URL}/uploads/${watchCompanyLogoUrl}`}
                       alt="company logo"
                       className="w-full border-2 border-gray-200 rounded-lg"
                     />
                   )}
                 </div>
 
-                <DropzoneUploader onUpload={handleUpload} />
+                <Uploader onAddFiles={handleUpload} />
                 <span className="mt-2 text-xs text-pink-500">
                   {errors.companyLogo?.message}
                 </span>
