@@ -28,7 +28,7 @@ if (!process.env.FORK) {
 }
 
 function start() {
-  var _db = require("./database");
+  let _db = require("./database");
 
   _db.init(function (err, db) {
     if (err) {
@@ -40,7 +40,7 @@ function start() {
 }
 
 function launchServer(db) {
-  require("./config/index");
+  require("./config");
   app.use(cors());
   app.use(passport.initialize());
 
@@ -57,11 +57,25 @@ function launchServer(db) {
   require("./config/passport");
   routes(app, middleware);
 
-  var port = nconf.get("serverPort") || 5000;
+  let port = nconf.get("serverPort") || 5000;
 
-  app.listen(port, () => {
-    logger.info(`Jobboard API is running on port ${port}`);
-  });
+  const serverInstance = app
+    .listen(port, () => {
+      logger.info(`Jobboard API is running on port ${port}`);
+    })
+    .on("error", function (err) {
+      if (err.errno === "EADDRINUSE") {
+        logger.error(
+          `----- Port ${port} is busy, trying with port ${port + 1} -----`
+        );
+        port += 1;
+        serverInstance.listen(port);
+      } else {
+        logger.error(err);
+      }
+    });
+
+  return serverInstance;
 }
 
 start();
