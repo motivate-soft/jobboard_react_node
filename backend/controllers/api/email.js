@@ -15,10 +15,10 @@ exports.newsletter = async (req, res) => {
     await addEmailToList(email);
     res.status(200).json({
       success: true,
-      message: "You have successfully subscribed to the newsletter",
+      message: "subscribed to the newsletter successfully",
     });
   } catch (error) {
     logger.error(error);
-    handleError(res, req, 500, "server error");
+    handleError(res, req, 500, error.message);
   }
 };

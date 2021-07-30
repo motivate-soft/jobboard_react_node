@@ -133,7 +133,7 @@ export default function SubscriptionForm() {
       //     "Content-Type": "application/json",
       //     authorization:
       //       "Bearer " +
-      //       "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",
+      //       "SENDGRID_KEY",
       //   },
       // });
 
@@ -150,7 +150,7 @@ export default function SubscriptionForm() {
       //       "Content-Type": "application/json",
       //       authorization:
       //         "Bearer " +
-      //         "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",
+      //         "SENDGRID_KEY",
       //     },
       //   }
       // );
@@ -175,15 +175,15 @@ export default function SubscriptionForm() {
       //       "Content-Type": "application/json",
       //       authorization:
       //         "Bearer " +
-      //         "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",
+      //         "SENDGRID_KEY",
       //     },
       //   }
       // );
 
       const res = await mailApi.newsletter({ email });
       console.log("Footer->SubscriptionForm", res);
-      if (res.sucess) {
-        toast.success(res.message);
+      if (res.status === 200) {
+        toast.success(res.data.message);
       }
     } catch (error) {
       console.log("error", error);
